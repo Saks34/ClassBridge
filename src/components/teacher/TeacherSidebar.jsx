@@ -1,5 +1,5 @@
 import { NavLink } from 'react-router-dom';
-import { BookOpen, Calendar, FileText, GraduationCap } from 'lucide-react';
+import { BookOpen, Calendar, FileText, GraduationCap, Video } from 'lucide-react';
 import { useTheme } from '../../context/ThemeContext';
 
 export default function TeacherSidebar() {
@@ -9,6 +9,7 @@ export default function TeacherSidebar() {
         { path: '/teacher/dashboard', label: 'Dashboard', icon: BookOpen, gradient: 'from-blue-500 to-cyan-500' },
         { path: '/teacher/timetable', label: 'Timetable', icon: Calendar, gradient: 'from-violet-500 to-purple-500' },
         { path: '/teacher/notes', label: 'My Notes', icon: FileText, gradient: 'from-rose-500 to-pink-500' },
+        { path: '/teacher/library', label: 'Recordings', icon: Video, gradient: 'from-orange-500 to-amber-500' },
     ];
 
     return (

@@ -52,7 +52,7 @@ export default function Dashboard() {
 
       const teachersData = teachersRes.data.staff || [];
       const studentsData = studentsRes.data.staff || [];
-      const batchesData = batchesRes.data.batches || [];
+      const batchesData = batchesRes.data.data?.batches || [];
       const allSlots = timetableRes.data.slots || [];
 
       setBatches(batchesData);

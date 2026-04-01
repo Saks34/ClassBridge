@@ -7,6 +7,7 @@ import ChatPanel from '../../components/student/ChatPanel';
 import { useAuth } from '../../context/AuthContext';
 import CustomYouTubePlayer from '../../components/shared/CustomYouTubePlayer';
 import CommentSection from '../../components/student/CommentSection';
+import QAPanel from '../../components/shared/QAPanel';
 import usePageTitle from '../../hooks/usePageTitle';
 import {
     Video,
@@ -16,7 +17,10 @@ import {
     MessageCircle,
     FileText,
     Radio,
-    ArrowLeft
+    ArrowLeft,
+    HelpCircle,
+    Users,
+    Hand
 } from 'lucide-react';
 
 export default function StudentClassDetail() {
@@ -28,7 +32,11 @@ export default function StudentClassDetail() {
     const [classData, setClassData] = useState(null);
     const [notes, setNotes] = useState([]);
     const [error, setError] = useState(null);
+    const [rightPanelTab, setRightPanelTab] = useState('chat'); // 'chat' or 'qa'
+    const [viewerCount, setViewerCount] = useState(0);
+    const [hasRaisedHand, setHasRaisedHand] = useState(false);
     const { user } = useAuth();
+    const socketRef = useRef(null);
 
     usePageTitle(classData?.subject || 'Class Detail', 'Student');
 
@@ -86,6 +94,22 @@ export default function StudentClassDetail() {
             console.log('Class ended');
             setClassData(prev => ({ ...prev, status: 'Completed', streamInfo: { ...prev.streamInfo, broadcastId: null } }));
         });
+
+        socket.on('viewer-count', ({ count }) => {
+            setViewerCount(count);
+        });
+
+        socket.on('handraise-history', ({ queue }) => {
+            const userId = user?._id || user?.sub;
+            const alreadyIn = queue.some(item => String(item.userId) === String(userId));
+            setHasRaisedHand(alreadyIn);
+        });
+
+        socket.on('handraise:cleared', () => {
+            setHasRaisedHand(false);
+        });
+
+        socketRef.current = socket;
 
         return () => {
             socket.disconnect();
@@ -163,9 +187,15 @@ export default function StudentClassDetail() {
 
                             {/* Status Overlay */}
                             {classData.status === 'Live' && (
-                                <div className="absolute top-4 right-4 z-20 flex items-center gap-2 px-3 py-1.5 bg-red-600 text-white rounded-sm text-xs font-bold shadow-xl animate-pulse pointer-events-none">
-                                    <span className="w-1.5 h-1.5 bg-white rounded-full animate-ping"></span>
-                                    <span>LIVE</span>
+                                <div className="absolute top-4 right-4 z-20 flex items-center gap-3">
+                                    <div className="flex items-center gap-2 px-3 py-1.5 bg-red-600 text-white rounded-sm text-xs font-bold shadow-xl animate-pulse cursor-default">
+                                        <span className="w-1.5 h-1.5 bg-white rounded-full animate-ping"></span>
+                                        <span>LIVE</span>
+                                    </div>
+                                    <div className="flex items-center gap-1.5 px-3 py-1.5 bg-black/60 backdrop-blur-md text-white rounded-sm text-xs font-bold border border-white/10">
+                                        <Users className="w-3.5 h-3.5" />
+                                        <span>{viewerCount}</span>
+                                    </div>
                                 </div>
                             )}
                             {classData.status === 'Completed' && (
@@ -245,7 +275,50 @@ export default function StudentClassDetail() {
                                 </div>
                             ) : (
                                 <div className="absolute inset-0 flex flex-col bg-[#212121]">
-                                    <ChatPanel liveClassId={id} />
+                                    {/* Tabs inside panel logic if we want, or just switch */}
+                                    <div className="flex border-b border-[#303030] sticky top-0 bg-[#212121] z-10">
+                                        <button 
+                                            onClick={() => setRightPanelTab('chat')}
+                                            className={`flex-1 py-3 text-xs font-bold transition flex items-center justify-center gap-2 ${
+                                                rightPanelTab === 'chat' ? 'text-[#3ea6ff] border-b-2 border-[#3ea6ff] bg-white/5' : 'text-gray-500 hover:text-white'
+                                            }`}
+                                        >
+                                            <MessageCircle className="w-3.5 h-3.5" />
+                                            CHAT
+                                        </button>
+                                        <button 
+                                            onClick={() => setRightPanelTab('qa')}
+                                            className={`flex-1 py-3 text-xs font-bold transition flex items-center justify-center gap-2 ${
+                                                rightPanelTab === 'qa' ? 'text-[#3ea6ff] border-b-2 border-[#3ea6ff] bg-white/5' : 'text-gray-500 hover:text-white'
+                                            }`}
+                                        >
+                                            <HelpCircle className="w-3.5 h-3.5" />
+                                            Q&A
+                                        </button>
+                                        <button 
+                                            onClick={() => {
+                                                if (!hasRaisedHand) {
+                                                    socketRef.current?.emit('handraise:request', { liveClassId: id }, (ack) => {
+                                                        if (ack?.ok) setHasRaisedHand(true);
+                                                    });
+                                                }
+                                            }}
+                                            disabled={hasRaisedHand}
+                                            className={`flex-1 py-3 text-xs font-bold transition flex items-center justify-center gap-2 ${
+                                                hasRaisedHand ? 'text-orange-500 bg-orange-500/10 cursor-default' : 'text-gray-500 hover:text-white'
+                                            }`}
+                                        >
+                                            <Hand className={`w-3.5 h-3.5 ${hasRaisedHand ? 'fill-orange-500' : ''}`} />
+                                            {hasRaisedHand ? 'HAND RAISED' : 'RAISE HAND'}
+                                        </button>
+                                    </div>
+                                    <div className="flex-1 overflow-hidden relative">
+                                        {rightPanelTab === 'chat' ? (
+                                            <ChatPanel liveClassId={id} />
+                                        ) : (
+                                            <QAPanel liveClassId={id} />
+                                        )}
+                                    </div>
                                 </div>
                             )}
                         </div>

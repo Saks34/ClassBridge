@@ -1,5 +1,5 @@
 import { NavLink } from 'react-router-dom';
-import { BookOpen, Home, Calendar, FileText, GraduationCap } from 'lucide-react';
+import { BookOpen, Home, Calendar, FileText, GraduationCap, Video } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { useTheme } from '../../context/ThemeContext';
 
@@ -11,6 +11,7 @@ export default function StudentSidebar() {
         { to: '/student/dashboard', icon: Home, label: 'Dashboard', gradient: 'from-blue-500 to-cyan-500' },
         { to: '/student/timetable', icon: Calendar, label: 'Timetable', gradient: 'from-violet-500 to-purple-500' },
         { to: '/student/notes', icon: FileText, label: 'Notes', gradient: 'from-rose-500 to-pink-500' },
+        { to: '/student/library', icon: Video, label: 'Recordings', gradient: 'from-orange-500 to-amber-500' },
     ];
 
     return (

@@ -2,6 +2,7 @@ import { useAuth } from '../../context/AuthContext';
 import { useTheme } from '../../context/ThemeContext';
 import { Sun, Moon, LogOut, Bell, Search } from 'lucide-react';
 import { useState } from 'react';
+import NotificationDropdown from '../shared/NotificationDropdown';
 
 export default function StudentTopBar() {
     const { user, logout } = useAuth();
@@ -53,10 +54,7 @@ export default function StudentTopBar() {
                         {isDark ? <Sun size={18} /> : <Moon size={18} />}
                     </button>
 
-                    <button className={`relative p-2 rounded-xl transition-all ${isDark ? 'bg-white/5 hover:bg-white/10 text-gray-400' : 'bg-gray-100 hover:bg-gray-200 text-gray-600'}`}>
-                        <Bell size={18} />
-                        <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-red-500 rounded-full"></span>
-                    </button>
+                    <NotificationDropdown />
 
                     <div className={`h-6 w-px mx-1 ${isDark ? 'bg-white/10' : 'bg-gray-200'}`}></div>
 

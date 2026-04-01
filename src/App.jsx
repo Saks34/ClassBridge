@@ -10,6 +10,7 @@ import { ThemeProvider } from './context/ThemeContext.jsx'
 import ErrorBoundary from './components/shared/ErrorBoundary.jsx'
 import InstitutionSignup from './pages/InstitutionSignup.jsx'
 import ChangePassword from './pages/ChangePassword.jsx'
+import VODLibrary from './pages/shared/VODLibrary.jsx'
 
 // Admin components
 import AdminLayout from './components/admin/AdminLayout.jsx'
@@ -79,6 +80,7 @@ export default function App() {
                 <Route path="dashboard" element={<TeacherDashboard />} />
                 <Route path="notes" element={<TeacherNotes />} />
                 <Route path="timetable" element={<TeacherTimetable />} />
+                <Route path="library" element={<VODLibrary />} />
               </Route>
               {/* Full Screen Live Class Control */}
               <Route path="/teacher/class/:id" element={<TeacherClassDetail />} />
@@ -90,6 +92,7 @@ export default function App() {
                 <Route path="dashboard" element={<StudentDashboard />} />
                 <Route path="notes" element={<StudentNotes />} />
                 <Route path="timetable" element={<StudentTimetable />} />
+                <Route path="library" element={<VODLibrary />} />
               </Route>
               <Route path="/student/class/:id" element={<StudentClassDetail />} />
             </Route>

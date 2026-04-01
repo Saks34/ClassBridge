@@ -5,7 +5,7 @@ import ClassCard from '../../components/student/ClassCard';
 import { useAuth } from '../../context/AuthContext';
 import { useTheme } from '../../context/ThemeContext';
 import usePageTitle from '../../hooks/usePageTitle';
-import { Calendar, BookOpen, Clock, Zap } from 'lucide-react';
+import { Calendar, BookOpen, Clock, Zap, Video, Award } from 'lucide-react';
 
 function todayISODate() {
   const d = new Date();
@@ -22,9 +22,11 @@ export default function StudentDashboard() {
   const [todayClasses, setTodayClasses] = useState([]);
   const [error, setError] = useState(null);
   const { user } = useAuth();
+  const [watchHistory, setWatchHistory] = useState([]);
 
   useEffect(() => {
     loadTodayClasses();
+    loadWatchStats();
   }, []);
 
   const loadTodayClasses = async () => {
@@ -57,6 +59,15 @@ export default function StudentDashboard() {
     }
   };
 
+  const loadWatchStats = async () => {
+    try {
+      const { data } = await api.get('/watch-history/me');
+      setWatchHistory(data || []);
+    } catch (e) {
+      console.error('Failed to load watch history');
+    }
+  };
+
   const liveClasses = todayClasses.filter(c => c.status === 'Live' || c.liveClass?.status === 'Live');
 
   if (loading) return <LoadingSpinner centered />;
@@ -65,6 +76,8 @@ export default function StudentDashboard() {
     { icon: BookOpen, label: "Today's Classes", value: todayClasses.length, gradient: 'from-blue-500 to-cyan-500' },
     { icon: Zap, label: 'Live Now', value: liveClasses.length, gradient: 'from-rose-500 to-pink-500', pulse: liveClasses.length > 0 },
     { icon: Clock, label: 'Upcoming', value: todayClasses.filter(c => c.status === 'Scheduled').length, gradient: 'from-violet-500 to-purple-500' },
+    { icon: Video, label: 'Attended', value: watchHistory.length, gradient: 'from-orange-500 to-amber-500' },
+    { icon: Award, label: 'Study Hours', value: (watchHistory.reduce((acc, curr) => acc + (curr.lastPosition || 0), 0) / 3600).toFixed(1), gradient: 'from-emerald-500 to-teal-500' },
   ];
 
   return (
@@ -87,7 +100,7 @@ export default function StudentDashboard() {
           </p>
 
           {/* Stats */}
-          <div className="grid grid-cols-3 gap-3 mt-5">
+          <div className="grid grid-cols-2 md:grid-cols-5 gap-3 mt-5">
             {statsCards.map((stat, i) => {
               const Icon = stat.icon;
               return (

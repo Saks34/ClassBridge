@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useTheme } from '../../context/ThemeContext';
 import { Bell, AlertTriangle, Calendar, Clock, CheckCircle } from 'lucide-react';
+import api from '../../services/api';
 
 export default function Notifications() {
     const { isDark } = useTheme();
@@ -17,33 +18,18 @@ export default function Notifications() {
 
     const loadNotifications = async () => {
         try {
-            // Mock data for now
-            setNotifications([
-                {
-                    id: 1,
-                    title: 'Class Cancelled',
-                    message: 'Mathematics class for Batch A has been cancelled.',
-                    timestamp: new Date().toISOString(),
-                    type: 'class_cancelled',
-                },
-                {
-                    id: 2,
-                    title: 'New Teacher Joined',
-                    message: 'Sarah Johnson has joined as a Physics teacher.',
-                    timestamp: new Date(Date.now() - 3600000).toISOString(),
-                    type: 'teacher_joined',
-                },
-                {
-                    id: 3,
-                    title: 'System Update',
-                    message: 'System maintenance scheduled for Sunday at 2 AM.',
-                    timestamp: new Date(Date.now() - 86400000).toISOString(),
-                    type: 'system',
-                }
-            ]);
+            const { data } = await api.get('/notifications');
+            setNotifications(data || []);
         } catch (error) {
             console.error('Failed to load notifications:', error);
         }
+    };
+
+    const markAsRead = async (id) => {
+        try {
+            await api.patch(`/notifications/${id}/read`);
+            setNotifications(prev => prev.map(n => n._id === id ? { ...n, read: true } : n));
+        } catch (e) { console.error(e); }
     };
 
     const formatTimestamp = (timestamp) => {
@@ -88,17 +74,24 @@ export default function Notifications() {
                 <div className={`${cardBg} border rounded-2xl overflow-hidden shadow-xl`}>
                     <div className="divide-y divide-white/5">
                         {notifications.map((notification) => (
-                            <div key={notification.id} className={`p-6 ${itemHoverBg} transition-all cursor-pointer group`}>
+                            <div 
+                                key={notification._id} 
+                                onClick={() => !notification.read && markAsRead(notification._id)}
+                                className={`p-6 ${itemHoverBg} transition-all cursor-pointer group ${!notification.read ? 'bg-blue-500/5' : ''}`}
+                            >
                                 <div className="flex items-start gap-4">
-                                    <div className={`mt-1 p-3 rounded-xl ${isDark ? 'bg-white/5' : 'bg-gray-100'} group-hover:scale-110 transition-transform shadow-inner`}>
+                                    <div className={`mt-1 p-3 rounded-xl ${isDark ? 'bg-white/5' : 'bg-gray-100'} group-hover:scale-110 transition-transform shadow-inner relative`}>
                                         {getIcon(notification.type)}
+                                        {!notification.read && (
+                                            <span className="absolute -top-1 -right-1 w-3 h-3 bg-blue-500 rounded-full border-2 border-gray-900 animate-pulse"></span>
+                                        )}
                                     </div>
                                     <div className="flex-1">
                                         <div className="flex items-center justify-between mb-1">
-                                            <h4 className={`text-base font-bold ${textPrimary}`}>{notification.title}</h4>
+                                            <h4 className={`text-base font-bold ${textPrimary} ${!notification.read ? 'text-blue-400' : ''}`}>{notification.title}</h4>
                                             <div className={`flex items-center gap-1.5 text-xs ${textSecondary} px-2 py-1 rounded-full ${isDark ? 'bg-white/5' : 'bg-gray-100'}`}>
                                                 <Clock size={12} />
-                                                <span>{formatTimestamp(notification.timestamp)}</span>
+                                                <span>{formatTimestamp(notification.timestamp || notification.createdAt)}</span>
                                             </div>
                                         </div>
                                         <p className={`${textSecondary} text-sm leading-relaxed`}>{notification.message}</p>

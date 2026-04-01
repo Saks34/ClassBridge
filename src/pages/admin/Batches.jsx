@@ -55,7 +55,8 @@ export default function Batches() {
         setLoading(true);
         try {
             const { data } = await api.get('/batches');
-            setBatches(data.batches || []);
+            // The backend returns { status, message, data: { batches } }
+            setBatches(data.data?.batches || []);
         } catch (error) {
             console.error('Failed to load batches:', error);
             toast.error(error?.response?.data?.message || 'Failed to load batches');

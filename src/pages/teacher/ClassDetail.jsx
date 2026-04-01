@@ -31,7 +31,9 @@ import {
     Activity,
     Wifi,
     Signal,
-    ArrowLeft
+    ArrowLeft,
+    HelpCircle,
+    Hand
 } from 'lucide-react';
 import toast from 'react-hot-toast';
 
@@ -42,6 +44,7 @@ import LoadingSpinner from '../../components/shared/LoadingSpinner';
 import ChatPanel from '../../components/teacher/ChatPanel';
 import CommentSection from '../../components/student/CommentSection';
 import CustomYouTubePlayer from '../../components/shared/CustomYouTubePlayer';
+import QAPanel from '../../components/shared/QAPanel';
 
 export default function TeacherClassControl() {
     const { id: liveClassId } = useParams();
@@ -53,6 +56,8 @@ export default function TeacherClassControl() {
     const [classData, setClassData] = useState(null);
     const [activeTab, setActiveTab] = useState('stream');
     const [viewerCount, setViewerCount] = useState(0);
+    const [handRaises, setHandRaises] = useState([]);
+    const [rightPanelTab, setRightPanelTab] = useState('chat'); // 'chat' or 'qa'
 
     // Stream Setup State
     const [streamKey, setStreamKey] = useState('');
@@ -70,6 +75,7 @@ export default function TeacherClassControl() {
     const [loadingNotes, setLoadingNotes] = useState(false);
 
     const playerRef = useRef(null);
+    const socketRef = useRef(null);
 
     const handleJumpToLive = () => {
         if (playerRef.current) {
@@ -115,6 +121,21 @@ export default function TeacherClassControl() {
         socket.on('viewer-count', ({ count }) => {
             setViewerCount(count);
         });
+
+        socket.on('handraise-history', ({ queue }) => {
+            setHandRaises(queue || []);
+        });
+
+        socket.on('handraise:new', (entry) => {
+            setHandRaises(prev => [...prev, entry]);
+            toast(`${entry.name} raised their hand!`, { icon: '✋' });
+        });
+
+        socket.on('handraise:cleared', () => {
+            setHandRaises([]);
+        });
+
+        socketRef.current = socket;
 
         return () => {
             socket.disconnect();
@@ -453,6 +474,23 @@ export default function TeacherClassControl() {
                                             <Users className="w-4 h-4" />
                                             {viewerCount} students
                                         </span>
+                                        {handRaises.length > 0 && (
+                                            <>
+                                                <span className={isDark ? 'text-gray-600' : 'text-gray-400'}>•</span>
+                                                <div className="flex items-center gap-2">
+                                                    <span className="flex items-center gap-1.5 text-orange-500 font-bold animate-pulse">
+                                                        <Hand className="w-4 h-4" />
+                                                        {handRaises.length} Raised Hands
+                                                    </span>
+                                                    <button 
+                                                        onClick={() => socketRef.current?.emit('handraise:clear', { liveClassId: classData._id })}
+                                                        className="text-[10px] uppercase tracking-wider text-gray-500 hover:text-white underline underline-offset-2"
+                                                    >
+                                                        Clear
+                                                    </button>
+                                                </div>
+                                            </>
+                                        )}
                                     </div>
                                     <span className={`text-sm ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>
                                         {new Date().toLocaleDateString()}
@@ -507,13 +545,39 @@ export default function TeacherClassControl() {
 
                     {/* Right Sidebar - Chat */}
                     <div className="col-span-12 lg:col-span-3">
-                        <div className="lg:sticky lg:top-20 h-[600px] lg:h-[calc(100vh-100px)] flex flex-col">
-                            <ChatPanel
-                                liveClassId={classData._id}
-                                batchId={classData.batch?._id}
-                                token={localStorage.getItem('accessToken')}
-                                user={user}
-                            />
+                        <div className="lg:sticky lg:top-20 h-[600px] lg:h-[calc(100vh-100px)] flex flex-col bg-[#212121] rounded border border-[#303030] overflow-hidden">
+                            <div className="flex border-b border-[#303030] bg-[#212121]">
+                                <button 
+                                    onClick={() => setRightPanelTab('chat')}
+                                    className={`flex-1 py-3 text-xs font-bold transition flex items-center justify-center gap-2 ${
+                                        rightPanelTab === 'chat' ? 'text-[#3ea6ff] border-b-2 border-[#3ea6ff] bg-white/5' : 'text-gray-400 hover:text-white'
+                                    }`}
+                                >
+                                    <MessageCircle className="w-3.5 h-3.5" />
+                                    CHAT
+                                </button>
+                                <button 
+                                    onClick={() => setRightPanelTab('qa')}
+                                    className={`flex-1 py-3 text-xs font-bold transition flex items-center justify-center gap-2 ${
+                                        rightPanelTab === 'qa' ? 'text-[#3ea6ff] border-b-2 border-[#3ea6ff] bg-white/5' : 'text-gray-500 hover:text-white'
+                                    }`}
+                                >
+                                    <HelpCircle className="w-3.5 h-3.5" />
+                                    Q&A
+                                </button>
+                            </div>
+                            <div className="flex-1 overflow-hidden">
+                                {rightPanelTab === 'chat' ? (
+                                    <ChatPanel
+                                        liveClassId={classData._id}
+                                        batchId={classData.batch?._id}
+                                        token={localStorage.getItem('accessToken')}
+                                        user={user}
+                                    />
+                                ) : (
+                                    <QAPanel liveClassId={classData._id} />
+                                )}
+                            </div>
                         </div>
                     </div>
                 </div>

@@ -2,6 +2,7 @@ import { Link } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { useTheme } from '../../context/ThemeContext';
 import { Sun, Moon, LogOut, Bell, GraduationCap } from 'lucide-react';
+import NotificationDropdown from '../shared/NotificationDropdown';
 
 export default function TeacherTopBar() {
     const { user, logout } = useAuth();
@@ -39,14 +40,7 @@ export default function TeacherTopBar() {
                         {isDark ? <Sun size={20} /> : <Moon size={20} />}
                     </button>
 
-                    {/* Notifications */}
-                    <button
-                        className={`p-2.5 ${isDark ? 'bg-white/5 hover:bg-white/10 text-gray-300 hover:text-white' : 'bg-gray-100 hover:bg-gray-200 text-gray-600 hover:text-gray-900'} rounded-xl transition-all relative`}
-                        aria-label="Notifications"
-                    >
-                        <Bell size={20} />
-                        <span className="absolute top-2 right-2.5 w-2 h-2 bg-red-500 rounded-full ring-2 ring-black"></span>
-                    </button>
+                    <NotificationDropdown />
 
                     <div className={`h-8 w-px ${isDark ? 'bg-white/10' : 'bg-gray-200'}`}></div>
 

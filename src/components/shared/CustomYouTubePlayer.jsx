@@ -3,7 +3,9 @@ import YouTube from 'react-youtube';
 import { Play, Pause, Volume2, VolumeX, Maximize, Minimize, Radio } from 'lucide-react';
 import { useTheme } from '../../context/ThemeContext';
 
-const CustomYouTubePlayer = forwardRef(({ videoId, autoplay = false }, ref) => {
+import api from '../../services/api';
+
+const CustomYouTubePlayer = forwardRef(({ videoId, liveClassId, autoplay = false }, ref) => {
     const [player, setPlayer] = useState(null);
     const [isPlaying, setIsPlaying] = useState(false);
     const [isMuted, setIsMuted] = useState(autoplay);
@@ -14,6 +16,8 @@ const CustomYouTubePlayer = forwardRef(({ videoId, autoplay = false }, ref) => {
     const [showControls, setShowControls] = useState(false);
     const [isEnded, setIsEnded] = useState(false);
     const [isSeeking, setIsSeeking] = useState(false);
+    const [lastSavedPosition, setLastSavedPosition] = useState(0);
+    const [hasLoadedHistory, setHasLoadedHistory] = useState(false);
     const containerRef = useRef(null);
     const controlsTimeoutRef = useRef(null);
     const progressBarRef = useRef(null);
@@ -58,6 +62,57 @@ const CustomYouTubePlayer = forwardRef(({ videoId, autoplay = false }, ref) => {
             setIsPlaying(true);
         }
     };
+
+    // Load watch history
+    useEffect(() => {
+        if (!liveClassId || !player) return;
+
+        const loadHistory = async () => {
+            try {
+                const { data } = await api.get(`/watch-history/${liveClassId}`);
+                if (data && data.lastPosition > 0) {
+                    setLastSavedPosition(data.lastPosition);
+                    player.seekTo(data.lastPosition, true);
+                    setCurrentTime(data.lastPosition);
+                }
+                setHasLoadedHistory(true);
+            } catch (err) {
+                console.error('Failed to load watch history:', err);
+                setHasLoadedHistory(true);
+            }
+        };
+
+        loadHistory();
+    }, [liveClassId, player]);
+
+    // Save watch history periodically
+    useEffect(() => {
+        if (!liveClassId || !player || !isPlaying) return;
+
+        const saveHistory = async () => {
+            const currentPos = Math.floor(player.getCurrentTime());
+            const dur = Math.floor(player.getDuration());
+            
+            // Only save if moved at least 5 seconds from last record
+            if (Math.abs(currentPos - lastSavedPosition) < 5) return;
+
+            try {
+                await api.post('/watch-history/update', {
+                    liveClassId,
+                    videoId,
+                    lastPosition: currentPos,
+                    totalDuration: dur,
+                    isCompleted: currentPos > dur - 10 // Consider completed if at the end
+                });
+                setLastSavedPosition(currentPos);
+            } catch (err) {
+                console.error('Failed to save watch history:', err);
+            }
+        };
+
+        const interval = setInterval(saveHistory, 10000); // Every 10 seconds
+        return () => clearInterval(interval);
+    }, [liveClassId, player, isPlaying, lastSavedPosition, videoId]);
 
     const handleStateChange = (event) => {
         if (event.data === 1) {
