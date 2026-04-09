@@ -33,10 +33,16 @@ import {
     Signal,
     ArrowLeft,
     HelpCircle,
-    Hand
+    Hand,
+    Edit3,
+    Link,
+    Save,
+    Sparkles,
+    Sun,
+    Moon
 } from 'lucide-react';
 import toast from 'react-hot-toast';
-
+import { confirmToast } from '../../utils/confirmToast';
 import api from '../../services/api';
 import { useAuth } from '../../context/AuthContext';
 import { useTheme } from '../../context/ThemeContext';
@@ -45,12 +51,14 @@ import ChatPanel from '../../components/teacher/ChatPanel';
 import CommentSection from '../../components/student/CommentSection';
 import CustomYouTubePlayer from '../../components/shared/CustomYouTubePlayer';
 import QAPanel from '../../components/shared/QAPanel';
+import ClassSummary from '../../components/shared/ClassSummary';
+import ClassTimer from '../../components/shared/ClassTimer';
 
 export default function TeacherClassControl() {
     const { id: liveClassId } = useParams();
     const navigate = useNavigate();
     const { user } = useAuth();
-    const { isDark } = useTheme();
+
 
     const [loading, setLoading] = useState(true);
     const [classData, setClassData] = useState(null);
@@ -58,6 +66,7 @@ export default function TeacherClassControl() {
     const [viewerCount, setViewerCount] = useState(0);
     const [handRaises, setHandRaises] = useState([]);
     const [rightPanelTab, setRightPanelTab] = useState('chat'); // 'chat' or 'qa'
+    const { isDark, toggleTheme } = useTheme();
 
     // Stream Setup State
     const [streamKey, setStreamKey] = useState('');
@@ -83,6 +92,11 @@ export default function TeacherClassControl() {
         }
     };
 
+    const summaryRef = useRef(null);
+    const scrollToSummary = () => {
+        summaryRef.current?.scrollIntoView({ behavior: 'smooth' });
+    };
+
     // Initialization
     useEffect(() => {
         loadClassData();
@@ -105,7 +119,7 @@ export default function TeacherClassControl() {
     useEffect(() => {
         if (!classData?._id) return;
 
-        const socket = io('http://localhost:5000/live-classes', {
+        const socket = io((import.meta.env.VITE_SOCKET_URL || 'http://localhost:5000') + '/live-classes', {
             auth: { token: localStorage.getItem('accessToken') },
             transports: ['websocket']
         });
@@ -146,7 +160,7 @@ export default function TeacherClassControl() {
         setLoading(true);
         try {
             const { data } = await api.get(`/live-classes/by-timetable/${liveClassId}`);
-            setClassData(data);
+            setClassData(data.data);
         } catch (error) {
             console.error('Failed to load class:', error);
             toast.error('Failed to load class details');
@@ -158,8 +172,8 @@ export default function TeacherClassControl() {
     const loadStreamKey = async (realLiveClassId) => {
         try {
             const { data } = await api.get(`/live-classes/${realLiveClassId}/stream-key`);
-            setStreamKey(data.streamKey);
-            setIngestionUrl(data.ingestionAddress);
+            setStreamKey(data.data.streamKey);
+            setIngestionUrl(data.data.ingestionAddress);
         } catch (error) {
             console.error('Failed to load stream key:', error);
         }
@@ -173,7 +187,7 @@ export default function TeacherClassControl() {
             const { data } = await api.get('/notes/by-batch', {
                 params: { batchId },
             });
-            setNotes(data.notes || []);
+            setNotes(data.data.notes || []);
         } catch (error) {
             console.error('Failed to load notes:', error);
             toast.error('Failed to load materials');
@@ -218,7 +232,8 @@ export default function TeacherClassControl() {
         setIsCheckingConfig(true);
         try {
             const { data } = await api.get(`/live-classes/${classData._id}/status`);
-            if (data.youtubeStatus === 'live' || data.youtubeStatus === 'ready' || data.status === 'Live') {
+            const statusData = data.data;
+            if (statusData.youtubeStatus === 'live' || statusData.status === 'Live') {
                 // Force local update if backend says live
                 toast.success('You are LIVE!');
                 await loadClassData();
@@ -236,7 +251,11 @@ export default function TeacherClassControl() {
 
     const handleEndStream = async () => {
         if (!classData?._id) return;
-        if (!confirm('Are you sure you want to end the stream?')) return;
+        const confirmed = await confirmToast('Are you sure you want to end the stream?', { 
+            confirmLabel: 'End Stream', 
+            variant: 'danger' 
+        });
+        if (!confirmed) return;
         setScheduling(true);
         try {
             await api.post(`/live-classes/${classData._id}/end`);
@@ -249,12 +268,13 @@ export default function TeacherClassControl() {
         }
     };
 
+
     if (loading) return <LoadingSpinner centered />;
     if (!classData) return (
-        <div className={`min-h-screen flex items-center justify-center ${isDark ? 'bg-[#0f0f0f] text-white' : 'bg-gray-50 text-gray-900'}`}>
+        <div className="min-h-screen flex items-center justify-center bg-surface text-on-surface">
             <div className="text-center">
                 <p className="text-xl font-bold">Class Not Found</p>
-                <button onClick={() => navigate('/teacher/dashboard')} className="mt-4 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">
+                <button onClick={() => navigate('/teacher/dashboard')} className="mt-4 px-4 py-2 bg-primary text-on-primary rounded-xl hover:shadow-primary/20 hover:shadow-lg transition">
                     Back to Dashboard
                 </button>
             </div>
@@ -264,10 +284,10 @@ export default function TeacherClassControl() {
     const getStatusConfig = () => {
         const status = classData.status || 'Scheduled';
         const configs = {
-            Live: { badge: 'bg-red-600', text: 'LIVE', icon: Radio, pulse: true },
-            Scheduled: { badge: 'bg-blue-600', text: 'UPCOMING', icon: Clock, pulse: false },
-            Completed: { badge: 'bg-green-600', text: 'ENDED', icon: Video, pulse: false },
-            Cancelled: { badge: 'bg-gray-600', text: 'CANCELLED', icon: Ban, pulse: false }
+            Live: { badge: 'bg-error text-on-error', text: 'LIVE', icon: Radio, pulse: true },
+            Scheduled: { badge: 'bg-primary text-on-primary', text: 'UPCOMING', icon: Clock, pulse: false },
+            Completed: { badge: 'bg-secondary text-on-secondary', text: 'ENDED', icon: Video, pulse: false },
+            Cancelled: { badge: 'bg-surface-container-highest text-on-surface', text: 'CANCELLED', icon: Ban, pulse: false }
         };
         return configs[status] || configs.Scheduled;
     };
@@ -305,38 +325,38 @@ export default function TeacherClassControl() {
     const isCompleted = classData.status === 'Completed';
 
     return (
-        <div className={`min-h-screen ${isDark ? 'bg-[#0f0f0f]' : 'bg-gray-50'}`}>
+        <div className="min-h-screen bg-surface">
             {/* Settings Modal */}
             {settingsOpen && (
-                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
-                    <div className={`w-full max-w-md p-6 rounded-xl shadow-2xl ${isDark ? 'bg-[#212121]' : 'bg-white'}`}>
-                        <h2 className={`text-xl font-bold mb-4 ${isDark ? 'text-white' : 'text-gray-900'}`}>Class Settings</h2>
+                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-md">
+                    <div className="w-full max-w-md p-8 rounded-[2rem] shadow-2xl bg-surface-container border border-outline-variant/10">
+                        <h2 className="text-xl font-bold mb-6 text-on-surface font-headline">Class Settings</h2>
                         <form onSubmit={handleSaveSettings}>
-                            <div className="mb-4">
-                                <label className={`block text-sm font-medium mb-1 ${isDark ? 'text-gray-400' : 'text-gray-700'}`}>
+                            <div className="mb-6">
+                                <label className="block text-[10px] font-label font-bold uppercase tracking-widest text-primary/70 mb-2">
                                     Stream Title
                                 </label>
                                 <input
                                     type="text"
                                     value={title}
                                     onChange={(e) => setTitle(e.target.value)}
-                                    className={`w-full px-3 py-2 rounded border focus:outline-none focus:ring-2 focus:ring-blue-500 ${isDark ? 'bg-[#0f0f0f] border-[#303030] text-white' : 'bg-white border-gray-300 text-gray-900'}`}
+                                    className="w-full px-4 py-3 rounded-xl bg-surface-container-high border border-outline-variant/10 text-on-surface placeholder:text-on-surface-variant/40 focus:ring-2 focus:ring-primary focus:border-transparent outline-none text-sm"
                                     placeholder="Enter stream title"
                                     required
                                 />
                             </div>
-                            <div className="flex justify-end gap-3 mt-6">
+                            <div className="flex justify-end gap-3">
                                 <button
                                     type="button"
                                     onClick={() => setSettingsOpen(false)}
-                                    className={`px-4 py-2 rounded text-sm font-medium ${isDark ? 'text-gray-300 hover:bg-white/10' : 'text-gray-600 hover:bg-gray-100'}`}
+                                    className="px-5 py-2.5 rounded-xl text-sm font-medium text-on-surface-variant hover:bg-surface-container-high transition"
                                 >
                                     Cancel
                                 </button>
                                 <button
                                     type="submit"
                                     disabled={savingSettings}
-                                    className="px-4 py-2 rounded text-sm font-medium bg-blue-600 text-white hover:bg-blue-700 disabled:opacity-50"
+                                    className="px-5 py-2.5 rounded-xl text-sm font-semibold bg-primary text-on-primary hover:shadow-primary/20 transition disabled:opacity-50"
                                 >
                                     {savingSettings ? 'Saving...' : 'Save'}
                                 </button>
@@ -346,18 +366,25 @@ export default function TeacherClassControl() {
                 </div>
             )}
 
-            {/* Top Bar - YouTube Studio Style */}
-            <div className={`border-b sticky top-0 z-50 ${isDark ? 'bg-[#212121] border-[#303030]' : 'bg-white border-gray-200'}`}>
+            {/* Top Bar */}
+            <div className="border-b border-outline-variant/10 sticky top-0 z-50 bg-surface-container">
                 <div className="max-w-[1920px] mx-auto px-6 py-3">
                     <div className="flex items-center justify-between">
                         <div className="flex items-center gap-4">
-                            <button onClick={() => navigate('/teacher/dashboard')} className={`p-1.5 rounded-full hover:bg-opacity-10 hover:bg-gray-500 ${isDark ? 'text-white' : 'text-gray-900'}`}>
+                            <button onClick={() => navigate('/teacher/dashboard')} className="p-1.5 rounded-full hover:bg-surface-container-high text-on-surface transition">
                                 <ArrowLeft className="w-5 h-5" />
                             </button>
-                            <h1 className={`text-xl font-medium ${isDark ? 'text-white' : 'text-gray-900'}`}>
+                            <h1 className="text-xl font-medium text-on-surface">
                                 {classData.title || classData.subject}
                             </h1>
 
+                            {classData.status !== 'Completed' && (
+                                <ClassTimer 
+                                    startTime={classData.startTime} 
+                                    endTime={classData.endTime} 
+                                    status={classData.status} 
+                                />
+                            )}
                             <div className={`flex items-center gap-2 px-3 py-1 rounded-sm text-white text-sm font-medium ${statusConfig.badge}`}>
                                 {statusConfig.pulse && <span className="w-2 h-2 bg-white rounded-full animate-pulse"></span>}
                                 {statusConfig.text}
@@ -366,14 +393,19 @@ export default function TeacherClassControl() {
 
                         <div className="flex items-center gap-3">
                             <div className="hidden md:flex items-center gap-2 mr-2">
-                                <span className={`text-sm ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>
+                                <span className="text-sm text-on-surface-variant/70">
                                     {classData.batch?.name || classData.batchName}
                                 </span>
                             </div>
+                             <button
+                                onClick={toggleTheme}
+                                className="w-10 h-10 flex items-center justify-center rounded-xl bg-surface-container-high text-on-surface-variant hover:text-primary transition-all active:scale-95 group relative"
+                            >
+                                {isDark ? <Sun className="w-4 h-4 group-hover:rotate-45 transition-transform" /> : <Moon className="w-4 h-4 group-hover:-rotate-12 transition-transform" />}
+                            </button>
                             <button
                                 onClick={() => setSettingsOpen(true)}
-                                className={`px-4 py-2 rounded-sm text-sm font-medium transition ${isDark ? 'text-[#3ea6ff] hover:bg-[#263850]' : 'text-blue-600 hover:bg-blue-50'
-                                    }`}>
+                                className="px-4 py-2 rounded-lg text-sm font-medium transition text-primary hover:bg-primary/10">
                                 <Settings className="w-4 h-4 inline mr-2" />
                                 Settings
                             </button>
@@ -385,7 +417,7 @@ export default function TeacherClassControl() {
                                         <button
                                             onClick={handleCreateStream}
                                             disabled={scheduling}
-                                            className="px-4 py-2 rounded-sm text-sm font-medium bg-blue-600 hover:bg-blue-700 text-white transition flex items-center gap-2 disabled:opacity-50">
+                                            className="px-4 py-2 rounded-sm text-sm font-medium bg-primary hover:shadow-primary/20 hover:shadow-md text-on-primary transition flex items-center gap-2 disabled:opacity-50">
                                             <Plus className="w-3.5 h-3.5" />
                                             Create Stream
                                         </button>
@@ -395,7 +427,7 @@ export default function TeacherClassControl() {
                                         <button
                                             onClick={handleGoLive}
                                             disabled={isCheckingConfig}
-                                            className="px-4 py-2 rounded-sm text-sm font-medium bg-green-600 hover:bg-green-700 text-white transition flex items-center gap-2 disabled:opacity-50">
+                                            className="px-4 py-2 rounded-sm text-sm font-medium bg-secondary hover:shadow-secondary/20 hover:shadow-md text-on-secondary transition flex items-center gap-2 disabled:opacity-50">
                                             <Radio className="w-3.5 h-3.5" />
                                             {isCheckingConfig ? 'Connecting...' : 'Go Live'}
                                         </button>
@@ -405,7 +437,7 @@ export default function TeacherClassControl() {
                                         <button
                                             onClick={handleEndStream}
                                             disabled={scheduling}
-                                            className="px-4 py-2 rounded-sm text-sm font-medium bg-red-600 hover:bg-red-700 text-white transition flex items-center gap-2 disabled:opacity-50">
+                                            className="px-4 py-2 rounded-sm text-sm font-medium bg-error hover:shadow-error/20 hover:shadow-md text-on-error transition flex items-center gap-2 disabled:opacity-50">
                                             <Square className="w-3.5 h-3.5" />
                                             End Stream
                                         </button>
@@ -414,9 +446,18 @@ export default function TeacherClassControl() {
                             )}
 
                             {isCompleted && (
-                                <button disabled className="px-4 py-2 rounded-sm text-sm font-medium bg-gray-600 text-white cursor-not-allowed">
-                                    Stream Ended
-                                </button>
+                                <div className="flex items-center gap-2">
+                                    <button 
+                                        onClick={scrollToSummary}
+                                        className="px-4 py-2 rounded-sm text-sm font-medium bg-surface-container-highest hover:bg-white/5 text-primary transition flex items-center gap-2 border border-primary/20"
+                                    >
+                                        <Sparkles className="w-3.5 h-3.5" />
+                                        AI Summary
+                                    </button>
+                                    <button disabled className="px-4 py-2 rounded-sm text-sm font-medium bg-surface-container-highest text-on-surface-variant cursor-not-allowed">
+                                        Stream Ended
+                                    </button>
+                                </div>
                             )}
                         </div>
                     </div>
@@ -428,11 +469,16 @@ export default function TeacherClassControl() {
                     {/* Main Content Area */}
                     <div className="col-span-12 lg:col-span-9 space-y-4">
                         {/* Video Preview Card */}
-                        <div className={`rounded ${isDark ? 'bg-[#212121]' : 'bg-white border border-gray-200'}`}>
+                        <div className="rounded-2xl bg-surface-container border border-outline-variant/10">
                             <div className="aspect-video bg-black relative group/player">
                                 {/* Video Player */}
                                 {videoId ? (
-                                    <CustomYouTubePlayer ref={playerRef} videoId={videoId} />
+                                    <CustomYouTubePlayer
+                                        ref={playerRef}
+                                        videoId={videoId}
+                                        isLive={classData.status === 'Live'}
+                                        title={classData.title || classData.subject}
+                                    />
                                 ) : (
                                     <div className="w-full h-full flex flex-col items-center justify-center text-zinc-500">
                                         <Video className="w-16 h-16 mb-4 opacity-50" />
@@ -444,12 +490,12 @@ export default function TeacherClassControl() {
 
                                 {classData.status === 'Live' && (
                                     <>
-                                        <div className="absolute top-3 right-3 bg-red-600 px-2.5 py-1.5 rounded text-white text-xs font-medium pointer-events-none">
+                                        <div className="absolute top-3 right-3 bg-error px-2.5 py-1.5 rounded text-on-error text-xs font-medium pointer-events-none">
                                             LIVE
                                         </div>
                                         <button
                                             onClick={handleJumpToLive}
-                                            className="absolute bottom-16 right-4 z-40 bg-red-600 hover:bg-red-700 text-white text-xs font-bold px-3 py-1.5 rounded-full shadow-lg flex items-center gap-1 opacity-0 group-hover/player:opacity-100 transition-opacity"
+                                            className="absolute bottom-16 right-4 z-40 bg-error hover:bg-error/90 text-on-error text-xs font-bold px-3 py-1.5 rounded-full shadow-lg flex items-center gap-1 opacity-0 group-hover/player:opacity-100 transition-opacity"
                                         >
                                             <Radio className="w-3 h-3" />
                                             JUMP TO LIVE
@@ -459,24 +505,24 @@ export default function TeacherClassControl() {
                             </div>
 
                             {/* Status bar below video */}
-                            <div className={`px-4 py-3 border-t ${isDark ? 'border-[#303030]' : 'border-gray-200'}`}>
+                            <div className="px-4 py-3 border-t border-outline-variant/10">
                                 <div className="flex items-center justify-between">
                                     <div className="flex items-center gap-4 text-sm">
-                                        <span className={isDark ? 'text-gray-400' : 'text-gray-600'}>
+                                        <span className="text-on-surface-variant/70">
                                             {classData.batch?.name || classData.batchName}
                                         </span>
-                                        <span className={isDark ? 'text-gray-600' : 'text-gray-400'}>•</span>
-                                        <span className={isDark ? 'text-gray-400' : 'text-gray-600'}>
+                                        <span className="text-on-surface-variant/40">•</span>
+                                        <span className="text-on-surface-variant/70">
                                             {classData.startTime} - {classData.endTime}
                                         </span>
-                                        <span className={isDark ? 'text-gray-600' : 'text-gray-400'}>•</span>
-                                        <span className={`flex items-center gap-1.5 ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>
+                                        <span className="text-on-surface-variant/40">•</span>
+                                        <span className="flex items-center gap-1.5 text-on-surface-variant/70">
                                             <Users className="w-4 h-4" />
                                             {viewerCount} students
                                         </span>
                                         {handRaises.length > 0 && (
                                             <>
-                                                <span className={isDark ? 'text-gray-600' : 'text-gray-400'}>•</span>
+                                                <span className="text-on-surface-variant/40">•</span>
                                                 <div className="flex items-center gap-2">
                                                     <span className="flex items-center gap-1.5 text-orange-500 font-bold animate-pulse">
                                                         <Hand className="w-4 h-4" />
@@ -492,38 +538,46 @@ export default function TeacherClassControl() {
                                             </>
                                         )}
                                     </div>
-                                    <span className={`text-sm ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>
+                                    <span className="text-sm text-on-surface-variant/70">
                                         {new Date().toLocaleDateString()}
                                     </span>
                                 </div>
                             </div>
                         </div>
 
+                        {/* AI Class Summary - Show for Completed Classes */}
+                        {isCompleted && (
+                            <div ref={summaryRef} className="rounded-2xl border p-8 bg-surface-container border-outline-variant/10 shadow-2xl animate-fade-in-up">
+                                <ClassSummary liveClassId={liveClassId} isTeacher={true} />
+                            </div>
+                        )}
+
 
 
                         {/* Tabs Section */}
-                        <div className={`rounded ${isDark ? 'bg-[#212121]' : 'bg-white border border-gray-200'}`}>
+                        <div className="rounded-2xl bg-surface-container border border-outline-variant/10">
                             {/* Tab Navigation */}
-                            <div className={`border-b ${isDark ? 'border-[#303030]' : 'border-gray-200'}`}>
+                            <div className="border-b border-outline-variant/10">
                                 <div className="flex px-3 overflow-x-auto">
                                     {[
                                         { id: 'stream', label: 'Stream setup', icon: Server },
+                                        { id: 'whiteboard', label: 'Whiteboard', icon: Edit3 },
                                         { id: 'materials', label: 'Materials', icon: FileText },
+                                        { id: 'attendance', label: 'Attendance', icon: Users },
                                         ...(classData.status === 'Completed' ? [{ id: 'comments', label: 'Comments', icon: MessageCircle }] : [])
                                     ].map(({ id, label, icon: Icon }) => (
                                         <button
                                             key={id}
                                             onClick={() => setActiveTab(id)}
                                             className={`flex items-center gap-2 px-4 py-3 text-sm font-medium relative transition shrink-0 ${activeTab === id
-                                                ? isDark ? 'text-[#3ea6ff]' : 'text-blue-600'
-                                                : isDark ? 'text-gray-400 hover:text-white' : 'text-gray-600 hover:text-gray-900'
+                                                ? 'text-primary'
+                                                : 'text-on-surface-variant/60 hover:text-on-surface'
                                                 }`}
                                         >
                                             <Icon className="w-4 h-4" />
                                             {label}
                                             {activeTab === id && (
-                                                <div className={`absolute bottom-0 left-0 right-0 h-0.5 ${isDark ? 'bg-[#3ea6ff]' : 'bg-blue-600'
-                                                    }`} />
+                                                <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-primary" />
                                             )}
                                         </button>
                                     ))}
@@ -532,10 +586,12 @@ export default function TeacherClassControl() {
 
                             {/* Tab Content */}
                             <div className="p-6">
-                                {activeTab === 'stream' && <StreamSetupTab isDark={isDark} streamKey={streamKey} ingestionUrl={ingestionUrl} />}
-                                {activeTab === 'materials' && <MaterialsTab isDark={isDark} notes={notes} loading={loadingNotes} classData={classData} onUpdate={loadNotes} />}
+                                {activeTab === 'stream' && <StreamSetupTab streamKey={streamKey} ingestionUrl={ingestionUrl} />}
+                                {activeTab === 'whiteboard' && <WhiteboardTab liveClassId={classData._id} initialUrl={classData.whiteboardUrl} />}
+                                {activeTab === 'materials' && <MaterialsTab notes={notes} loading={loadingNotes} classData={classData} onUpdate={loadNotes} />}
+                                {activeTab === 'attendance' && <AttendanceTab liveClassId={classData._id} />}
                                 {activeTab === 'comments' && classData.status === 'Completed' && (
-                                    <div className="h-[600px] border border-[#303030] rounded overflow-hidden">
+                                    <div className="h-[600px] border border-outline-variant/10 rounded-2xl overflow-hidden">
                                         <CommentSection liveClassId={classData._id} />
                                     </div>
                                 )}
@@ -545,12 +601,12 @@ export default function TeacherClassControl() {
 
                     {/* Right Sidebar - Chat */}
                     <div className="col-span-12 lg:col-span-3">
-                        <div className="lg:sticky lg:top-20 h-[600px] lg:h-[calc(100vh-100px)] flex flex-col bg-[#212121] rounded border border-[#303030] overflow-hidden">
-                            <div className="flex border-b border-[#303030] bg-[#212121]">
+                        <div className="lg:sticky lg:top-20 h-[600px] lg:h-[calc(100vh-100px)] flex flex-col bg-surface-container rounded-2xl border border-outline-variant/10 overflow-hidden">
+                            <div className="flex border-b border-outline-variant/10 bg-surface-container">
                                 <button 
                                     onClick={() => setRightPanelTab('chat')}
                                     className={`flex-1 py-3 text-xs font-bold transition flex items-center justify-center gap-2 ${
-                                        rightPanelTab === 'chat' ? 'text-[#3ea6ff] border-b-2 border-[#3ea6ff] bg-white/5' : 'text-gray-400 hover:text-white'
+                                        rightPanelTab === 'chat' ? 'text-primary border-b-2 border-primary bg-primary/5' : 'text-on-surface-variant/60 hover:text-on-surface'
                                     }`}
                                 >
                                     <MessageCircle className="w-3.5 h-3.5" />
@@ -559,11 +615,20 @@ export default function TeacherClassControl() {
                                 <button 
                                     onClick={() => setRightPanelTab('qa')}
                                     className={`flex-1 py-3 text-xs font-bold transition flex items-center justify-center gap-2 ${
-                                        rightPanelTab === 'qa' ? 'text-[#3ea6ff] border-b-2 border-[#3ea6ff] bg-white/5' : 'text-gray-500 hover:text-white'
+                                        rightPanelTab === 'qa' ? 'text-primary border-b-2 border-primary bg-primary/5' : 'text-on-surface-variant/60 hover:text-on-surface'
                                     }`}
                                 >
                                     <HelpCircle className="w-3.5 h-3.5" />
                                     Q&A
+                                </button>
+                                <button 
+                                    onClick={() => setRightPanelTab('moderation')}
+                                    className={`flex-1 py-3 text-xs font-bold transition flex items-center justify-center gap-2 ${
+                                        rightPanelTab === 'moderation' ? 'text-primary border-b-2 border-primary bg-primary/5' : 'text-on-surface-variant/60 hover:text-on-surface'
+                                    }`}
+                                >
+                                    <Shield className="w-3.5 h-3.5" />
+                                    MODERATION
                                 </button>
                             </div>
                             <div className="flex-1 overflow-hidden">
@@ -574,8 +639,10 @@ export default function TeacherClassControl() {
                                         token={localStorage.getItem('accessToken')}
                                         user={user}
                                     />
-                                ) : (
+                                ) : rightPanelTab === 'qa' ? (
                                     <QAPanel liveClassId={classData._id} />
+                                ) : (
+                                    <ModerationPanel liveClassId={classData._id} />
                                 )}
                             </div>
                         </div>
@@ -587,7 +654,7 @@ export default function TeacherClassControl() {
 }
 
 // Stream Setup Tab
-function StreamSetupTab({ isDark, streamKey, ingestionUrl }) {
+function StreamSetupTab({ streamKey, ingestionUrl }) {
     const [copiedUrl, setCopiedUrl] = useState(false);
     const [copiedKey, setCopiedKey] = useState(false);
     const [showKey, setShowKey] = useState(false);
@@ -602,25 +669,19 @@ function StreamSetupTab({ isDark, streamKey, ingestionUrl }) {
     return (
         <div className="space-y-6">
             <div>
-                <label className={`text-sm font-medium mb-2 block ${isDark ? 'text-white' : 'text-gray-900'}`}>
+                <label className="text-sm font-medium mb-2 block text-on-surface">
                     Stream URL
                 </label>
                 <div className="flex gap-2">
                     <input
                         readOnly
                         value={ingestionUrl || 'Generate stream first...'}
-                        className={`flex-1 px-3 py-2 rounded text-sm font-mono ${isDark ? 'bg-[#0f0f0f] border-[#303030] text-gray-300' : 'bg-white border-gray-300 text-gray-900'
-                            } border outline-none focus:border-blue-500`}
+                        className="flex-1 px-3 py-2 rounded-lg text-sm font-mono bg-surface-container-high border border-outline-variant/10 text-on-surface outline-none"
                     />
                     <button
                         onClick={() => copyToClipboard(ingestionUrl, setCopiedUrl)}
                         disabled={!ingestionUrl}
-                        className={`px-4 py-2 rounded text-sm font-medium transition flex items-center justify-center min-w-[60px] ${copiedUrl
-                            ? 'bg-green-600 text-white'
-                            : isDark
-                                ? 'bg-[#3ea6ff] hover:bg-[#65b8ff] text-black'
-                                : 'bg-blue-600 hover:bg-blue-700 text-white'
-                            }`}
+                        className={`px-4 py-2 rounded-lg text-sm font-medium transition flex items-center justify-center min-w-[60px] ${copiedUrl ? 'bg-secondary text-on-secondary' : 'bg-primary text-on-primary hover:shadow-primary/20'}`}
                     >
                         {copiedUrl ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
                     </button>
@@ -629,12 +690,12 @@ function StreamSetupTab({ isDark, streamKey, ingestionUrl }) {
 
             <div>
                 <div className="flex items-center justify-between mb-2">
-                    <label className={`text-sm font-medium ${isDark ? 'text-white' : 'text-gray-900'}`}>
+                    <label className="text-sm font-medium text-on-surface">
                         Stream Key
                     </label>
                     <button
                         onClick={() => setShowKey(!showKey)}
-                        className={`text-xs flex items-center gap-1 ${isDark ? 'text-gray-400 hover:text-white' : 'text-gray-600 hover:text-gray-900'}`}
+                        className="text-xs flex items-center gap-1 text-on-surface-variant/60 hover:text-on-surface transition"
                     >
                         {showKey ? <EyeOff className="w-3 h-3" /> : <Eye className="w-3 h-3" />}
                         {showKey ? 'Hide' : 'Show'}
@@ -646,29 +707,23 @@ function StreamSetupTab({ isDark, streamKey, ingestionUrl }) {
                         type={showKey ? 'text' : 'password'}
                         value={streamKey || ''}
                         placeholder="Generate stream first..."
-                        className={`flex-1 px-3 py-2 rounded text-sm font-mono ${isDark ? 'bg-[#0f0f0f] border-[#303030] text-gray-300' : 'bg-white border-gray-300 text-gray-900'
-                            } border outline-none focus:border-blue-500`}
+                        className="flex-1 px-3 py-2 rounded-lg text-sm font-mono bg-surface-container-high border border-outline-variant/10 text-on-surface outline-none"
                     />
                     <button
                         onClick={() => copyToClipboard(streamKey, setCopiedKey)}
                         disabled={!streamKey}
-                        className={`px-4 py-2 rounded text-sm font-medium transition flex items-center justify-center min-w-[60px] ${copiedKey
-                            ? 'bg-green-600 text-white'
-                            : isDark
-                                ? 'bg-[#3ea6ff] hover:bg-[#65b8ff] text-black'
-                                : 'bg-blue-600 hover:bg-blue-700 text-white'
-                            }`}
+                        className={`px-4 py-2 rounded-lg text-sm font-medium transition flex items-center justify-center min-w-[60px] ${copiedKey ? 'bg-secondary text-on-secondary' : 'bg-primary text-on-primary hover:shadow-primary/20'}`}
                     >
                         {copiedKey ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
                     </button>
                 </div>
             </div>
 
-            <div className={`p-4 rounded ${isDark ? 'bg-[#263850]' : 'bg-blue-50'}`}>
-                <h4 className={`text-sm font-medium mb-2 ${isDark ? 'text-[#3ea6ff]' : 'text-blue-900'}`}>
+            <div className="p-4 rounded-xl bg-primary/5 border border-primary/10">
+                <h4 className="text-sm font-medium mb-2 text-primary">
                     Setup Instructions
                 </h4>
-                <ol className={`space-y-1 text-sm ${isDark ? 'text-gray-300' : 'text-gray-700'}`}>
+                <ol className="space-y-1 text-sm text-on-surface-variant/80">
                     <li>1. Open OBS Studio</li>
                     <li>2. Go to Settings → Stream</li>
                     <li>3. Select "Custom" service</li>
@@ -683,7 +738,7 @@ function StreamSetupTab({ isDark, streamKey, ingestionUrl }) {
 
 
 // Materials Tab
-function MaterialsTab({ isDark, notes, loading, classData, onUpdate }) {
+function MaterialsTab({ notes, loading, classData, onUpdate }) {
     const [uploading, setUploading] = useState(false);
     const [file, setFile] = useState(null);
     const [materialTitle, setMaterialTitle] = useState('');
@@ -745,7 +800,11 @@ function MaterialsTab({ isDark, notes, loading, classData, onUpdate }) {
     };
 
     const handleDelete = async (noteId) => {
-        if (!confirm('Are you sure you want to delete this material?')) return;
+        const confirmed = await confirmToast('Are you sure you want to delete this material?', {
+            confirmLabel: 'Delete Material',
+            variant: 'danger'
+        });
+        if (!confirmed) return;
         try {
             await api.delete(`/notes/${noteId}`);
             toast.success('Material deleted');
@@ -760,33 +819,32 @@ function MaterialsTab({ isDark, notes, loading, classData, onUpdate }) {
             {!showUpload ? (
                 <button
                     onClick={() => setShowUpload(true)}
-                    className={`w-full px-4 py-2 rounded text-sm font-medium transition flex items-center justify-center gap-2 ${isDark ? 'bg-[#3ea6ff] hover:bg-[#65b8ff] text-black' : 'bg-blue-600 hover:bg-blue-700 text-white'
-                        }`}>
+                    className="w-full px-4 py-2.5 rounded-xl text-sm font-semibold transition flex items-center justify-center gap-2 bg-primary text-on-primary hover:shadow-primary/20 hover:shadow-lg">
                     <Plus className="w-4 h-4" />
                     Upload material
                 </button>
             ) : (
-                <form onSubmit={handleUpload} className={`p-4 rounded border ${isDark ? 'bg-[#282828] border-gray-700' : 'bg-gray-50 border-gray-200'}`}>
-                    <h3 className={`text-sm font-semibold mb-3 ${isDark ? 'text-white' : 'text-gray-900'}`}>Upload New Material</h3>
+                <form onSubmit={handleUpload} className="p-4 rounded-xl border border-outline-variant/10 bg-surface-container-high">
+                    <h3 className="text-sm font-semibold mb-3 text-on-surface">Upload New Material</h3>
 
                     <div className="space-y-3">
                         <div>
-                            <label className={`block text-xs font-medium mb-1 ${isDark ? 'text-gray-400' : 'text-gray-700'}`}>Title</label>
+                            <label className="block text-xs font-medium mb-1 text-on-surface-variant/70">Title</label>
                             <input
                                 type="text"
                                 value={materialTitle}
                                 onChange={(e) => setMaterialTitle(e.target.value)}
                                 placeholder="e.g. Chapter 1 Notes"
-                                className={`w-full px-3 py-2 rounded text-sm ${isDark ? 'bg-[#0f0f0f] border-gray-700 text-white chat-input' : 'bg-white border-gray-300 text-gray-900'} border focus:outline-none focus:ring-1 focus:ring-blue-500`}
+                                className="w-full px-3 py-2 rounded-lg text-sm bg-surface-container-high border border-outline-variant/10 text-on-surface outline-none focus:ring-1 focus:ring-primary"
                             />
                         </div>
 
                         <div>
-                            <label className={`block text-xs font-medium mb-1 ${isDark ? 'text-gray-400' : 'text-gray-700'}`}>File</label>
+                            <label className="block text-xs font-medium mb-1 text-on-surface-variant/70">File</label>
                             <input
                                 type="file"
                                 onChange={handleFileChange}
-                                className={`w-full text-sm ${isDark ? 'text-gray-300' : 'text-gray-700'}`}
+                                className="w-full text-sm text-on-surface-variant/80"
                             />
                         </div>
 
@@ -794,7 +852,7 @@ function MaterialsTab({ isDark, notes, loading, classData, onUpdate }) {
                             <button
                                 type="button"
                                 onClick={() => setShowUpload(false)}
-                                className={`px-3 py-1.5 rounded text-xs font-medium ${isDark ? 'text-gray-300 hover:bg-white/10' : 'text-gray-600 hover:bg-gray-200'}`}
+                                className="px-3 py-1.5 rounded-lg text-xs font-medium text-on-surface-variant hover:bg-surface-container-high transition"
                             >
                                 Cancel
                             </button>
@@ -812,23 +870,22 @@ function MaterialsTab({ isDark, notes, loading, classData, onUpdate }) {
 
             <div className="space-y-2">
                 {notes.length === 0 ? (
-                    <div className={`text-center py-8 ${isDark ? 'text-gray-400' : 'text-gray-500'}`}>
+                    <div className="text-center py-8 text-on-surface-variant/60">
                         <p>No materials uploaded yet.</p>
                     </div>
                 ) : (
                     notes.map((note) => (
                         <div
                             key={note._id || note.id}
-                            className={`flex items-center justify-between p-3 rounded ${isDark ? 'bg-[#282828] hover:bg-[#303030]' : 'bg-gray-50 hover:bg-gray-100'
-                                }`}
+                            className="flex items-center justify-between p-3 rounded-xl bg-surface-container-high hover:bg-surface-bright/10 transition"
                         >
                             <div className="flex items-center gap-3">
                                 <FileText className="w-5 h-5 text-red-500" />
                                 <div>
-                                    <p className={`text-sm font-medium ${isDark ? 'text-white' : 'text-gray-900'}`}>
+                                    <p className="text-sm font-medium text-on-surface">
                                         {note.title}
                                     </p>
-                                    <p className={`text-xs ${isDark ? 'text-gray-500' : 'text-gray-500'}`}>
+                                    <p className="text-xs text-on-surface-variant/60">
                                         {new Date(note.createdAt).toLocaleDateString()}
                                     </p>
                                 </div>
@@ -836,7 +893,7 @@ function MaterialsTab({ isDark, notes, loading, classData, onUpdate }) {
                             <div className="flex items-center gap-2">
                                 <button
                                     onClick={() => window.open(note.secureUrl || note.fileUrl, '_blank')}
-                                    className={`p-2 rounded ${isDark ? 'hover:bg-[#404040] text-gray-300' : 'hover:bg-gray-200 text-gray-600'}`}>
+                                    className="p-2 rounded-lg hover:bg-primary/10 text-on-surface-variant hover:text-primary transition">
                                     <Eye className="w-4 h-4" />
                                 </button>
                                 <button
@@ -848,6 +905,348 @@ function MaterialsTab({ isDark, notes, loading, classData, onUpdate }) {
                         </div>
                     ))
                 )}
+            </div>
+        </div>
+    );
+}
+
+// Attendance Tab
+function AttendanceTab({ liveClassId }) {
+    const [attendanceData, setAttendanceData] = useState(null);
+    const [loading, setLoading] = useState(true);
+
+    const fetchAttendance = async () => {
+        try {
+            const { data } = await api.get(`/attendance/${liveClassId}`);
+            setAttendanceData(data.data);
+        } catch (error) {
+            console.error('Failed to load attendance:', error);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    useEffect(() => {
+        fetchAttendance();
+        const interval = setInterval(fetchAttendance, 10000); // 10s refresh rate
+        return () => clearInterval(interval);
+    }, [liveClassId]);
+
+    if (loading && !attendanceData) return <LoadingSpinner centered />;
+    if (!attendanceData) return <div className="p-4 text-on-surface-variant/60">Unable to load attendance data.</div>;
+
+    const { status, elapsedTime, records } = attendanceData;
+    const isLive = status === 'live';
+
+    const downloadCSV = () => {
+        if (!records?.length) return toast.error('No attendance records to export');
+        
+        const headers = ['Student Name', 'Email', 'Present Duration', 'Attendance %', 'Status'];
+        const rows = records.map(r => [
+            r.studentId?.name || 'Unknown',
+            r.studentId?.email || 'N/A',
+            `${Math.floor(r.duration / 60)}m ${r.duration % 60}s`,
+            `${r.percentage}%`,
+            r.status
+        ]);
+
+        const csvContent = [
+            headers.join(','),
+            ...rows.map(row => row.map(cell => `"${cell}"`).join(','))
+        ].join('\n');
+
+        const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+        const link = document.createElement('a');
+        const url = URL.createObjectURL(blob);
+        link.setAttribute('href', url);
+        link.setAttribute('download', `Attendance_Report_${liveClassId}_${new Date().toLocaleDateString()}.csv`);
+        link.style.visibility = 'hidden';
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+    };
+
+    return (
+        <div className="space-y-4">
+            <div className="flex justify-between items-center mb-4">
+                <h3 className="font-semibold text-on-surface">
+                    Session Attendance {isLive && <span className="bg-red-600 px-2 py-0.5 rounded text-white text-xs ml-2">Live</span>}
+                </h3>
+                <div className="flex items-center gap-4">
+                    {isLive && elapsedTime > 0 && (
+                        <span className="text-sm text-on-surface-variant/70">
+                            Duration: {Math.floor(elapsedTime / 60)} min
+                        </span>
+                    )}
+                    <button 
+                        onClick={downloadCSV}
+                        className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold transition bg-surface-container-high hover:bg-primary/10 text-on-surface-variant hover:text-primary"
+                    >
+                        <Download className="w-3.5 h-3.5" />
+                        EXPORT CSV
+                    </button>
+                </div>
+            </div>
+
+            <div className="overflow-x-auto">
+                <table className="w-full text-left text-sm text-on-surface-variant">
+                    <thead>
+                        <tr className="border-b border-outline-variant/10">
+                            <th className="py-2 px-3">Student</th>
+                            <th className="py-2 px-3">Present Time</th>
+                            <th className="py-2 px-3">Percentage</th>
+                            <th className="py-2 px-3">Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {records?.map((record, idx) => {
+                            const student = record.studentId;
+                            const isPresent = record.status === 'present';
+                            return (
+                                <tr key={idx} className="border-b last:border-0 border-outline-variant/10">
+                                    <td className="py-3 px-3 flex items-center gap-2">
+                                        <img src={student?.avatarUrl || 'https://ui-avatars.com/api/?name=' + (student?.name || 'U')} alt="Avatar" className="w-8 h-8 rounded-full bg-gray-200 object-cover" />
+                                        <div>
+                                            <p className="font-medium text-on-surface">{student?.name}</p>
+                                            <p className="text-xs opacity-70">{student?.email}</p>
+                                        </div>
+                                    </td>
+                                    <td className="py-3 px-3">{Math.floor(record.duration / 60)}m {record.duration % 60}s</td>
+                                    <td className="py-3 px-3">
+                                        <div className="flex items-center gap-2">
+                                            <div className="flex-1 max-w-[100px] h-2 bg-gray-200 rounded-full overflow-hidden">
+                                                <div 
+                                                    className={`h-full ${record.percentage >= 75 ? 'bg-green-500' : record.percentage >= 50 ? 'bg-yellow-500' : 'bg-red-500'}`} 
+                                                    style={{ width: `${Math.min(100, record.percentage)}%` }}
+                                                />
+                                            </div>
+                                            <span className="text-xs">{record.percentage}%</span>
+                                        </div>
+                                    </td>
+                                    <td className="py-3 px-3">
+                                        <span className={`px-2 py-1 rounded text-xs font-semibold ${isPresent ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>
+                                            {isPresent ? 'Present' : 'Absent'}
+                                        </span>
+                                    </td>
+                                </tr>
+                            );
+                        })}
+                        {(!records || records.length === 0) && (
+                            <tr>
+                                <td colSpan="4" className="py-4 text-center opacity-50">No students enrolled or found.</td>
+                            </tr>
+                        )}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    );
+}
+
+// Whiteboard Tab
+function WhiteboardTab({ liveClassId, initialUrl }) {
+    const [url, setUrl] = useState(initialUrl || `https://wbo.ophir.dev/boards/class-${liveClassId}`);
+    const [saving, setSaving] = useState(false);
+
+    const handleSync = async () => {
+        setSaving(true);
+        try {
+            await api.patch(`/live-classes/${liveClassId}/whiteboard`, { whiteboardUrl: url });
+            toast.success('Whiteboard synced to students');
+        } catch (error) {
+            toast.error('Failed to sync whiteboard URL');
+        } finally {
+            setSaving(false);
+        }
+    };
+
+    return (
+        <div className="space-y-4">
+            <div className="flex flex-col md:flex-row gap-4 justify-between items-start md:items-center p-3 rounded-xl border border-outline-variant/10 bg-surface-container-high">
+                <div className="flex-1 w-full relative h-[42px]">
+                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none h-full">
+                        <Link className="h-4 w-4 text-on-surface-variant/50" />
+                    </div>
+                    <input 
+                        type="url" 
+                        value={url}
+                        onChange={(e) => setUrl(e.target.value)}
+                        placeholder="Excalidraw or Whiteboard URL"
+                        className="pl-10 w-full h-full px-3 text-sm rounded-lg bg-surface-container border border-outline-variant/10 text-on-surface outline-none focus:ring-2 focus:ring-primary"
+                    />
+                </div>
+                <button 
+                    onClick={handleSync}
+                    disabled={saving || !url}
+                    className="flex items-center gap-2 h-[42px] px-4 bg-primary text-on-primary text-sm font-semibold rounded-xl transition hover:shadow-primary/20 disabled:opacity-50 whitespace-nowrap"
+                >
+                    <Save className="w-4 h-4" />
+                    {saving ? 'Syncing...' : 'Sync to Students'}
+                </button>
+            </div>
+            
+            <div className="w-full aspect-video md:h-[600px] rounded-2xl border border-outline-variant/10 overflow-hidden bg-white">
+                <iframe 
+                    src={url} 
+                    title="Whiteboard"
+                    className="w-full h-full border-0"
+                    allow="camera; microphone; display-capture; autoplay"
+                />
+            </div>
+        </div>
+    );
+}
+
+// Moderation Queue Panel
+function ModerationPanel({ liveClassId }) {
+    const [queue, setQueue] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const [refreshing, setRefreshing] = useState(false);
+    const [errorMessage, setErrorMessage] = useState('');
+    const [processingJobId, setProcessingJobId] = useState(null);
+    const [lastUpdated, setLastUpdated] = useState(null);
+
+    const fetchQueue = async ({ silent = false } = {}) => {
+        if (!silent) {
+            setLoading(true);
+        } else {
+            setRefreshing(true);
+        }
+
+        try {
+            const { data } = await api.get(`/live-classes/${liveClassId}/moderation-queue`);
+            setQueue(data.data || []);
+            setErrorMessage('');
+            setLastUpdated(new Date());
+        } catch (error) {
+            console.error('Failed to fetch moderation queue:', error);
+            setErrorMessage(error?.response?.data?.message || 'Unable to load flagged messages right now.');
+        } finally {
+            if (!silent) {
+                setLoading(false);
+            } else {
+                setRefreshing(false);
+            }
+        }
+    };
+
+    useEffect(() => {
+        fetchQueue();
+        const interval = setInterval(() => fetchQueue({ silent: true }), 5000);
+        return () => clearInterval(interval);
+    }, [liveClassId]);
+
+    const handleAction = async (jobId, action) => {
+        setProcessingJobId(jobId);
+        try {
+            await api.post(`/live-classes/moderation-queue/${jobId}/${action}`);
+            toast.success(action === 'approve' ? 'Message approved' : 'Message rejected');
+            setQueue(prev => prev.filter(j => j.jobId !== jobId));
+            setLastUpdated(new Date());
+        } catch (error) {
+            toast.error(error?.response?.data?.message || `Failed to ${action} message`);
+        } finally {
+            setProcessingJobId(null);
+        }
+    };
+
+    const formatTimestamp = (value) => {
+        if (!value) return 'Just now';
+        return new Date(value).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    };
+
+    return (
+        <div className="flex flex-col h-full bg-[#1a1a1a]">
+            <div className="p-4 border-b border-[#303030] space-y-3">
+                <div className="flex justify-between items-center gap-3">
+                    <div>
+                        <h3 className="text-sm font-bold text-white flex items-center gap-2">
+                            <Shield className="w-4 h-4 text-blue-400" />
+                            MODERATION QUEUE
+                        </h3>
+                        <p className="mt-1 text-[11px] text-gray-400">
+                            Review flagged chat messages before they appear to students.
+                        </p>
+                    </div>
+                    <span className="bg-red-600 text-white text-[10px] px-1.5 py-0.5 rounded-full font-bold min-w-6 text-center">
+                        {queue.length}
+                    </span>
+                </div>
+
+                <div className="flex items-center justify-between gap-3 text-[10px] text-gray-500">
+                    <span>
+                        {lastUpdated ? `Updated at ${formatTimestamp(lastUpdated)}` : 'Waiting for first sync'}
+                    </span>
+                    <button
+                        onClick={() => fetchQueue()}
+                        disabled={loading || refreshing}
+                        className="px-2.5 py-1 rounded-md border border-outline-variant/20 text-gray-200 hover:bg-white/5 disabled:opacity-50 transition"
+                    >
+                        {refreshing ? 'Refreshing...' : 'Refresh'}
+                    </button>
+                </div>
+            </div>
+
+            <div className="flex-1 overflow-y-auto p-4 space-y-4">
+                {loading ? (
+                    <div className="flex justify-center py-8"><div className="w-5 h-5 border-2 border-blue-500 border-t-transparent rounded-full animate-spin"></div></div>
+                ) : errorMessage ? (
+                    <div className="rounded-xl border border-red-500/20 bg-red-950/20 p-4 text-center">
+                        <p className="text-xs font-semibold text-red-300">Moderation queue unavailable</p>
+                        <p className="mt-1 text-[11px] text-red-200/80">{errorMessage}</p>
+                        <button
+                            onClick={() => fetchQueue()}
+                            className="mt-3 px-3 py-1.5 rounded-lg bg-red-500/15 text-red-200 text-[11px] font-semibold border border-red-500/20 hover:bg-red-500/25 transition"
+                        >
+                            Try again
+                        </button>
+                    </div>
+                ) : queue.length === 0 ? (
+                    <div className="text-center py-12 text-gray-500">
+                        <Check className="w-10 h-10 mx-auto mb-2 opacity-20" />
+                        <p className="text-xs font-semibold text-gray-300">No pending messages to review</p>
+                        <p className="mt-1 text-[11px] text-gray-500">
+                            Flagged student messages will appear here automatically.
+                        </p>
+                    </div>
+                ) : (
+                    queue.map((item) => (
+                        <div key={item.jobId} className="p-3 rounded bg-[#212121] border border-red-500/20 space-y-3">
+                            <div className="flex justify-between items-start">
+                                <div>
+                                    <span className="text-[10px] font-bold text-gray-400 uppercase">{item.senderName}</span>
+                                <span className="text-[9px] ml-2 px-1 rounded bg-red-900/30 text-red-400">FLAGGED</span>
+                                </div>
+                                <span className="text-[9px] text-gray-600">{formatTimestamp(item.ts)}</span>
+                            </div>
+                            <p className="text-xs text-white bg-black/30 p-2 rounded italic border-l-2 border-red-500">
+                                "{item.text}"
+                            </p>
+                            <div className="flex gap-2">
+                                <button 
+                                    onClick={() => handleAction(item.jobId, 'approve')}
+                                    disabled={processingJobId === item.jobId}
+                                    className="flex-1 py-1.5 bg-green-600 hover:bg-green-700 disabled:opacity-60 text-white text-[10px] font-bold rounded transition"
+                                >
+                                    {processingJobId === item.jobId ? 'PROCESSING...' : 'APPROVE'}
+                                </button>
+                                <button 
+                                    onClick={() => handleAction(item.jobId, 'reject')}
+                                    disabled={processingJobId === item.jobId}
+                                    className="flex-1 py-1.5 bg-red-600/20 hover:bg-red-600/40 disabled:opacity-60 text-red-500 text-[10px] font-bold rounded transition border border-red-500/30"
+                                >
+                                    REJECT
+                                </button>
+                            </div>
+                        </div>
+                    ))
+                )}
+            </div>
+            
+            <div className="p-3 bg-red-900/10 border-t border-red-900/20">
+                <p className="text-[10px] text-red-300 leading-tight">
+                    Messages containing blocked keywords are held here for manual review before appearing in chat.
+                </p>
             </div>
         </div>
     );

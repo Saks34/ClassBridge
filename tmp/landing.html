@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>ClassBridge | The Digital Observatory</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;700;800&amp;family=Inter:wght@400;500;600&amp;family=Space+Grotesk:wght@400;500;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "secondary-fixed": "#62fae3",
+                        "surface-variant": "#192540",
+                        "surface-dim": "#060e20",
+                        "primary-dim": "#40ceed",
+                        "tertiary-dim": "#9b90fe",
+                        "primary-fixed": "#53ddfc",
+                        "tertiary-container": "#9b90fe",
+                        "outline": "#6d758c",
+                        "on-primary": "#004b58",
+                        "surface-container-highest": "#192540",
+                        "on-secondary": "#005c52",
+                        "on-tertiary-fixed": "#13005b",
+                        "surface-tint": "#53ddfc",
+                        "tertiary-fixed-dim": "#a196ff",
+                        "inverse-on-surface": "#4d556b",
+                        "background": "#060e20",
+                        "secondary": "#62fae3",
+                        "on-secondary-fixed-variant": "#00675c",
+                        "on-tertiary-fixed-variant": "#352591",
+                        "on-tertiary": "#271284",
+                        "surface-container-low": "#091328",
+                        "on-primary-fixed": "#003640",
+                        "outline-variant": "#40485d",
+                        "on-secondary-container": "#dcfff7",
+                        "primary": "#53ddfc",
+                        "surface": "#060e20",
+                        "surface-container-lowest": "#000000",
+                        "secondary-dim": "#50ebd5",
+                        "secondary-container": "#006b5f",
+                        "on-surface": "#dee5ff",
+                        "on-error-container": "#ffa8a3",
+                        "error": "#ff716c",
+                        "on-error": "#490006",
+                        "surface-bright": "#1f2b49",
+                        "on-primary-container": "#00343e",
+                        "secondary-fixed-dim": "#50ebd5",
+                        "on-primary-fixed-variant": "#005564",
+                        "inverse-surface": "#faf8ff",
+                        "on-tertiary-container": "#1a0072",
+                        "on-secondary-fixed": "#004840",
+                        "primary-container": "#21bedc",
+                        "surface-container-high": "#141f38",
+                        "surface-container": "#0f1930",
+                        "inverse-primary": "#00687b",
+                        "error-dim": "#d7383b",
+                        "tertiary-fixed": "#afa6ff",
+                        "on-surface-variant": "#a3aac4",
+                        "primary-fixed-dim": "#40ceed",
+                        "on-background": "#dee5ff",
+                        "tertiary": "#a9a0ff",
+                        "error-container": "#9f0519"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.125rem",
+                        "lg": "0.25rem",
+                        "xl": "0.5rem",
+                        "full": "0.75rem"
+                    },
+                    "fontFamily": {
+                        "headline": ["Manrope"],
+                        "body": ["Inter"],
+                        "label": ["Space Grotesk"]
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .glass-panel {
+            background: rgba(25, 37, 64, 0.4);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+        }
+        .text-gradient-primary {
+            background: linear-gradient(135deg, #53ddfc 0%, #21bedc 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .bg-gradient-primary {
+            background: linear-gradient(135deg, #53ddfc 0%, #21bedc 100%);
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-surface text-on-surface font-body selection:bg-primary/30 selection:text-primary">
+<!-- TopAppBar -->
+<nav class="fixed top-0 w-full z-50 bg-[#060e20]/80 backdrop-blur-xl shadow-[0_0_15px_rgba(83,221,252,0.05)]">
+<div class="flex justify-between items-center px-8 py-4 max-w-7xl mx-auto">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-2xl font-black tracking-tighter text-sky-400" data-icon="polyline">polyline</span>
+<span class="font-headline tracking-tight text-lg font-bold text-sky-400">ClassBridge</span>
+</div>
+<div class="hidden md:flex items-center gap-8">
+<a class="text-sky-400 font-bold border-b-2 border-sky-400 font-label text-xs tracking-widest" href="#">CURRICULUM</a>
+<a class="text-slate-400 hover:text-sky-300 transition-colors font-label text-xs tracking-widest" href="#">MENTORS</a>
+<a class="text-slate-400 hover:text-sky-300 transition-colors font-label text-xs tracking-widest" href="#">LABS</a>
+<a class="text-slate-400 hover:text-sky-300 transition-colors font-label text-xs tracking-widest" href="#">SUPPORT</a>
+</div>
+<div class="flex items-center gap-4">
+<span class="material-symbols-outlined text-slate-400 hover:bg-sky-400/10 hover:text-sky-300 p-2 rounded-full transition-all cursor-pointer" data-icon="menu">menu</span>
+</div>
+</div>
+</nav>
+<main class="relative pt-24 overflow-hidden">
+<!-- Ambient Background Glows -->
+<div class="absolute top-[-10%] left-[-10%] w-[50%] h-[50%] bg-primary/10 blur-[120px] rounded-full pointer-events-none"></div>
+<div class="absolute bottom-[10%] right-[-5%] w-[40%] h-[40%] bg-tertiary/5 blur-[100px] rounded-full pointer-events-none"></div>
+<!-- Hero Section -->
+<section class="relative max-w-7xl mx-auto px-8 py-20 lg:py-32 flex flex-col items-center text-center">
+<div class="inline-flex items-center gap-2 px-4 py-2 rounded-full glass-panel mb-8 border border-outline-variant/10">
+<span class="font-label text-[10px] tracking-[0.2em] text-secondary uppercase">New: Virtual Laboratories 2.0</span>
+</div>
+<h1 class="font-headline text-5xl md:text-7xl lg:text-8xl font-extrabold tracking-tighter mb-8 leading-[0.9]">
+                Bridge the Gap in <br/>
+<span class="text-gradient-primary">Education</span>
+</h1>
+<p class="max-w-2xl text-on-surface-variant text-lg md:text-xl mb-12 font-body leading-relaxed">
+                Step into the Digital Observatory. A high-fidelity learning environment designed to connect global mentors with the next generation of digital pioneers.
+            </p>
+<!-- Floating Hero Card (Glassmorphism) -->
+<div class="relative w-full max-w-4xl group">
+<div class="absolute -inset-1 bg-gradient-to-r from-primary/20 to-secondary/20 rounded-xl blur opacity-25 group-hover:opacity-50 transition duration-1000 group-hover:duration-200"></div>
+<div class="relative glass-panel rounded-xl p-8 md:p-12 shadow-2xl border border-outline-variant/15 overflow-hidden">
+<div class="flex flex-col md:flex-row items-center justify-between gap-8">
+<div class="text-left">
+<h3 class="font-headline text-2xl font-bold mb-2">Ready to explore?</h3>
+<p class="text-on-surface-variant font-body">Join 12,000+ students already in the observatory.</p>
+</div>
+<div class="flex flex-col sm:flex-row gap-4 w-full md:w-auto">
+<button class="bg-gradient-primary text-on-primary-container font-headline font-bold py-4 px-10 rounded-full shadow-lg hover:shadow-primary/20 transition-all active:scale-95">
+                                Get Started
+                            </button>
+<button class="glass-panel text-on-surface hover:bg-surface-variant/40 py-4 px-10 rounded-full border border-outline-variant/20 transition-all font-headline font-bold">
+                                View Demo
+                            </button>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Features Bento Grid -->
+<section class="max-w-7xl mx-auto px-8 py-24">
+<div class="grid grid-cols-1 md:grid-cols-12 gap-6">
+<!-- Live Classes (Large Card) -->
+<div class="md:col-span-8 group relative overflow-hidden rounded-xl bg-surface-container-low border border-outline-variant/10 hover:border-primary/20 transition-all duration-500">
+<img alt="Live Classroom" class="absolute inset-0 w-full h-full object-cover opacity-20 group-hover:scale-105 transition-transform duration-700" data-alt="Futuristic digital classroom interface with holographic displays and diverse students participating in a live lecture" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCCfXBA0x8YW1m-RAM3l1aCM_cLh7C4rPbNeDK7hcwk7B1sQ6XZ_vI8d3eCz_Qvr5nHWvkieSzO8EEbhdZ34YIbBeW4u4GRVQhAfQwqlmFHyxAevExNK0ChsJS0hzzjda0uCUkvU86zSpzTn8bknzJ-6gRtxOBQGwJFyHVoco5URcA7l9_NiCaQOK-i7ZWT28EZ7j1lFIp5p4HrAI7GIyL7hXvbHGs_EI2sc-oCgiIg1dP_LYJE4IVfuUDz0DA0py9MMumAYCNkI_g"/>
+<div class="relative p-10 h-full flex flex-col justify-end min-h-[400px]">
+<div class="mb-4">
+<span class="material-symbols-outlined text-primary text-4xl mb-4" data-icon="sensors">sensors</span>
+<h3 class="font-headline text-3xl font-extrabold mb-4">Live Classes</h3>
+<p class="text-on-surface-variant max-w-md leading-relaxed">Experience high-bandwidth synchronous learning with ultra-low latency streaming and interactive whiteboards.</p>
+</div>
+<div class="flex gap-2 mt-6">
+<span class="font-label text-[10px] bg-primary/10 text-primary px-3 py-1 rounded-full uppercase tracking-wider">HD VIDEO</span>
+<span class="font-label text-[10px] bg-primary/10 text-primary px-3 py-1 rounded-full uppercase tracking-wider">INTERACTIVE</span>
+</div>
+</div>
+</div>
+<!-- Materials (Small Card) -->
+<div class="md:col-span-4 glass-panel p-8 rounded-xl flex flex-col justify-between border border-outline-variant/10 group hover:bg-surface-container-high transition-colors">
+<div>
+<div class="w-12 h-12 rounded-lg bg-secondary/10 flex items-center justify-center mb-6">
+<span class="material-symbols-outlined text-secondary" data-icon="folder_zip">folder_zip</span>
+</div>
+<h3 class="font-headline text-2xl font-bold mb-4">Materials</h3>
+<p class="text-on-surface-variant font-body text-sm leading-relaxed">Access our comprehensive vault of deep-dive documentation, case studies, and asset packs.</p>
+</div>
+<div class="mt-8 pt-8 border-t border-outline-variant/10">
+<div class="flex items-center justify-between text-secondary group-hover:translate-x-1 transition-transform cursor-pointer">
+<span class="font-label text-xs font-bold tracking-widest uppercase">Browse Vault</span>
+<span class="material-symbols-outlined text-sm" data-icon="arrow_forward">arrow_forward</span>
+</div>
+</div>
+</div>
+<!-- Real-time Chat (Asymmetric Middle) -->
+<div class="md:col-span-5 bg-surface-container-highest p-10 rounded-xl border border-outline-variant/10 relative overflow-hidden">
+<div class="absolute -right-10 -bottom-10 opacity-10">
+<span class="material-symbols-outlined text-[160px]" data-icon="chat_bubble_outline">chat_bubble_outline</span>
+</div>
+<h3 class="font-headline text-2xl font-bold mb-4">Real-time Chat</h3>
+<p class="text-on-surface-variant font-body mb-8">Instant communication with peers and mentors. Threaded discussions and code snippets supported natively.</p>
+<div class="space-y-4">
+<div class="flex items-center gap-3 p-3 glass-panel rounded-lg border border-outline-variant/5">
+<div class="w-8 h-8 rounded-full bg-tertiary-dim"></div>
+<div class="h-2 w-24 bg-outline-variant/20 rounded"></div>
+</div>
+<div class="flex items-center gap-3 p-3 glass-panel rounded-lg border border-outline-variant/5 ml-8">
+<div class="w-8 h-8 rounded-full bg-primary-dim"></div>
+<div class="h-2 w-32 bg-outline-variant/20 rounded"></div>
+</div>
+</div>
+</div>
+<!-- Progress/Stats (The Bridge) -->
+<div class="md:col-span-7 bg-surface-container-lowest p-10 rounded-xl border border-outline-variant/20 flex flex-col justify-center">
+<div class="mb-8">
+<div class="flex justify-between items-end mb-4">
+<span class="font-label text-xs text-on-surface-variant tracking-[0.2em] uppercase">Global Engagement</span>
+<span class="text-primary font-headline font-bold text-2xl">94%</span>
+</div>
+<!-- Progress Bridge Custom Component -->
+<div class="h-1 w-full bg-surface-variant/20 rounded-full overflow-hidden">
+<div class="h-full w-[94%] bg-gradient-to-r from-primary to-secondary"></div>
+</div>
+</div>
+<div class="grid grid-cols-3 gap-4">
+<div>
+<p class="font-label text-[10px] text-on-surface-variant mb-1 uppercase tracking-tighter">Nodes</p>
+<p class="font-headline font-bold text-lg">1.2k</p>
+</div>
+<div>
+<p class="font-label text-[10px] text-on-surface-variant mb-1 uppercase tracking-tighter">Sessions</p>
+<p class="font-headline font-bold text-lg">45k</p>
+</div>
+<div>
+<p class="font-label text-[10px] text-on-surface-variant mb-1 uppercase tracking-tighter">Latency</p>
+<p class="font-headline font-bold text-lg text-secondary">12ms</p>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- CTA Section -->
+<section class="max-w-5xl mx-auto px-8 py-24 text-center">
+<div class="py-16 px-8 rounded-2xl glass-panel border border-outline-variant/10 relative overflow-hidden">
+<div class="absolute top-0 right-0 p-8 opacity-20">
+<span class="material-symbols-outlined text-8xl" data-icon="auto_awesome">auto_awesome</span>
+</div>
+<h2 class="font-headline text-4xl font-extrabold mb-6 tracking-tight">Ready to join the observatory?</h2>
+<p class="text-on-surface-variant mb-10 max-w-xl mx-auto">Registration is open for the Winter Cohort. Secure your place in the most advanced digital education bridge ever built.</p>
+<button class="bg-gradient-primary text-on-primary-container font-headline font-bold py-4 px-12 rounded-full shadow-xl hover:scale-105 transition-all">
+                    Register Now
+                </button>
+</div>
+</section>
+</main>
+<!-- Footer -->
+<footer class="w-full border-t border-sky-900/10 bg-[#060e20]">
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 px-12 py-16 max-w-7xl mx-auto">
+<div class="space-y-4">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-sky-400" data-icon="polyline">polyline</span>
+<span class="text-xl font-bold text-sky-400">ClassBridge</span>
+</div>
+<p class="font-body text-sm text-slate-400 leading-relaxed">
+                    Building digital pathways between knowledge and ambition. The Digital Observatory for the modern age.
+                </p>
+</div>
+<div class="flex flex-col gap-4">
+<h4 class="font-label text-xs font-bold text-on-surface uppercase tracking-widest">Navigation</h4>
+<a class="font-body text-sm text-slate-500 hover:text-sky-300 hover:translate-x-1 transition-all cursor-pointer" href="#">Curriculum</a>
+<a class="font-body text-sm text-slate-500 hover:text-sky-300 hover:translate-x-1 transition-all cursor-pointer" href="#">Mentors</a>
+<a class="font-body text-sm text-slate-500 hover:text-sky-300 hover:translate-x-1 transition-all cursor-pointer" href="#">Labs</a>
+</div>
+<div class="flex flex-col gap-4">
+<h4 class="font-label text-xs font-bold text-on-surface uppercase tracking-widest">Connect</h4>
+<a class="font-body text-sm text-slate-500 hover:text-sky-300 hover:translate-x-1 transition-all cursor-pointer" href="#">Twitter</a>
+<a class="font-body text-sm text-slate-500 hover:text-sky-300 hover:translate-x-1 transition-all cursor-pointer" href="#">Discord</a>
+<a class="font-body text-sm text-slate-500 hover:text-sky-300 hover:translate-x-1 transition-all cursor-pointer" href="#">GitHub</a>
+</div>
+<div class="flex flex-col gap-4">
+<h4 class="font-label text-xs font-bold text-on-surface uppercase tracking-widest">Newsletter</h4>
+<div class="relative">
+<input class="w-full bg-surface-container-high border-none rounded-lg text-sm p-3 focus:ring-1 focus:ring-primary/50 placeholder:text-slate-600" placeholder="Email address" type="email"/>
+<button class="absolute right-2 top-2 text-primary">
+<span class="material-symbols-outlined" data-icon="send">send</span>
+</button>
+</div>
+</div>
+</div>
+<div class="max-w-7xl mx-auto px-12 pb-8 flex flex-col md:flex-row justify-between items-center gap-4">
+<span class="font-body text-sm text-slate-400">© 2024 ClassBridge. The Digital Observatory.</span>
+<div class="flex gap-6">
+<a class="font-body text-xs text-slate-500 hover:text-sky-300 transition-colors" href="#">Privacy</a>
+<a class="font-body text-xs text-slate-500 hover:text-sky-300 transition-colors" href="#">Terms</a>
+</div>
+</div>
+</footer>
+</body></html>

@@ -24,7 +24,7 @@ const localizer = dateFnsLocalizer({
 });
 
 export default function TimetableCalendar({ slots, onSlotClick, userRole, loading }) {
-    const { isDark } = useTheme();
+    const { toggleTheme } = useTheme();
     const [view, setView] = useState(Views.MONTH); // Default to Week as usually best for timetables
     const [date, setDate] = useState(new Date());
     const [selectedEvent, setSelectedEvent] = useState(null);
@@ -51,17 +51,17 @@ export default function TimetableCalendar({ slots, onSlotClick, userRole, loadin
                     {getStatusDot()}
                 </div>
 
-                <div className={`text-[10px] font-medium truncate mb-1 ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>
+                <div className="text-[10px] font-medium truncate mb-1 text-on-surface-variant/60">
                     {event.resource.batch?.name || 'Batch'}
                 </div>
 
-                <div className={`mt-auto flex items-center gap-1 text-[10px] ${isDark ? 'text-gray-500' : 'text-gray-500'}`}>
+                <div className="mt-auto flex items-center gap-1 text-[10px] text-on-surface-variant/40">
                     <Clock size={10} />
                     <span>{format(event.start, 'h:mm')} - {format(event.end, 'h:mm a')}</span>
                 </div>
 
                 {event.resource.teacher?.name && (
-                    <div className="text-[9px] text-gray-500 truncate mt-0.5">
+                    <div className="text-[9px] text-on-surface-variant/40 truncate mt-0.5">
                         👤 {event.resource.teacher.name}
                     </div>
                 )}
@@ -70,35 +70,30 @@ export default function TimetableCalendar({ slots, onSlotClick, userRole, loadin
     };
 
     const eventStyleGetter = (event) => {
-        let backgroundColor = '#f3f4f6';
-        let borderColor = '#d1d5db';
-        let textColor = '#374151';
-
-        if (isDark) {
-            backgroundColor = '#1f2937';
-            textColor = '#e5e7eb';
-        }
+        let backgroundColor = 'var(--surface-container-highest)';
+        let borderColor = 'var(--outline-variant)';
+        let textColor = 'var(--on-surface-variant)';
 
         switch (event.status) {
             case 'live':
-                backgroundColor = isDark ? 'rgba(16, 185, 129, 0.15)' : '#d1fae5';
-                borderColor = '#10b981';
-                textColor = isDark ? '#6ee7b7' : '#065f46';
+                backgroundColor = 'rgba(var(--secondary-rgb), 0.15)';
+                borderColor = 'var(--secondary)';
+                textColor = 'var(--secondary)';
                 break;
             case 'upcoming':
-                backgroundColor = isDark ? 'rgba(251, 191, 36, 0.15)' : '#fef3c7';
-                borderColor = '#f59e0b';
-                textColor = isDark ? '#fcd34d' : '#92400e';
+                backgroundColor = 'rgba(var(--primary-rgb), 0.15)';
+                borderColor = 'var(--primary)';
+                textColor = 'var(--primary)';
                 break;
             case 'completed':
-                backgroundColor = isDark ? 'rgba(107, 114, 128, 0.15)' : '#f3f4f6';
-                borderColor = '#9ca3af';
-                textColor = isDark ? '#d1d5db' : '#6b7280';
+                backgroundColor = 'rgba(var(--on-surface-variant-rgb), 0.05)';
+                borderColor = 'rgba(var(--on-surface-variant-rgb), 0.2)';
+                textColor = 'rgba(var(--on-surface-variant-rgb), 0.5)';
                 break;
             default:
-                backgroundColor = isDark ? 'rgba(139, 92, 246, 0.15)' : '#ede9fe';
-                borderColor = '#8b5cf6';
-                textColor = isDark ? '#c4b5fd' : '#5b21b6';
+                backgroundColor = 'rgba(var(--tertiary-rgb), 0.15)';
+                borderColor = 'var(--tertiary)';
+                textColor = 'var(--tertiary)';
         }
 
         return {
@@ -112,52 +107,30 @@ export default function TimetableCalendar({ slots, onSlotClick, userRole, loadin
                 color: textColor,
                 padding: '0',
                 fontSize: '0.75rem',
-                boxShadow: '0 1px 3px rgba(0,0,0,0.1)',
+                boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
                 transition: 'all 0.2s ease',
                 cursor: 'pointer',
             }
         };
     };
 
-    // Let's redefine CustomToolbar to correctly use props
     const CustomToolbar = (toolbar) => {
-        const goToBack = () => {
-            toolbar.onNavigate('PREV');
-        };
-
-        const goToNext = () => {
-            toolbar.onNavigate('NEXT');
-        };
-
-        const goToCurrent = () => {
-            toolbar.onNavigate('TODAY');
-        };
-
-        const handleViewChange = (newView) => {
-            toolbar.onView(newView);
-        };
+        const goToBack = () => toolbar.onNavigate('PREV');
+        const goToNext = () => toolbar.onNavigate('NEXT');
+        const goToCurrent = () => toolbar.onNavigate('TODAY');
+        const handleViewChange = (newView) => toolbar.onView(newView);
 
         return (
             <div className="flex flex-col xl:flex-row items-center justify-between mb-8 gap-6">
-                {/* Date Navigation & View Title */}
                 <div className="flex flex-col sm:flex-row items-center gap-4 w-full xl:w-auto">
-                    <div className={`flex items-center p-1 rounded-full shadow-sm border ${isDark ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'}`}>
-                        <button
-                            onClick={goToBack}
-                            className={`p-2.5 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 transition-all ${isDark ? 'text-gray-400 hover:text-white' : 'text-gray-600 hover:text-gray-900'}`}
-                        >
+                    <div className="flex items-center p-1 rounded-full shadow-sm border border-outline-variant/10 bg-surface-container-high">
+                        <button onClick={goToBack} className="p-2.5 rounded-full hover:bg-surface-bright/10 text-on-surface-variant transition-all hover:text-on-surface">
                             <ChevronLeft size={20} />
                         </button>
-                        <button
-                            onClick={goToCurrent}
-                            className={`px-6 py-2 text-sm font-bold uppercase tracking-wider transition-all ${isDark ? 'text-gray-200' : 'text-gray-700'}`}
-                        >
+                        <button onClick={goToCurrent} className="px-6 py-2 text-sm font-bold uppercase tracking-wider transition-all text-on-surface">
                             Today
                         </button>
-                        <button
-                            onClick={goToNext}
-                            className={`p-2.5 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 transition-all ${isDark ? 'text-gray-400 hover:text-white' : 'text-gray-600 hover:text-gray-900'}`}
-                        >
+                        <button onClick={goToNext} className="p-2.5 rounded-full hover:bg-surface-bright/10 text-on-surface-variant transition-all hover:text-on-surface">
                             <ChevronRight size={20} />
                         </button>
                     </div>
@@ -167,38 +140,16 @@ export default function TimetableCalendar({ slots, onSlotClick, userRole, loadin
                     </h2>
                 </div>
 
-                {/* View Switcher & Legend */}
                 <div className="flex flex-col sm:flex-row items-center gap-4 w-full xl:w-auto">
-                    <div className={`flex p-1 rounded-xl border shadow-sm ${isDark ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'}`}>
-                        <button
-                            onClick={() => handleViewChange(Views.MONTH)}
-                            className={`flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-lg transition-all ${toolbar.view === Views.MONTH
-                                ? (isDark ? 'bg-violet-900/50 text-violet-300' : 'bg-violet-50 text-violet-700')
-                                : (isDark ? 'text-gray-400 hover:text-gray-200' : 'text-gray-600 hover:text-gray-900')
-                                }`}
-                        >
-                            <CalendarIcon size={16} />
-                            Month
+                    <div className="flex p-1 rounded-xl border border-outline-variant/10 shadow-sm bg-surface-container-high">
+                        <button onClick={() => handleViewChange(Views.MONTH)} className={`flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-lg transition-all ${toolbar.view === Views.MONTH ? 'bg-primary/20 text-primary' : 'text-on-surface-variant/60 hover:text-on-surface'}`}>
+                            <CalendarIcon size={16} /> Month
                         </button>
-                        <button
-                            onClick={() => handleViewChange(Views.WEEK)}
-                            className={`flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-lg transition-all ${toolbar.view === Views.WEEK
-                                ? (isDark ? 'bg-violet-900/50 text-violet-300' : 'bg-violet-50 text-violet-700')
-                                : (isDark ? 'text-gray-400 hover:text-gray-200' : 'text-gray-600 hover:text-gray-900')
-                                }`}
-                        >
-                            <Layout size={16} />
-                            Week
+                        <button onClick={() => handleViewChange(Views.WEEK)} className={`flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-lg transition-all ${toolbar.view === Views.WEEK ? 'bg-primary/20 text-primary' : 'text-on-surface-variant/60 hover:text-on-surface'}`}>
+                            <Layout size={16} /> Week
                         </button>
-                        <button
-                            onClick={() => handleViewChange(Views.DAY)}
-                            className={`flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-lg transition-all ${toolbar.view === Views.DAY
-                                ? (isDark ? 'bg-violet-900/50 text-violet-300' : 'bg-violet-50 text-violet-700')
-                                : (isDark ? 'text-gray-400 hover:text-gray-200' : 'text-gray-600 hover:text-gray-900')
-                                }`}
-                        >
-                            <List size={16} />
-                            Day
+                        <button onClick={() => handleViewChange(Views.DAY)} className={`flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-lg transition-all ${toolbar.view === Views.DAY ? 'bg-primary/20 text-primary' : 'text-on-surface-variant/60 hover:text-on-surface'}`}>
+                            <List size={16} /> Day
                         </button>
                     </div>
 
@@ -217,42 +168,20 @@ export default function TimetableCalendar({ slots, onSlotClick, userRole, loadin
         );
     };
 
-    const handleSelectEvent = (event) => {
-        setSelectedEvent(event);
-    };
+    const handleSelectEvent = (event) => setSelectedEvent(event);
 
     const getStatusBadge = (status) => {
         const badges = {
-            live: {
-                bg: isDark ? 'bg-green-900/30' : 'bg-green-100',
-                text: isDark ? 'text-green-400' : 'text-green-700',
-                label: 'LIVE NOW',
-                icon: <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse"></div>
-            },
-            upcoming: {
-                bg: isDark ? 'bg-yellow-900/30' : 'bg-yellow-100',
-                text: isDark ? 'text-yellow-400' : 'text-yellow-700',
-                label: 'UPCOMING',
-                icon: <Clock size={16} />
-            },
-            completed: {
-                bg: isDark ? 'bg-gray-800' : 'bg-gray-100',
-                text: isDark ? 'text-gray-400' : 'text-gray-600',
-                label: 'COMPLETED',
-                icon: null
-            },
-            default: {
-                bg: isDark ? 'bg-violet-900/30' : 'bg-violet-100',
-                text: isDark ? 'text-violet-400' : 'text-violet-700',
-                label: 'SCHEDULED',
-                icon: null
-            }
+            live: { bg: 'bg-secondary/10', text: 'text-secondary', label: 'LIVE NOW', icon: <div className="w-2 h-2 rounded-full bg-secondary animate-pulse"></div> },
+            upcoming: { bg: 'bg-primary/10', text: 'text-primary', label: 'UPCOMING', icon: <Clock size={16} /> },
+            completed: { bg: 'bg-surface-container-highest', text: 'text-on-surface-variant/70', label: 'COMPLETED', icon: null },
+            default: { bg: 'bg-tertiary/10', text: 'text-tertiary', label: 'SCHEDULED', icon: null }
         };
         return badges[status] || badges.default;
     };
 
     return (
-        <div className={`rounded-2xl shadow-xl border transition-all duration-300 overflow-hidden ${isDark ? 'bg-gray-900 border-gray-800' : 'bg-white border-gray-200'}`}>
+        <div className="rounded-2xl shadow-xl border border-outline-variant/10 transition-all duration-300 overflow-hidden bg-surface-container-low">
             <div className="p-4 sm:p-6">
                 <Calendar
                     localizer={localizer}
@@ -267,115 +196,32 @@ export default function TimetableCalendar({ slots, onSlotClick, userRole, loadin
                     date={date}
                     onNavigate={(newDate) => setDate(newDate)}
                     eventPropGetter={eventStyleGetter}
-                    components={{
-                        toolbar: CustomToolbar,
-                        event: CustomEvent,
-                    }}
-                    min={new Date(0, 0, 0, 7, 0, 0)} // Start at 7 AM
-                    max={new Date(0, 0, 0, 22, 0, 0)} // End at 10 PM
+                    components={{ toolbar: CustomToolbar, event: CustomEvent }}
+                    min={new Date(0, 0, 0, 7, 0, 0)}
+                    max={new Date(0, 0, 0, 22, 0, 0)}
                     step={30}
                     timeslots={2}
-                    className={`enhanced-calendar ${isDark ? 'dark-mode' : 'light-mode'}`}
+                    className="enhanced-calendar"
                     onSelectEvent={handleSelectEvent}
                 />
             </div>
-
             <style>{`
-                .enhanced-calendar {
-                    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
-                }
-
-                .enhanced-calendar .rbc-header {
-                    padding: 16px 8px;
-                    font-size: 0.875rem;
-                    font-weight: 700;
-                    text-transform: uppercase;
-                    letter-spacing: 0.05em;
-                    border-bottom: 2px solid ${isDark ? '#374151' : '#e5e7eb'} !important;
-                    background: ${isDark ? '#111827' : '#fafafa'};
-                }
-
-                .enhanced-calendar .rbc-time-header-content {
-                    border-left: none !important;
-                }
-
-                .enhanced-calendar .rbc-time-content {
-                    border-top: 2px solid ${isDark ? '#374151' : '#e5e7eb'} !important;
-                }
-
-                .enhanced-calendar .rbc-day-bg + .rbc-day-bg {
-                    border-left: 1px solid ${isDark ? '#1f2937' : '#f3f4f6'} !important;
-                }
-
-                .enhanced-calendar .rbc-timeslot-group {
-                    min-height: 80px;
-                    border-bottom: 1px solid ${isDark ? '#1f2937' : '#f3f4f6'} !important;
-                }
-
-                .enhanced-calendar .rbc-time-slot {
-                    border-top: 1px dashed ${isDark ? '#1f2937' : '#f9fafb'} !important;
-                }
-
-                .enhanced-calendar .rbc-current-time-indicator {
-                    background-color: #ef4444 !important;
-                    height: 2px !important;
-                }
-
-                .enhanced-calendar .rbc-today {
-                    background-color: ${isDark ? 'rgba(139, 92, 246, 0.08)' : 'rgba(139, 92, 246, 0.05)'} !important;
-                }
-
-                .enhanced-calendar .rbc-time-gutter .rbc-timeslot-group {
-                    border-bottom: none !important;
-                }
-
-                .enhanced-calendar .rbc-label {
-                    font-size: 0.75rem;
-                    font-weight: 600;
-                    color: ${isDark ? '#9ca3af' : '#6b7280'};
-                    padding-right: 8px;
-                }
-
-                .enhanced-calendar .rbc-event {
-                    border-radius: 8px !important;
-                }
-
-                .enhanced-calendar .rbc-event:hover {
-                    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-                    transform: translateY(-1px);
-                }
-
-                .enhanced-calendar .rbc-event-content {
-                    padding: 0 !important;
-                }
-
-                .enhanced-calendar .rbc-time-view {
-                    border: none !important;
-                }
-
-                .enhanced-calendar .rbc-time-header {
-                    border-bottom: none !important;
-                }
-
-                .enhanced-calendar .rbc-allday-cell {
-                    display: none;
-                }
-
-                .enhanced-calendar.dark-mode .rbc-off-range-bg {
-                    background-color: #0f172a;
-                }
+                .enhanced-calendar { font-family: 'Inter', sans-serif; }
+                .enhanced-calendar .rbc-header { padding: 16px 8px; font-size: 0.875rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; border-bottom: 2px solid var(--outline-variant) !important; background: var(--surface-container-high); color: var(--on-surface-variant); }
+                .enhanced-calendar .rbc-time-header-content { border-left: none !important; }
+                .enhanced-calendar .rbc-month-view, .enhanced-calendar .rbc-time-view { border: 1px solid var(--outline-variant) !important; background: var(--surface-container-low); color: var(--on-surface); }
+                .enhanced-calendar .rbc-day-bg + .rbc-day-bg { border-left: 1px solid var(--outline-variant) !important; }
+                .enhanced-calendar .rbc-timeslot-group { min-height: 80px; border-bottom: 1px solid var(--outline-variant) !important; }
+                .enhanced-calendar .rbc-time-slot { border-top: 1px dashed var(--outline-variant) !important; }
+                .enhanced-calendar .rbc-label { font-size: 0.75rem; font-weight: 600; color: var(--on-surface-variant-5); padding-right: 8px; }
+                .enhanced-calendar .rbc-today { background-color: var(--primary-10) !important; }
+                .enhanced-calendar .rbc-off-range-bg { background-color: var(--surface-container) !important; opacity: 0.5; }
+                .enhanced-calendar .rbc-event { border-radius: 8px !important; padding: 0 !important; }
             `}</style>
 
-            {/* Enhanced Details Modal */}
-            <Modal
-                isOpen={!!selectedEvent}
-                onClose={() => setSelectedEvent(null)}
-                title="Class Details"
-                maxWidth="max-w-xl"
-            >
+            <Modal isOpen={!!selectedEvent} onClose={() => setSelectedEvent(null)} title="Class Details" size="max-w-xl">
                 {selectedEvent && (
                     <div className="space-y-6">
-                        {/* Status Badge */}
                         <div className={`flex items-center justify-between p-4 rounded-xl ${getStatusBadge(selectedEvent.status).bg}`}>
                             <div className="flex items-center gap-2">
                                 {getStatusBadge(selectedEvent.status).icon}
@@ -385,58 +231,55 @@ export default function TimetableCalendar({ slots, onSlotClick, userRole, loadin
                             </div>
                         </div>
 
-                        {/* Subject Info */}
                         <div>
-                            <h3 className={`text-2xl font-bold mb-2 ${isDark ? 'text-white' : 'text-gray-900'}`}>
+                            <h3 className="text-2xl font-bold mb-2 text-on-surface">
                                 {selectedEvent.resource.subject}
                             </h3>
-                            <div className={`flex items-center gap-2 ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>
+                            <div className="flex items-center gap-2 text-on-surface-variant/70">
                                 <BookOpen size={18} />
                                 <span className="font-medium">{selectedEvent.resource.batch?.name || 'Batch'}</span>
                             </div>
                         </div>
 
-                        {/* Details Grid */}
                         <div className="grid grid-cols-1 gap-4">
-                            <div className={`flex items-start gap-4 p-4 rounded-xl ${isDark ? 'bg-gray-800/50' : 'bg-gray-50'}`}>
-                                <div className={`p-2 rounded-lg ${isDark ? 'bg-violet-900/30' : 'bg-violet-100'}`}>
-                                    <Clock className={isDark ? 'text-violet-400' : 'text-violet-600'} size={20} />
+                            <div className="flex items-start gap-4 p-4 rounded-xl bg-surface-container-highest/30">
+                                <div className="p-2 rounded-lg bg-tertiary/10">
+                                    <Clock className="text-tertiary" size={20} />
                                 </div>
                                 <div className="flex-1">
-                                    <p className={`text-xs font-bold uppercase tracking-wider mb-1 ${isDark ? 'text-gray-400' : 'text-gray-500'}`}>Time</p>
-                                    <p className={`text-base font-semibold ${isDark ? 'text-gray-100' : 'text-gray-900'}`}>
+                                    <p className="text-xs font-bold uppercase tracking-wider mb-1 text-on-surface-variant/50">Time</p>
+                                    <p className="text-base font-semibold text-on-surface">
                                         {selectedEvent.resource.startTime} - {selectedEvent.resource.endTime}
                                     </p>
                                 </div>
                             </div>
 
-                            <div className={`flex items-start gap-4 p-4 rounded-xl ${isDark ? 'bg-gray-800/50' : 'bg-gray-50'}`}>
-                                <div className={`p-2 rounded-lg ${isDark ? 'bg-blue-900/30' : 'bg-blue-100'}`}>
-                                    <UserIcon className={isDark ? 'text-blue-400' : 'text-blue-600'} size={20} />
+                            <div className="flex items-start gap-4 p-4 rounded-xl bg-surface-container-highest/30">
+                                <div className="p-2 rounded-lg bg-primary/10">
+                                    <UserIcon className="text-primary" size={20} />
                                 </div>
                                 <div className="flex-1">
-                                    <p className={`text-xs font-bold uppercase tracking-wider mb-1 ${isDark ? 'text-gray-400' : 'text-gray-500'}`}>Teacher</p>
-                                    <p className={`text-base font-semibold ${isDark ? 'text-gray-100' : 'text-gray-900'}`}>
+                                    <p className="text-xs font-bold uppercase tracking-wider mb-1 text-on-surface-variant/50">Teacher</p>
+                                    <p className="text-base font-semibold text-on-surface">
                                         {selectedEvent.resource.teacher?.name || 'Unassigned'}
                                     </p>
                                 </div>
                             </div>
 
-                            <div className={`flex items-start gap-4 p-4 rounded-xl ${isDark ? 'bg-gray-800/50' : 'bg-gray-50'}`}>
-                                <div className={`p-2 rounded-lg ${isDark ? 'bg-pink-900/30' : 'bg-pink-100'}`}>
-                                    <MapPin className={isDark ? 'text-pink-400' : 'text-pink-600'} size={20} />
+                            <div className="flex items-start gap-4 p-4 rounded-xl bg-surface-container-highest/30">
+                                <div className="p-2 rounded-lg bg-secondary/10">
+                                    <MapPin className="text-secondary" size={20} />
                                 </div>
                                 <div className="flex-1">
-                                    <p className={`text-xs font-bold uppercase tracking-wider mb-1 ${isDark ? 'text-gray-400' : 'text-gray-500'}`}>Day</p>
-                                    <p className={`text-base font-semibold ${isDark ? 'text-gray-100' : 'text-gray-900'}`}>
+                                    <p className="text-xs font-bold uppercase tracking-wider mb-1 text-on-surface-variant/50">Day</p>
+                                    <p className="text-base font-semibold text-on-surface">
                                         {selectedEvent.resource.day}
                                     </p>
                                 </div>
                             </div>
                         </div>
 
-                        {/* Action Buttons */}
-                        <div className={`flex flex-col gap-3 pt-4 border-t ${isDark ? 'border-gray-700' : 'border-gray-200'}`}>
+                        <div className="flex flex-col gap-3 pt-4 border-t border-outline-variant/10">
                             {userRole === 'InstitutionAdmin' || userRole === 'SuperAdmin' ? (
                                 <>
                                     {selectedEvent.status === 'live' && (

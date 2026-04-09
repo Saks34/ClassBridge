@@ -3,53 +3,53 @@ import api from '../../services/api';
 import TimetableCalendar from '../../components/shared/TimetableCalendar';
 import LoadingSpinner from '../../components/shared/LoadingSpinner';
 import { useAuth } from '../../context/AuthContext';
-import { useTheme } from '../../context/ThemeContext';
+import { Calendar, Compass } from 'lucide-react';
+import usePageTitle from '../../hooks/usePageTitle';
 
 export default function TeacherTimetable() {
+    usePageTitle('My Schedule', 'Teacher');
     const { user } = useAuth();
-    const { isDark } = useTheme();
     const [slots, setSlots] = useState([]);
     const [loading, setLoading] = useState(false);
-
-    const textPrimary = isDark ? 'text-white' : 'text-gray-900';
-    const textSecondary = isDark ? 'text-gray-400' : 'text-gray-600';
-    const cardBg = isDark
-        ? 'bg-gray-900/60 backdrop-blur-xl border-white/10'
-        : 'bg-white/60 backdrop-blur-xl border-gray-200/50';
 
     useEffect(() => {
         const loadData = async () => {
             setLoading(true);
             try {
-                // Teacher endpoint automatically uses logical teacher ID from token
                 const { data } = await api.get('/timetables/by-teacher');
-                setSlots(data.slots || []);
+                setSlots(data.data.slots || []);
             } catch (error) {
                 console.error('Failed to load timetable:', error);
-            } finally {
-                setLoading(false);
-            }
+            } finally { setLoading(false); }
         };
-
         loadData();
     }, []);
 
-    const handleSlotClick = (slot, action) => {
-        // Teachers might have different actions like "Start Class" (handled inside Calendar for generic 'live' status button)
-        // But for now, maybe just view details.
-        // console.log('Slot clicked:', slot);
-    };
+    const handleSlotClick = (slot, action) => {};
 
-    if (loading) return <LoadingSpinner centered />;
+    if (loading) return <div className="h-[80vh] flex items-center justify-center"><LoadingSpinner centered /></div>;
 
     return (
-        <div className="max-w-7xl mx-auto space-y-6">
-            <div>
-                <h1 className={`text-4xl font-bold ${textPrimary} mb-2`}>My Schedule</h1>
-                <p className={textSecondary}>View your weekly teaching schedule</p>
-            </div>
+        <div className="max-w-screen-2xl mx-auto space-y-12 animate-fade-in">
+            <header className="mb-12">
+                <div className="flex items-center gap-5 mb-4">
+                    <div className="w-14 h-14 rounded-[1.25rem] bg-surface-container-high border border-outline-variant/10 flex items-center justify-center shadow-lg">
+                        <Calendar className="text-primary" size={28} />
+                    </div>
+                    <div>
+                        <h1 className="text-4xl md:text-6xl font-extrabold font-headline text-on-surface tracking-tight leading-none">
+                            My <span className="text-gradient-primary">Schedule</span>
+                        </h1>
+                    </div>
+                </div>
+                <div className="flex items-center gap-2 mt-2">
+                    <Compass size={14} className="text-secondary" />
+                    <p className="text-on-surface-variant/70 font-body text-base">View your weekly teaching schedule and manage your sessions.</p>
+                </div>
+            </header>
 
-            <div className={`${cardBg} border rounded-2xl p-6 shadow-xl`}>
+            <div className="bg-surface-container-low/40 glass-panel border border-outline-variant/10 rounded-[2.5rem] p-8 shadow-2xl relative overflow-hidden">
+                <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-primary/10 via-secondary/10 to-primary/10 opacity-20"></div>
                 <TimetableCalendar
                     slots={slots}
                     onSlotClick={handleSlotClick}

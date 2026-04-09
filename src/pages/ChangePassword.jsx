@@ -3,27 +3,19 @@ import { useNavigate } from 'react-router-dom';
 import toast from 'react-hot-toast';
 import api from '../services/api';
 import { useAuth } from '../context/AuthContext';
-import { Sun, Moon, Lock, ArrowRight, ShieldCheck } from 'lucide-react';
+import { useTheme } from '../context/ThemeContext';
+import { Sun, Moon, Lock, ArrowRight, ShieldCheck, Eye, EyeOff } from 'lucide-react';
 
 export default function ChangePassword() {
     const [newPassword, setNewPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
-    const [theme, setTheme] = useState('light');
+    const [showNewPassword, setShowNewPassword] = useState(false);
+    const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+    const { theme, toggleTheme, isDark } = useTheme();
     const { login } = useAuth();
     const navigate = useNavigate();
-
-    useEffect(() => {
-        const savedTheme = localStorage.getItem('theme') || 'light';
-        setTheme(savedTheme);
-    }, []);
-
-    const toggleTheme = () => {
-        const newTheme = theme === 'light' ? 'dark' : 'light';
-        setTheme(newTheme);
-        localStorage.setItem('theme', newTheme);
-    };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -72,96 +64,95 @@ export default function ChangePassword() {
         }
     };
 
-    const isDark = theme === 'dark';
+
 
     return (
-        <div className={`min-h-screen flex items-center justify-center p-4 transition-colors duration-300 ${isDark
-                ? 'bg-gradient-to-br from-gray-900 via-blue-900 to-indigo-900'
-                : 'bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50'
-            }`}>
-            {/* Theme Toggle */}
+        <div className="min-h-screen flex items-center justify-center p-4 transition-colors duration-300 bg-surface">
+            {/* Theme Toggle Overlay */}
+            <div className="fixed top-0 left-0 w-full h-full bg-[radial-gradient(circle_at_50%_50%,rgba(var(--primary-rgb),0.05),transparent_70%)] pointer-events-none"></div>
+
             <button
                 onClick={toggleTheme}
-                className={`fixed top-6 right-6 p-3 rounded-full shadow-lg hover:shadow-xl transition-all duration-300 group ${isDark ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'
-                    } border`}
+                className="fixed top-6 right-6 p-3 rounded-full shadow-lg hover:shadow-primary/20 transition-all duration-300 group bg-surface-container-high border border-outline-variant/10"
                 aria-label="Toggle theme"
             >
                 {isDark ? (
-                    <Sun className="w-5 h-5 text-yellow-400 group-hover:rotate-12 transition-transform" />
+                    <Sun className="w-5 h-5 text-primary group-hover:rotate-12 transition-transform" />
                 ) : (
-                    <Moon className="w-5 h-5 text-indigo-600 group-hover:rotate-12 transition-transform" />
+                    <Moon className="w-5 h-5 text-secondary group-hover:rotate-12 transition-transform" />
                 )}
             </button>
 
             <div className="w-full max-w-md">
                 {/* Logo & Header */}
                 <div className="text-center mb-8">
-                    <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-gradient-to-br from-indigo-600 to-purple-600 shadow-lg mb-4 transform hover:scale-110 transition-transform">
-                        <ShieldCheck className="w-8 h-8 text-white" />
+                    <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-gradient-primary shadow-lg mb-6 transform hover:scale-110 transition-transform">
+                        <ShieldCheck className="w-8 h-8 text-on-primary-container" />
                     </div>
-                    <h1 className={`text-3xl font-bold mb-2 ${isDark ? 'text-white' : 'text-gray-900'}`}>
+                    <h1 className="text-3xl font-bold mb-2 text-on-surface font-headline tracking-tight">
                         Secure Your Account
                     </h1>
-                    <p className={isDark ? 'text-gray-400' : 'text-gray-600'}>
+                    <p className="text-on-surface-variant font-body">
                         Please set a new secure password to continue
                     </p>
                 </div>
 
                 {/* Main Card */}
-                <div className={`rounded-2xl shadow-2xl p-8 backdrop-blur-sm ${isDark ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-100'
-                    } border`}>
+                <div className="rounded-[2.5rem] shadow-2xl p-8 md:p-10 backdrop-blur-sm bg-surface-container-low/40 border border-outline-variant/10 relative overflow-hidden group">
+                    <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-primary/10 via-secondary/10 to-primary/10 opacity-20"></div>
 
                     <form onSubmit={handleSubmit} className="space-y-5">
                         {/* New Password */}
                         <div>
-                            <label className={`block text-sm font-medium mb-2 ${isDark ? 'text-gray-300' : 'text-gray-700'
-                                }`}>
+                            <label className="font-label text-[10px] uppercase tracking-widest text-primary/70 font-bold block mb-2">
                                 New Password
                             </label>
-                            <div className="relative">
-                                <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+                            <div className="relative group">
+                                <Lock className="absolute left-0 top-1/2 -translate-y-1/2 w-5 h-5 text-on-surface-variant/30 group-focus-within:text-primary transition-colors" />
                                 <input
                                     value={newPassword}
                                     onChange={(e) => setNewPassword(e.target.value)}
-                                    type="password"
+                                    type={showNewPassword ? 'text' : 'password'}
                                     placeholder="••••••••"
                                     required
-                                    className={`w-full pl-11 pr-4 py-3 rounded-xl border transition-all outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent ${isDark
-                                            ? 'border-gray-600 bg-gray-700 text-white placeholder-gray-400'
-                                            : 'border-gray-300 bg-white text-gray-900 placeholder-gray-400'
-                                        }`}
+                                    className="w-full pl-8 pr-12 py-3 bg-transparent border-0 border-b-2 border-outline-variant/30 text-on-surface placeholder:text-outline-variant/50 font-body focus:outline-none focus:border-primary transition-all"
                                 />
+                                <button type="button" onClick={() => setShowNewPassword(!showNewPassword)}
+                                    className="absolute right-0 top-1/2 -translate-y-1/2 text-on-surface-variant/30 hover:text-primary transition-colors"
+                                    aria-label={showNewPassword ? 'Hide password' : 'Show password'}>
+                                    {showNewPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                                </button>
                             </div>
                         </div>
 
                         {/* Confirm Password */}
                         <div>
-                            <label className={`block text-sm font-medium mb-2 ${isDark ? 'text-gray-300' : 'text-gray-700'
-                                }`}>
+                            <label className="font-label text-[10px] uppercase tracking-widest text-primary/70 font-bold block mb-2">
                                 Confirm Password
                             </label>
-                            <div className="relative">
-                                <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+                            <div className="relative group">
+                                <Lock className="absolute left-0 top-1/2 -translate-y-1/2 w-5 h-5 text-on-surface-variant/30 group-focus-within:text-primary transition-colors" />
                                 <input
                                     value={confirmPassword}
                                     onChange={(e) => setConfirmPassword(e.target.value)}
-                                    type="password"
+                                    type={showConfirmPassword ? 'text' : 'password'}
                                     placeholder="••••••••"
                                     required
-                                    className={`w-full pl-11 pr-4 py-3 rounded-xl border transition-all outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent ${isDark
-                                            ? 'border-gray-600 bg-gray-700 text-white placeholder-gray-400'
-                                            : 'border-gray-300 bg-white text-gray-900 placeholder-gray-400'
-                                        }`}
+                                    className="w-full pl-8 pr-12 py-3 bg-transparent border-0 border-b-2 border-outline-variant/30 text-on-surface placeholder:text-outline-variant/50 font-body focus:outline-none focus:border-primary transition-all"
                                 />
+                                <button type="button" onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                                    className="absolute right-0 top-1/2 -translate-y-1/2 text-on-surface-variant/30 hover:text-primary transition-colors"
+                                    aria-label={showConfirmPassword ? 'Hide password' : 'Show password'}>
+                                    {showConfirmPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                                </button>
                             </div>
                         </div>
 
                         {/* Error Message */}
                         {error && (
-                            <div className={`p-4 rounded-lg border flex items-start gap-3 ${isDark ? 'bg-red-900/20 border-red-800' : 'bg-red-50 border-red-200'
-                                }`}>
-                                <div className="w-1 h-full bg-red-500 rounded-full"></div>
-                                <p className={`text-sm ${isDark ? 'text-red-300' : 'text-red-800'}`}>
+                            <div className="p-4 rounded-xl bg-error/10 border border-error/20 flex items-start gap-3 animate-fade-in">
+                                <div className="w-1 h-5 bg-error rounded-full shrink-0"></div>
+                                <p className="text-sm text-error font-body">
                                     {error}
                                 </p>
                             </div>
@@ -171,16 +162,13 @@ export default function ChangePassword() {
                         <button
                             disabled={loading}
                             type="submit"
-                            className="w-full py-3 px-6 rounded-xl bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white font-semibold shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300 flex items-center justify-center gap-2 group"
+                            className="w-full py-4 px-6 rounded-full bg-gradient-primary text-on-primary-container font-headline font-extrabold text-lg shadow-[0_10px_30px_rgba(var(--primary-rgb),0.2)] hover:shadow-[0_15px_40px_rgba(var(--primary-rgb),0.4)] disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300 flex items-center justify-center gap-2 group"
                         >
                             {loading ? (
-                                <>
-                                    <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
-                                    Updating...
-                                </>
+                                <div className="w-6 h-6 border-2 border-on-primary-container/30 border-t-on-primary-container rounded-full animate-spin"></div>
                             ) : (
                                 <>
-                                    Change Password
+                                    Update Security Protocol
                                     <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
                                 </>
                             )}
@@ -189,8 +177,8 @@ export default function ChangePassword() {
                 </div>
 
                 {/* Footer */}
-                <p className={`text-center mt-6 text-sm ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>
-                    Ensure your new password is strong and unique
+                <p className="text-center mt-8 text-[10px] font-label uppercase tracking-[0.3em] font-bold text-on-surface-variant/40">
+                    Signal Encryption v4.2.0 • Active Node
                 </p>
             </div>
         </div>

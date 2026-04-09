@@ -1,44 +1,281 @@
 import { useState, useEffect, useRef } from 'react';
 import { io } from 'socket.io-client';
+import { confirmToast } from '../../utils/confirmToast';
 import { API_BASE } from '../../services/api';
 import { useAuth } from '../../context/AuthContext';
+import { useTheme } from '../../context/ThemeContext';
 import {
-    MessageSquare,
     Send,
     ThumbsUp,
     CheckCircle2,
-    Clock,
     Trash2,
     ChevronUp,
     HelpCircle,
-    User,
-    Check,
     MessageCircle,
-    X
+    Sparkles,
+    Bot,
+    Loader2,
+    X,
+    CornerDownRight,
+    Clock,
+    Users,
 } from 'lucide-react';
 import toast from 'react-hot-toast';
+import EmptyState from '../../components/shared/EmptyState';
 
+/* ─── tiny helpers ─────────────────────────────────────────────── */
+const fmtTime = (ts) =>
+    new Date(ts).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
+
+const Avatar = ({ name, role, size = 32 }) => {
+    const initials = (name || 'U')[0].toUpperCase();
+    const isTeacher = role === 'Teacher' || role === 'teacher';
+    return (
+        <div
+            style={{ width: size, height: size, minWidth: size }}
+            className={`rounded-full flex items-center justify-center text-xs font-semibold select-none ${
+                isTeacher
+                    ? 'bg-primary/20 text-primary'
+                    : 'bg-secondary/20 text-secondary'
+            }`}
+        >
+            {initials}
+        </div>
+    );
+};
+
+/* ─── Filter pill ──────────────────────────────────────────────── */
+const FilterPill = ({ label, active, count, onClick }) => (
+    <button
+        onClick={onClick}
+        className={`px-3 py-1 rounded-full text-xs font-medium transition-all ${
+            active
+                ? 'bg-primary text-on-primary shadow-lg shadow-primary/20'
+                : 'bg-surface-container-high text-on-surface-variant/70 hover:bg-surface-container-highest'
+        }`}
+    >
+        {label}
+        {count !== undefined && (
+            <span className={`ml-1.5 ${active ? 'opacity-70' : 'opacity-40'}`}>
+                {count}
+            </span>
+        )}
+    </button>
+);
+
+/* ─── Single question card ─────────────────────────────────────── */
+const QuestionCard = ({
+    q,
+    user,
+    isTeacher,
+    replyingTo,
+    replyText,
+    onUpvote,
+    onDelete,
+    onStartReply,
+    onCancelReply,
+    onReplyTextChange,
+    onSubmitReply,
+    onToggleAnswered,
+}) => {
+    const isOwn = q.senderId === user?._id;
+    const upvoteCount = q.upvotes?.length || 0;
+    const hasUpvoted = q.upvotes?.includes(String(user?._id));
+    const isReplying = replyingTo === q._id;
+    const isAI = q.answeredBy === 'AI Tutor';
+
+    return (
+        <div
+            className={`rounded-2xl border transition-all duration-300 hover:shadow-xl hover:shadow-black/5 ${
+                q.isAnswered
+                    ? 'bg-secondary/5 border-secondary/20'
+                    : 'bg-surface-container border-outline-variant/10'
+            }`}
+        >
+            {/* Question header */}
+            <div className="p-4 pb-3">
+                <div className="flex items-start gap-3">
+                    <Avatar name={q.senderName} role={q.role} size={34} />
+
+                    <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-2 flex-wrap">
+                            <span className="text-sm font-semibold text-on-surface leading-none">
+                                {q.senderName}
+                            </span>
+                            {(q.role === 'Teacher' || q.role === 'teacher') && (
+                                <span className="text-[10px] font-medium px-1.5 py-0.5 rounded-md bg-primary/10 text-primary">
+                                    Teacher
+                                </span>
+                            )}
+                            {q.isAnswered && (
+                                <span
+                                    className={`flex items-center gap-1 text-[10px] font-semibold px-1.5 py-0.5 rounded-md ${
+                                        isAI
+                                            ? 'bg-tertiary-container text-on-tertiary-container'
+                                            : 'bg-secondary/10 text-secondary'
+                                    }`}
+                                >
+                                    {isAI ? (
+                                        <Bot className="w-3 h-3" />
+                                    ) : (
+                                        <CheckCircle2 className="w-3 h-3" />
+                                    )}
+                                    {isAI ? 'AI answered' : 'Answered'}
+                                </span>
+                            )}
+                            <span className="text-[11px] text-on-surface-variant/40 flex items-center gap-1 ml-auto">
+                                <Clock className="w-3 h-3" />
+                                {fmtTime(q.ts)}
+                            </span>
+                        </div>
+
+                        <p className="mt-2 text-[14px] text-on-surface/80 leading-relaxed break-words">
+                            {q.text}
+                        </p>
+                    </div>
+
+                    {/* Delete */}
+                    {(isTeacher || isOwn) && (
+                        <button
+                            onClick={() => onDelete(q._id)}
+                            className="p-1.5 rounded-lg text-on-surface-variant/20 hover:text-error hover:bg-error/10 transition-all shrink-0"
+                            title="Delete question"
+                        >
+                            <Trash2 className="w-3.5 h-3.5" />
+                        </button>
+                    )}
+                </div>
+            </div>
+
+            {/* Answer block */}
+            {q.isAnswered && q.answerText && (
+                <div
+                    className={`mx-4 mb-3 p-3 rounded-xl border-l-2 ${
+                        isAI
+                            ? 'bg-tertiary-container/30 border-tertiary'
+                            : 'bg-secondary/10 border-secondary'
+                    }`}
+                >
+                    <p
+                        className={`text-[11px] font-semibold flex items-center gap-1.5 mb-1.5 ${
+                            isAI ? 'text-tertiary' : 'text-secondary'
+                        }`}
+                    >
+                        {isAI ? (
+                            <Bot className="w-3.5 h-3.5" />
+                        ) : (
+                            <CornerDownRight className="w-3.5 h-3.5" />
+                        )}
+                        {isAI ? 'AI Tutor' : q.answeredBy || 'Teacher'}
+                    </p>
+                    <p className="text-[13px] text-on-surface/70 leading-relaxed">
+                        {q.answerText}
+                    </p>
+                </div>
+            )}
+
+            {/* Reply input (teacher only) */}
+            {isReplying && (
+                <div className="mx-4 mb-3 space-y-2">
+                    <textarea
+                        value={replyText}
+                        onChange={(e) => onReplyTextChange(e.target.value)}
+                        placeholder="Type your reply…"
+                        className="w-full px-3 py-2 text-sm bg-surface-container-highest border border-outline-variant/10 rounded-xl resize-none focus:outline-none focus:border-primary/50 focus:ring-4 focus:ring-primary/10 transition-all text-on-surface"
+                        rows={2}
+                        autoFocus
+                    />
+                    <div className="flex items-center justify-end gap-2">
+                        <button
+                            onClick={onCancelReply}
+                            className="px-3 py-1.5 text-xs text-on-surface-variant/60 hover:text-on-surface rounded-lg hover:bg-surface-container-highest transition-all"
+                        >
+                            Cancel
+                        </button>
+                        <button
+                            onClick={() => onSubmitReply(q._id)}
+                            disabled={!replyText.trim()}
+                            className="px-4 py-1.5 text-xs font-semibold bg-primary text-on-primary rounded-lg hover:shadow-lg hover:shadow-primary/20 disabled:opacity-40 disabled:cursor-not-allowed transition-all"
+                        >
+                            Send Reply
+                        </button>
+                    </div>
+                </div>
+            )}
+
+            {/* Actions row */}
+            <div className="px-4 pb-3 flex items-center gap-2 border-t border-outline-variant/5 pt-3">
+                {/* Upvote */}
+                <button
+                    onClick={() => onUpvote(q._id)}
+                    className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-semibold transition-all ${
+                        hasUpvoted
+                            ? 'bg-primary text-on-primary shadow-lg shadow-primary/20'
+                            : 'bg-surface-container-high text-on-surface-variant/60 hover:bg-surface-container-highest'
+                    }`}
+                >
+                    <ChevronUp className="w-3.5 h-3.5" />
+                    {upvoteCount}
+                </button>
+
+                {/* Spacer */}
+                <div className="flex-1" />
+
+                {/* Teacher controls */}
+                {isTeacher && !q.isAnswered && !isReplying && (
+                    <button
+                        onClick={() => onStartReply(q._id)}
+                        className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-primary hover:bg-primary/10 rounded-lg transition-all"
+                    >
+                        <MessageCircle className="w-3.5 h-3.5" />
+                        Reply
+                    </button>
+                )}
+
+                {isTeacher && (
+                    <button
+                        onClick={() => onToggleAnswered(q._id, !q.isAnswered)}
+                        className={`flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold rounded-lg border transition-all ${
+                            q.isAnswered
+                                ? 'border-secondary/20 text-secondary bg-secondary/10 hover:bg-secondary/20'
+                                : 'border-outline-variant/20 text-on-surface-variant/60 hover:border-secondary/20 hover:text-secondary hover:bg-secondary/10'
+                        }`}
+                    >
+                        <CheckCircle2 className="w-3.5 h-3.5" />
+                        {q.isAnswered ? 'Answered' : 'Mark as answered'}
+                    </button>
+                )}
+            </div>
+        </div>
+    );
+};
+
+/* ─── Main Panel ───────────────────────────────────────────────── */
 export default function QAPanel({ liveClassId }) {
     const { user } = useAuth();
-    const isTeacher = user?.role === 'Teacher' || user?.role === 'teacher' || ['InstitutionAdmin', 'AcademicAdmin', 'SuperAdmin'].includes(user?.role);
-    
-    // State
+    const { isDark } = useTheme();
+    const isTeacher =
+        user?.role === 'Teacher' ||
+        user?.role === 'teacher' ||
+        ['InstitutionAdmin', 'AcademicAdmin', 'SuperAdmin'].includes(user?.role);
+
     const [questions, setQuestions] = useState([]);
     const [newQuestion, setNewQuestion] = useState('');
-    const [replyingTo, setReplyingTo] = useState(null); // questionId for input focus
+    const [replyingTo, setReplyingTo] = useState(null);
     const [replyText, setReplyText] = useState('');
     const [connected, setConnected] = useState(false);
-    const [filter, setFilter] = useState('all'); // 'all', 'unanswered', 'answered'
-    
+    const [filter, setFilter] = useState('all');
+    const [askingAI, setAskingAI] = useState(false);
+    const [isAILoading, setIsAILoading] = useState(false);
+
     const socketRef = useRef(null);
     const token = localStorage.getItem('accessToken');
+    const textareaRef = useRef(null);
 
+    /* ── socket setup ── */
     useEffect(() => {
         if (!liveClassId || !token) return;
-
-        const socket = io(`${API_BASE}/live-classes`, {
-            auth: { token },
-        });
+        const socket = io((import.meta.env.VITE_SOCKET_URL || 'http://localhost:5000') + '/live-classes', { auth: { token } });
         socketRef.current = socket;
 
         socket.on('connect', () => {
@@ -47,271 +284,226 @@ export default function QAPanel({ liveClassId }) {
                 if (!ack?.ok) console.error('Failed to join QA room:', ack?.error);
             });
         });
-
-        socket.on('qa-history', (payload) => {
-            if (payload && payload.questions) {
-                setQuestions(payload.questions);
-            }
-        });
-
-        socket.on('qa:new-question', (question) => {
-            setQuestions(prev => [question, ...prev]);
-        });
-
-        socket.on('qa:question-updated', (updated) => {
-            setQuestions(prev => prev.map(q => (q._id === updated._id) ? updated : q));
-        });
-
-        socket.on('qa:question-deleted', ({ questionId }) => {
-            setQuestions(prev => prev.filter(q => q._id !== questionId));
-        });
-
-        return () => {
-            if (socket) {
-                socket.disconnect();
-            }
-        };
+        socket.on('disconnect', () => setConnected(false));
+        socket.on('qa-history', (p) => p?.questions && setQuestions(p.questions));
+        socket.on('qa:new-question', (q) => setQuestions((prev) => [q, ...prev]));
+        socket.on('qa:question-updated', (u) =>
+            setQuestions((prev) => prev.map((q) => (q._id === u._id ? u : q)))
+        );
+        socket.on('qa:question-deleted', ({ questionId }) =>
+            setQuestions((prev) => prev.filter((q) => q._id !== questionId))
+        );
+        return () => socket.disconnect();
     }, [liveClassId, token]);
 
-    const handlePostQuestion = (e) => {
-        e?.preventDefault();
-        const trimmed = newQuestion.trim();
-        if (!trimmed || !socketRef.current) return;
+    /* ── derived counts ── */
+    const answeredCount = questions.filter((q) => q.isAnswered).length;
+    const unansweredCount = questions.filter((q) => !q.isAnswered).length;
 
-        socketRef.current.emit('qa:question', { liveClassId, text: trimmed }, (ack) => {
+    /* ── filtered + sorted ── */
+    const filtered = questions
+        .filter((q) => {
+            if (filter === 'answered') return q.isAnswered;
+            if (filter === 'unanswered') return !q.isAnswered;
+            return true;
+        })
+        .sort((a, b) => {
+            const ua = a.upvotes?.length || 0;
+            const ub = b.upvotes?.length || 0;
+            if (ua !== ub) return ub - ua;
+            return new Date(b.ts) - new Date(a.ts);
+        });
+
+    /* ── handlers ── */
+    const handlePost = (e) => {
+        e?.preventDefault();
+        const text = newQuestion.trim();
+        if (!text || !socketRef.current) return;
+
+        if (askingAI) {
+            setIsAILoading(true);
+            socketRef.current.emit('qa:ask-ai', { liveClassId, text }, (ack) => {
+                setIsAILoading(false);
+                if (ack?.ok) {
+                    setNewQuestion('');
+                    setAskingAI(false);
+                    toast.success('AI Tutor is responding…');
+                } else {
+                    toast.error(ack?.error || 'AI Tutor is busy');
+                }
+            });
+            return;
+        }
+
+        socketRef.current.emit('qa:question', { liveClassId, text }, (ack) => {
             if (ack?.ok) {
                 setNewQuestion('');
-                toast.success('Question posted');
+                toast.success('Question posted!');
             } else {
                 toast.error(ack?.error || 'Failed to post question');
             }
         });
     };
 
-    const handleUpvote = (questionId) => {
-        if (!socketRef.current) return;
-        socketRef.current.emit('qa:upvote', { liveClassId, questionId });
-    };
+    const handleUpvote = (questionId) =>
+        socketRef.current?.emit('qa:upvote', { liveClassId, questionId });
 
-    const handleMarkAsAnswered = (questionId, isAnswered, answerText = '') => {
-        if (!socketRef.current) return;
-        socketRef.current.emit('qa:answered', { liveClassId, questionId, isAnswered, answerText });
-    };
+    const handleMarkAnswered = (questionId, isAnswered, answerText = '') =>
+        socketRef.current?.emit('qa:answered', {
+            liveClassId,
+            questionId,
+            isAnswered,
+            answerText,
+        });
 
-    const handlePostReply = (questionId) => {
+    const handleSubmitReply = (questionId) => {
         if (!replyText.trim()) return;
-        handleMarkAsAnswered(questionId, true, replyText.trim());
+        handleMarkAnswered(questionId, true, replyText.trim());
         setReplyText('');
         setReplyingTo(null);
     };
 
-    const handleDelete = (questionId) => {
-        if (!socketRef.current || !window.confirm('Delete this question?')) return;
-        socketRef.current.emit('qa:delete', { liveClassId, questionId });
+    const handleDelete = async (questionId) => {
+        if (!socketRef.current) return;
+        const ok = await confirmToast('Delete this question?', {
+            confirmLabel: 'Delete',
+            cancelLabel: 'Cancel',
+            variant: 'danger',
+        });
+        if (ok) socketRef.current.emit('qa:delete', { liveClassId, questionId });
     };
 
-    const formatTime = (timestamp) => {
-        const date = new Date(timestamp);
-        return date.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
+    const handleKeyDown = (e) => {
+        if (e.key === 'Enter' && !e.shiftKey) {
+            e.preventDefault();
+            handlePost();
+        }
     };
-
-    const filteredQuestions = questions.filter(q => {
-        if (filter === 'answered') return q.isAnswered;
-        if (filter === 'unanswered') return !q.isAnswered;
-        return true;
-    }).sort((a, b) => {
-        // Unanswered first if not in "answered" filter? Or just by upvotes
-        const upvotesA = a.upvotes?.length || 0;
-        const upvotesB = b.upvotes?.length || 0;
-        if (upvotesA !== upvotesB) return upvotesB - upvotesA;
-        return new Date(b.ts) - new Date(a.ts);
-    });
 
     return (
-        <div className="flex flex-col h-full bg-[#212121] border border-[#303030] rounded overflow-hidden">
-            {/* Header */}
-            <div className="px-4 py-3 border-b border-[#303030] bg-[#212121]">
-                <div className="flex items-center justify-between mb-3">
-                    <h3 className="text-sm font-medium text-white flex items-center gap-2">
-                        Questions & Answers
-                        <span className="px-1.5 py-0.5 rounded bg-[#3ea6ff]/10 text-[#3ea6ff] text-[10px]">
-                            {questions.length}
-                        </span>
-                    </h3>
-                    <div className="flex bg-[#0f0f0f] rounded p-0.5 border border-[#303030]">
-                        {['all', 'unanswered', 'answered'].map((f) => (
-                            <button
-                                key={f}
-                                onClick={() => setFilter(f)}
-                                className={`px-2 py-1 text-[10px] rounded transition capitalize ${
-                                    filter === f ? 'bg-[#3ea6ff] text-black font-medium' : 'text-gray-400 hover:text-white'
-                                }`}
-                            >
-                                {f}
-                            </button>
-                        ))}
-                    </div>
+        <div className="flex flex-col h-full bg-surface-container rounded-2xl border border-outline-variant/10 shadow-sm overflow-hidden">
+
+            {/* ── Header ── */}
+            <div className="px-5 pt-4 pb-3 border-b border-outline-variant/10 bg-surface-container">
+               
+
+                {/* Filter tabs */}
+                <div className="flex items-center gap-1.5">
+                    <FilterPill
+                        label="All"
+                        count={questions.length}
+                        active={filter === 'all'}
+                        onClick={() => setFilter('all')}
+                    />
+                    <FilterPill
+                        label="Unanswered"
+                        count={unansweredCount}
+                        active={filter === 'unanswered'}
+                        onClick={() => setFilter('unanswered')}
+                    />
+                    <FilterPill
+                        label="Answered"
+                        count={answeredCount}
+                        active={filter === 'answered'}
+                        onClick={() => setFilter('answered')}
+                    />
                 </div>
             </div>
 
-            {/* Questions List */}
-            <div className="flex-1 overflow-y-auto p-3 space-y-3 bg-[#1f1f1f]">
-                {filteredQuestions.length === 0 ? (
-                    <div className="h-full flex flex-col items-center justify-center text-center py-12 opacity-50">
-                        <HelpCircle className="w-10 h-10 mb-2" />
-                        <p className="text-xs text-gray-400">No questions yet.</p>
-                        <p className="text-[10px] text-gray-500 mt-1">Be the first to ask something!</p>
+            {/* ── Questions list ── */}
+            <div className="flex-1 overflow-y-auto px-4 py-3 space-y-3 bg-surface/30">
+                {filtered.length === 0 ? (
+                    <div className="flex flex-col items-center justify-center h-full py-16 text-center">
+                        <HelpCircle className="w-10 h-10 text-on-surface-variant/10 mb-3" />
+                        <p className="text-sm font-medium text-on-surface-variant/40">No questions yet</p>
+                        <p className="text-xs text-on-surface-variant/20 mt-1">Be the first to ask something!</p>
                     </div>
                 ) : (
-                    filteredQuestions.map((q) => (
-                        <div key={q._id} className={`p-3 rounded border transition flex flex-col gap-2 ${
-                            q.isAnswered ? 'bg-[#1b2a1b] border-green-900/30' : 'bg-[#282828] border-[#383838]'
-                        }`}>
-                            <div className="flex items-start justify-between gap-2">
-                                <div className="flex items-center gap-2">
-                                    <div className={`w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-bold ${
-                                        q.role === 'Teacher' ? 'bg-red-600' : 'bg-[#3ea6ff] text-black'
-                                    }`}>
-                                        {q.senderName?.[0] || 'U'}
-                                    </div>
-                                    <div>
-                                        <div className="flex items-center gap-1.5">
-                                            <span className="text-[11px] font-medium text-gray-300">{q.senderName}</span>
-                                            {q.isAnswered && (
-                                                <span className="flex items-center gap-0.5 text-[9px] font-bold text-green-400 px-1 py-0.5 rounded bg-green-400/10">
-                                                    <CheckCircle2 className="w-2.5 h-2.5" />
-                                                    ANSWERED
-                                                </span>
-                                            )}
-                                        </div>
-                                        <span className="text-[9px] text-gray-500 uppercase tracking-tighter">{formatTime(q.ts)}</span>
-                                    </div>
-                                </div>
-                                <div className="flex items-center gap-1">
-                                    {(isTeacher || q.senderId === user?._id) && (
-                                        <button 
-                                            onClick={() => handleDelete(q._id)}
-                                            className="p-1.5 rounded hover:bg-black/20 text-gray-500 hover:text-red-500"
-                                        >
-                                            <Trash2 className="w-3 h-3" />
-                                        </button>
-                                    )}
-                                </div>
-                            </div>
-
-                            <p className="text-[13px] text-gray-200 break-words leading-relaxed">
-                                {q.text}
-                            </p>
-
-                            {/* Answer Section */}
-                            {q.isAnswered && q.answerText && (
-                                <div className="bg-[#0f0f0f]/50 p-2.5 rounded border border-[#303030] mt-1 space-y-1">
-                                    <p className="text-[10px] font-bold text-[#3ea6ff] flex items-center gap-1">
-                                        <CheckCircle2 className="w-3 h-3" /> TEACHER'S ANSWER
-                                    </p>
-                                    <p className="text-xs text-gray-300 leading-tight italic">
-                                        "{q.answerText}"
-                                    </p>
-                                </div>
-                            )}
-
-                            <div className="flex items-center justify-between pt-2 mt-1 border-t border-[#383838]">
-                                <div className="flex items-center gap-2">
-                                    <button 
-                                        onClick={() => handleUpvote(q._id)}
-                                        className={`flex items-center gap-1.5 px-2 py-1 rounded text-[11px] transition ${
-                                            q.upvotes?.includes(String(user?._id)) 
-                                                ? 'bg-[#3ea6ff] text-black font-bold' 
-                                                : 'bg-[#1a1a1a] text-gray-400 hover:bg-[#323232] border border-[#303030]'
-                                        }`}
-                                    >
-                                        <ChevronUp className={`w-3.5 h-3.5 ${q.upvotes?.includes(String(user?._id)) ? 'stroke-[3px]' : ''}`} />
-                                        {q.upvotes?.length || 0}
-                                    </button>
-
-                                    {isTeacher && !q.isAnswered && replyingTo !== q._id && (
-                                        <button
-                                            onClick={() => setReplyingTo(q._id)}
-                                            className="flex items-center gap-1 text-[10px] font-medium text-[#3ea6ff] hover:underline"
-                                        >
-                                            <MessageCircle className="w-3 h-3" /> Reply
-                                        </button>
-                                    )}
-                                </div>
-
-                                {isTeacher && (
-                                    <button
-                                        onClick={() => handleMarkAsAnswered(q._id, !q.isAnswered)}
-                                        className={`px-2 py-1 rounded text-[10px] font-bold transition flex items-center gap-1.5 border ${
-                                            q.isAnswered 
-                                                ? 'bg-transparent border-green-500 text-green-500 hover:bg-green-500 hover:text-black' 
-                                                : 'bg-[#3ea6ff] border-transparent text-black hover:bg-white'
-                                        }`}
-                                    >
-                                        {q.isAnswered ? 'UNMARK' : 'MARK'} ANSWERED
-                                    </button>
-                                )}
-                            </div>
-
-                            {/* Reply Input for Teacher */}
-                            {replyingTo === q._id && (
-                                <div className="mt-2 space-y-2 anim-fade-in">
-                                    <textarea
-                                        value={replyText}
-                                        onChange={(e) => setReplyText(e.target.value)}
-                                        placeholder="Type your answer..."
-                                        className="w-full p-2 bg-[#0a0a0a] border border-[#3ea6ff]/30 rounded text-xs text-white focus:outline-none focus:border-[#3ea6ff]"
-                                        rows={2}
-                                        autoFocus
-                                    />
-                                    <div className="flex justify-end gap-2">
-                                        <button 
-                                            onClick={() => { setReplyingTo(null); setReplyText(''); }}
-                                            className="px-2 py-1 text-[10px] text-gray-400 hover:text-white"
-                                        >
-                                            Cancel
-                                        </button>
-                                        <button 
-                                            onClick={() => handlePostReply(q._id)}
-                                            className="px-3 py-1 bg-[#3ea6ff] text-black rounded text-[10px] font-bold hover:bg-white"
-                                        >
-                                            Post Answer
-                                        </button>
-                                    </div>
-                                </div>
-                            )}
-                        </div>
+                    filtered.map((q) => (
+                        <QuestionCard
+                            key={q._id}
+                            q={q}
+                            user={user}
+                            isTeacher={isTeacher}
+                            replyingTo={replyingTo}
+                            replyText={replyText}
+                            onUpvote={handleUpvote}
+                            onDelete={handleDelete}
+                            onStartReply={(id) => { setReplyingTo(id); setReplyText(''); }}
+                            onCancelReply={() => { setReplyingTo(null); setReplyText(''); }}
+                            onReplyTextChange={setReplyText}
+                            onSubmitReply={handleSubmitReply}
+                            onToggleAnswered={handleMarkAnswered}
+                        />
                     ))
                 )}
             </div>
 
-            {/* Input Area (Only for students / when not teacher acting as one) */}
+            {/* ── Input area ── */}
             {(!isTeacher || filter === 'all') && (
-                <div className="p-3 bg-[#212121] border-t border-[#303030]">
-                    <form onSubmit={handlePostQuestion} className="relative">
+                <div className="px-4 pt-3 pb-4 border-t border-outline-variant/10 bg-surface-container space-y-2.5">
+
+                    {/* AI toggle */}
+                    <div className="flex items-center gap-2">
+                        <button
+                            type="button"
+                            onClick={() => setAskingAI(!askingAI)}
+                            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium border transition-all ${
+                                askingAI
+                                    ? 'bg-tertiary text-on-tertiary shadow-lg shadow-tertiary/20 border-tertiary'
+                                    : 'bg-surface-container-high border-outline-variant/10 text-on-surface-variant hover:border-tertiary/50 hover:text-tertiary'
+                            }`}
+                        >
+                            <Sparkles className="w-3.5 h-3.5" />
+                            Ask AI Tutor
+                        </button>
+                        {askingAI && (
+                            <span className="text-xs text-tertiary flex items-center gap-1 animate-pulse">
+                                <Bot className="w-3.5 h-3.5" />
+                                AI will respond to your question
+                            </span>
+                        )}
+                    </div>
+
+                    {/* Textarea + send */}
+                    <form onSubmit={handlePost} className="relative">
                         <textarea
+                            ref={textareaRef}
                             value={newQuestion}
                             onChange={(e) => setNewQuestion(e.target.value)}
-                            placeholder="Ask a question..."
-                            className="w-full pl-3 pr-10 py-2.5 bg-[#0f0f0f] border border-[#303030] rounded-lg text-sm text-white placeholder-gray-600 focus:outline-none focus:border-[#3ea6ff] resize-none min-h-[44px] max-h-[120px]"
-                            rows={1}
-                            onKeyDown={(e) => {
-                                if (e.key === 'Enter' && !e.shiftKey) {
-                                    e.preventDefault();
-                                    handlePostQuestion();
-                                }
-                            }}
+                            onKeyDown={handleKeyDown}
+                            disabled={isAILoading}
+                            placeholder={
+                                askingAI
+                                    ? 'Ask the AI Tutor anything about the class…'
+                                    : 'Ask the teacher a question… (Enter to send)'
+                            }
+                            rows={2}
+                            className={`w-full pl-4 pr-12 py-3 text-sm border rounded-xl resize-none focus:outline-none transition-all text-on-surface ${
+                                askingAI
+                                    ? 'border-tertiary/20 bg-tertiary/5 placeholder:text-tertiary/30 focus:border-tertiary/50 focus:ring-4 focus:ring-tertiary/10'
+                                    : 'border-outline-variant/10 bg-surface-container-high placeholder:text-on-surface-variant/20 focus:border-primary/50 focus:ring-4 focus:ring-primary/10'
+                            } disabled:opacity-60`}
                         />
                         <button
                             type="submit"
-                            disabled={!newQuestion.trim() || !connected}
-                            className="absolute right-2 bottom-2 p-1.5 rounded-md bg-[#3ea6ff] text-black hover:bg-white transition disabled:opacity-50 disabled:bg-gray-600"
+                            disabled={!newQuestion.trim() || !connected || isAILoading}
+                            className={`absolute right-2 bottom-2 p-2 rounded-lg transition-all disabled:opacity-30 disabled:cursor-not-allowed hover:scale-105 active:scale-95 ${
+                                askingAI
+                                    ? 'bg-tertiary text-on-tertiary hover:shadow-lg hover:shadow-tertiary/20'
+                                    : 'bg-primary text-on-primary hover:shadow-lg hover:shadow-primary/20'
+                            }`}
                         >
-                            <Send className="w-4 h-4" />
+                            {isAILoading ? (
+                                <Loader2 className="w-4 h-4 animate-spin" />
+                            ) : (
+                                <Send className="w-4 h-4" />
+                            )}
                         </button>
                     </form>
-                    <p className="text-[9px] text-gray-500 mt-2 text-center flex items-center justify-center gap-1">
-                        <Clock className="w-2.5 h-2.5" /> Questions are visible to everyone
+
+                    <p className="text-[10px] text-on-surface-variant/20 text-center uppercase tracking-widest font-bold">
+                        All students and the teacher can see your question
                     </p>
                 </div>
             )}

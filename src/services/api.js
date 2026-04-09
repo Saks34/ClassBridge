@@ -1,4 +1,5 @@
 import axios from 'axios';
+import { confirmToast } from '../utils/confirmToast';
 
 const API_BASE = import.meta.env.VITE_API_BASE || 'http://localhost:3000';
 
@@ -69,17 +70,17 @@ api.interceptors.response.use(
         // Session expired - show warning before redirect
         if (!hasShownSessionWarning) {
           hasShownSessionWarning = true;
-          const shouldRedirect = confirm(
-            'Your session has expired. You will be redirected to the login page.\n\nClick OK to continue.'
+          // Use confirmToast for a better UI experience
+          const shouldRedirect = await confirmToast(
+            'Your session has expired. You will be redirected to the login page.',
+            { confirmLabel: 'Go to Login', cancelLabel: 'Wait', variant: 'warning' }
           );
-          if (shouldRedirect || true) { // Always redirect even if cancelled
-            localStorage.removeItem('accessToken');
-            localStorage.removeItem('refreshToken');
-            localStorage.removeItem('user');
-            // Give user time to see the message
+          
+          if (shouldRedirect) {
+            localStorage.clear();
             setTimeout(() => {
               window.location.href = '/login?session=expired';
-            }, 500);
+            }, 300);
           }
         }
         return Promise.reject(error);

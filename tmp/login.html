@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>ClassBridge | Login</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;700;800&amp;family=Inter:wght@400;500;600&amp;family=Space+Grotesk:wght@400;500;700&amp;family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                "on-error-container": "#ffa8a3",
+                "on-tertiary-container": "#1a0072",
+                "surface-container-high": "#141f38",
+                "surface-container-highest": "#192540",
+                "on-error": "#490006",
+                "primary-dim": "#40ceed",
+                "on-primary-fixed-variant": "#005564",
+                "tertiary-fixed-dim": "#a196ff",
+                "primary": "#53ddfc",
+                "tertiary-dim": "#9b90fe",
+                "primary-container": "#21bedc",
+                "surface-bright": "#1f2b49",
+                "surface": "#060e20",
+                "on-secondary-fixed": "#004840",
+                "on-secondary-fixed-variant": "#00675c",
+                "inverse-on-surface": "#4d556b",
+                "surface-container": "#0f1930",
+                "on-tertiary": "#271284",
+                "error": "#ff716c",
+                "on-primary-container": "#00343e",
+                "outline-variant": "#40485d",
+                "surface-container-lowest": "#000000",
+                "secondary-fixed": "#62fae3",
+                "on-primary-fixed": "#003640",
+                "surface-dim": "#060e20",
+                "on-surface": "#dee5ff",
+                "on-secondary-container": "#dcfff7",
+                "tertiary-fixed": "#afa6ff",
+                "on-tertiary-fixed": "#13005b",
+                "inverse-surface": "#faf8ff",
+                "primary-fixed-dim": "#40ceed",
+                "on-background": "#dee5ff",
+                "surface-variant": "#192540",
+                "secondary-container": "#006b5f",
+                "tertiary-container": "#9b90fe",
+                "secondary": "#62fae3",
+                "surface-tint": "#53ddfc",
+                "on-primary": "#004b58",
+                "tertiary": "#a9a0ff",
+                "secondary-fixed-dim": "#50ebd5",
+                "error-dim": "#d7383b",
+                "on-surface-variant": "#a3aac4",
+                "primary-fixed": "#53ddfc",
+                "outline": "#6d758c",
+                "surface-container-low": "#091328",
+                "secondary-dim": "#50ebd5",
+                "error-container": "#9f0519",
+                "inverse-primary": "#00687b",
+                "background": "#060e20",
+                "on-secondary": "#005c52",
+                "on-tertiary-fixed-variant": "#352591"
+            },
+            "borderRadius": {
+                "DEFAULT": "0.125rem",
+                "lg": "0.25rem",
+                "xl": "0.5rem",
+                "full": "0.75rem"
+            },
+            "fontFamily": {
+                "headline": ["Manrope"],
+                "body": ["Inter"],
+                "label": ["Space Grotesk"]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        .glass-panel {
+            background: rgba(25, 37, 64, 0.4);
+            backdrop-filter: blur(30px);
+            -webkit-backdrop-filter: blur(30px);
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .input-underline {
+            border: none;
+            border-bottom: 2px solid #40485d;
+            background: transparent;
+            transition: all 0.3s ease;
+        }
+        .input-underline:focus {
+            outline: none;
+            border-bottom-color: #53ddfc;
+            box-shadow: 0 4px 12px -4px rgba(83, 221, 252, 0.3);
+        }
+        .text-gradient {
+            background: linear-gradient(135deg, #53ddfc 0%, #62fae3 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+    </style>
+</head>
+<body class="bg-surface text-on-surface font-body selection:bg-primary/30 min-h-screen overflow-x-hidden">
+<!-- TopNavBar (Shared Component) -->
+<nav class="fixed top-0 w-full z-50 bg-slate-950/40 backdrop-blur-xl shadow-[0_20px_40px_rgba(0,0,0,0.4),0_0_15px_rgba(83,221,252,0.05)]">
+<div class="flex justify-between items-center px-8 py-4 max-w-screen-2xl mx-auto font-['Manrope'] tracking-tight">
+<div class="flex items-center gap-2">
+<span class="text-2xl font-bold tracking-tighter bg-gradient-to-r from-sky-400 to-cyan-400 bg-clip-text text-transparent">ClassBridge</span>
+</div>
+<div class="hidden md:flex items-center gap-8">
+<a class="text-slate-400 hover:text-sky-200 transition-colors" href="#">Explore</a>
+<a class="text-slate-400 hover:text-sky-200 transition-colors" href="#">About</a>
+<a class="text-slate-400 hover:text-sky-200 transition-colors" href="#">Help</a>
+<button class="bg-gradient-to-r from-primary to-primary-container text-on-primary-container px-6 py-2 rounded-full font-bold scale-95 active:scale-90 duration-200 transition-all hover:shadow-[0_0_20px_rgba(83,221,252,0.4)]">
+                    Get Started
+                </button>
+</div>
+<!-- Mobile Menu Icon (Visual Only) -->
+<div class="md:hidden">
+<span class="material-symbols-outlined text-primary">menu</span>
+</div>
+</div>
+</nav>
+<main class="flex flex-col md:flex-row min-h-screen pt-16">
+<!-- Left Side: Immersive Visual -->
+<section class="hidden md:flex w-1/2 relative items-center justify-center overflow-hidden">
+<div class="absolute inset-0 z-0">
+<img alt="Digital Observatory Visualization" class="w-full h-full object-cover opacity-60 scale-105" data-alt="futuristic interior of a space observatory with glowing holograms of celestial bodies and a massive panoramic window showing a nebula" src="https://lh3.googleusercontent.com/aida-public/AB6AXuD8UcZzdk3k7Sv3MDIfkVQy540B_fMMQjLH0aqd1Y2DNj3GqcYZF2ZKy0l_iTxWUT0A-wFz33cOukG9kYlScXkBUbaHrz7FauapjT4TlnWrWCsQCul52fEwqhEbmMdLWKrUucxl1t0g03jC54amyJrWeDd3k49PkmGDbQbzoxI8Uv5Q5_lgAlC_j8mRiKkKTi9ADWG_WTJcxtSkLhW1aved7peBDK8U0Q0j3ZLg-_Ca3zSXdUuGkuSzQhGTmSgXjXp1Sfd6bZ0zm-k"/>
+<div class="absolute inset-0 bg-gradient-to-r from-transparent to-surface"></div>
+</div>
+<div class="relative z-10 p-12 max-w-xl">
+<div class="space-y-6">
+<span class="font-label text-secondary tracking-[0.3em] text-sm uppercase">Navigation Protocol</span>
+<h1 class="font-headline text-6xl font-extrabold tracking-tighter leading-none text-white">
+                        Access the <span class="text-gradient">Celestial</span> Knowledge Bridge.
+                    </h1>
+<p class="text-on-surface-variant text-lg leading-relaxed max-w-md">
+                        Step into the Digital Observatory. Secure your terminal and continue your journey across the curriculum of the future.
+                    </p>
+<!-- Decorative Elements -->
+<div class="pt-8 flex items-center gap-4">
+<div class="h-px w-12 bg-primary/30"></div>
+<div class="flex gap-2">
+<div class="w-2 h-2 rounded-full bg-primary animate-pulse"></div>
+<div class="w-2 h-2 rounded-full bg-primary/40"></div>
+<div class="w-2 h-2 rounded-full bg-primary/20"></div>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Right Side: Login Form -->
+<section class="w-full md:w-1/2 flex items-center justify-center p-6 md:p-12 relative">
+<!-- Background Glow -->
+<div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-primary/5 rounded-full blur-[120px] pointer-events-none"></div>
+<div class="glass-panel w-full max-w-md p-8 md:p-12 rounded-[2rem] shadow-2xl relative z-10">
+<div class="mb-10 text-center md:text-left">
+<h2 class="font-headline text-4xl font-bold text-white mb-2 tracking-tight">Welcome Back</h2>
+<p class="text-on-surface-variant font-body">Identify yourself to enter the bridge.</p>
+</div>
+<form action="#" class="space-y-8" method="POST">
+<!-- Email Field -->
+<div class="space-y-1 group">
+<label class="font-label text-[10px] uppercase tracking-widest text-primary/70 group-focus-within:text-primary transition-colors">Terminal Identifier</label>
+<div class="relative">
+<input class="w-full py-3 px-0 input-underline text-on-surface placeholder:text-outline/50 font-body focus:placeholder:opacity-0" placeholder="email@observatory.edu" required="" type="email"/>
+<span class="material-symbols-outlined absolute right-0 top-1/2 -translate-y-1/2 text-outline/30 group-focus-within:text-primary transition-all text-lg">alternate_email</span>
+</div>
+</div>
+<!-- Password Field -->
+<div class="space-y-1 group">
+<div class="flex justify-between items-end">
+<label class="font-label text-[10px] uppercase tracking-widest text-primary/70 group-focus-within:text-primary transition-colors">Access Key</label>
+<a class="font-label text-[10px] uppercase tracking-widest text-secondary hover:text-primary transition-colors" href="#">Forgot Protocol?</a>
+</div>
+<div class="relative">
+<input class="w-full py-3 px-0 input-underline text-on-surface placeholder:text-outline/50 font-body focus:placeholder:opacity-0" placeholder="••••••••••••" required="" type="password"/>
+<span class="material-symbols-outlined absolute right-0 top-1/2 -translate-y-1/2 text-outline/30 group-focus-within:text-primary transition-all text-lg">lock</span>
+</div>
+</div>
+<!-- Options -->
+<div class="flex items-center gap-3">
+<input class="w-4 h-4 rounded-sm border-outline bg-surface-container-high text-primary focus:ring-primary/20" id="remember" type="checkbox"/>
+<label class="text-xs text-on-surface-variant font-body select-none" for="remember">Maintain persistent session</label>
+</div>
+<!-- Action -->
+<div class="pt-4">
+<button class="w-full py-4 px-6 bg-gradient-to-r from-primary to-primary-container text-on-primary-container font-headline font-extrabold text-lg rounded-full shadow-[0_10px_30px_rgba(83,221,252,0.2)] hover:shadow-[0_15px_40px_rgba(83,221,252,0.4)] hover:scale-[1.02] active:scale-95 transition-all duration-300" type="submit">
+                            Login to Observatory
+                        </button>
+</div>
+</form>
+<div class="mt-10 pt-8 border-t border-outline-variant/10 text-center">
+<p class="text-on-surface-variant text-sm font-body">
+                        New explorer? 
+                        <a class="font-label text-secondary hover:text-primary transition-colors uppercase tracking-widest text-xs ml-2 font-bold" href="#">Initiate Registration</a>
+</p>
+</div>
+<!-- Technical Footer Decoration -->
+<div class="mt-8 flex justify-center items-center gap-2 opacity-20">
+<span class="font-label text-[8px] tracking-[0.4em] uppercase text-on-surface">Secure Core v4.2.0</span>
+<div class="w-1 h-1 rounded-full bg-on-surface"></div>
+<span class="font-label text-[8px] tracking-[0.4em] uppercase text-on-surface">Encrypted Node</span>
+</div>
+</div>
+</section>
+</main>
+<!-- Background Decorative Elements -->
+<div class="fixed top-0 right-0 p-8 opacity-10 pointer-events-none select-none overflow-hidden">
+<span class="font-label text-[12vw] leading-none font-bold text-outline-variant uppercase -rotate-12 translate-x-1/4 select-none">ACCESS</span>
+</div>
+</body></html>

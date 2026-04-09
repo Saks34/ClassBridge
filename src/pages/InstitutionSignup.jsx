@@ -1,30 +1,21 @@
 import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import toast from 'react-hot-toast';
 import api from '../services/api';
-import { Sun, Moon, GraduationCap, Building2, User, Mail, Lock, ArrowRight, School, BookOpen, Briefcase } from 'lucide-react';
+import { useTheme } from '../context/ThemeContext';
+import { Info, ArrowRight, Building2, User, School, BookOpen, Briefcase, Eye, EyeOff, CheckCircle2 } from 'lucide-react';
 
 export default function InstitutionSignup() {
   const navigate = useNavigate();
+  const { toggleTheme } = useTheme();
   const [instName, setInstName] = useState('');
   const [instType, setInstType] = useState('school');
   const [adminName, setAdminName] = useState('');
   const [adminEmail, setAdminEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState(null);
-  const [theme, setTheme] = useState('light');
-
-  useEffect(() => {
-    const savedTheme = localStorage.getItem('theme') || 'light';
-    setTheme(savedTheme);
-  }, []);
-
-  const toggleTheme = () => {
-    const newTheme = theme === 'light' ? 'dark' : 'light';
-    setTheme(newTheme);
-    localStorage.setItem('theme', newTheme);
-  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -47,7 +38,7 @@ export default function InstitutionSignup() {
         }
       });
       toast.success('Institution created successfully! Please login.');
-      navigate('/login');
+      navigate('/login', { state: { message: 'Account activated. Please login to begin.' } });
     } catch (err) {
       console.error(err);
       const msg = err.response?.data?.message || 'Failed to create institution';
@@ -58,264 +49,247 @@ export default function InstitutionSignup() {
     }
   };
 
-  const isDark = theme === 'dark';
-
   const institutionTypes = [
-    { value: 'school', label: 'School', icon: School },
-    { value: 'coaching', label: 'Coaching Center', icon: BookOpen },
-    { value: 'college', label: 'College/University', icon: Briefcase },
+    { value: 'school', label: 'Academic School', icon: School, desc: 'K-12 Educational Institutions' },
+    { value: 'coaching', label: 'Coaching Center', icon: BookOpen, desc: 'Specialized Training Centers' },
+    { value: 'college', label: 'University/College', icon: Briefcase, desc: 'Higher Education & Research' },
   ];
 
   return (
-    <div className={`min-h-screen flex items-center justify-center p-4 transition-colors duration-300 ${isDark
-        ? 'bg-gradient-to-br from-gray-900 via-blue-900 to-indigo-900'
-        : 'bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50'
-      }`}>
-      {/* Theme Toggle */}
-      <button
-        onClick={toggleTheme}
-        className={`fixed top-6 right-6 p-3 rounded-full shadow-lg hover:shadow-xl transition-all duration-300 group ${isDark ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'
-          } border`}
-        aria-label="Toggle theme"
-      >
-        {isDark ? (
-          <Sun className="w-5 h-5 text-yellow-400 group-hover:rotate-12 transition-transform" />
-        ) : (
-          <Moon className="w-5 h-5 text-indigo-600 group-hover:rotate-12 transition-transform" />
-        )}
-      </button>
-
-      <div className="w-full max-w-2xl">
-        {/* Logo & Header */}
-        <div className="text-center mb-8">
-          <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-gradient-to-br from-indigo-600 to-purple-600 shadow-lg mb-4 transform hover:scale-110 transition-transform">
-            <GraduationCap className="w-8 h-8 text-white" />
+    <div className="bg-surface text-on-surface font-body selection:bg-primary/30 min-h-screen overflow-x-hidden">
+      {/* TopNavBar */}
+      <nav className="fixed top-0 w-full z-50 bg-surface/40 backdrop-blur-xl border-b border-outline-variant/10 shadow-lg">
+        <div className="flex justify-between items-center px-8 py-4 max-w-screen-2xl mx-auto font-headline tracking-tight">
+          <Link to="/" className="flex items-center gap-2">
+            <span className="text-2xl font-bold tracking-tighter bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">ClassBridge</span>
+          </Link>
+          <div className="hidden md:flex items-center gap-8">
+            <Link className="text-on-surface-variant hover:text-primary transition-colors" to="/">Return to Base</Link>
+            <Link to="/login" className="text-on-surface-variant hover:text-primary transition-colors">Existing Node?</Link>
           </div>
-          <h1 className={`text-3xl font-bold mb-2 ${isDark ? 'text-white' : 'text-gray-900'}`}>
-            Create Your Institution
-          </h1>
-          <p className={isDark ? 'text-gray-400' : 'text-gray-600'}>
-            Set up your institution and admin account in minutes
-          </p>
         </div>
+      </nav>
 
-        {/* Main Card */}
-        <div className={`rounded-2xl shadow-2xl p-8 backdrop-blur-sm ${isDark ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-100'
-          } border`}>
+      <main className="flex flex-col lg:flex-row min-h-screen pt-16">
+        {/* Left Side: Educational Benefits */}
+        <section className="hidden lg:flex lg:w-2/5 p-16 flex-col justify-center gap-12 bg-surface-container-low relative overflow-hidden">
+          <div className="absolute top-0 left-0 w-full h-full opacity-10 pointer-events-none">
+             <div className="absolute top-10 left-10 w-64 h-64 bg-primary/20 blur-3xl rounded-full"></div>
+             <div className="absolute bottom-10 right-10 w-96 h-96 bg-secondary/10 blur-3xl rounded-full"></div>
+          </div>
+          
+          <div className="relative z-10 space-y-8">
+            <span className="font-label text-primary tracking-[0.4em] text-xs uppercase font-bold">Account Setup</span>
+            <h1 className="text-4xl md:text-5xl font-black font-headline text-on-surface mb-4 leading-none tracking-tighter">
+              Get Started with <span className="text-gradient-primary">ClassBridge</span>.
+            </h1>
+            <p className="text-on-surface-variant text-lg leading-relaxed max-w-md">
+              Deploy a high-fidelity learning ecosystem designed for the next era of pedagogy. Rapid, secure, and decentralized.
+            </p>
 
-          <div className="space-y-6">
-            {/* Institution Details Section */}
-            <div>
-              <h3 className={`text-lg font-semibold mb-4 flex items-center gap-2 ${isDark ? 'text-white' : 'text-gray-900'
-                }`}>
-                <Building2 className="w-5 h-5 text-indigo-600" />
-                Institution Details
-              </h3>
-
-              <div className="space-y-4">
-                {/* Institution Name */}
-                <div>
-                  <label className={`block text-sm font-medium mb-2 ${isDark ? 'text-gray-300' : 'text-gray-700'
-                    }`}>
-                    Institution Name *
-                  </label>
-                  <input
-                    value={instName}
-                    onChange={(e) => setInstName(e.target.value)}
-                    placeholder="e.g., Springfield High School"
-                    required
-                    className={`w-full px-4 py-3 rounded-xl border transition-all outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent ${isDark
-                        ? 'border-gray-600 bg-gray-700 text-white placeholder-gray-400'
-                        : 'border-gray-300 bg-white text-gray-900 placeholder-gray-400'
-                      }`}
-                  />
-                </div>
-
-                {/* Institution Type */}
-                <div>
-                  <label className={`block text-sm font-medium mb-3 ${isDark ? 'text-gray-300' : 'text-gray-700'
-                    }`}>
-                    Institution Type *
-                  </label>
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-                    {institutionTypes.map(({ value, label, icon: Icon }) => (
-                      <button
-                        key={value}
-                        type="button"
-                        onClick={() => setInstType(value)}
-                        className={`p-4 rounded-xl border-2 transition-all duration-200 flex flex-col items-center gap-2 ${instType === value
-                            ? 'border-indigo-600 bg-indigo-50 dark:bg-indigo-900/20'
-                            : isDark
-                              ? 'border-gray-600 bg-gray-700 hover:border-gray-500'
-                              : 'border-gray-300 bg-white hover:border-gray-400'
-                          }`}
-                      >
-                        <Icon className={`w-6 h-6 ${instType === value
-                            ? 'text-indigo-600'
-                            : isDark ? 'text-gray-400' : 'text-gray-500'
-                          }`} />
-                        <span className={`text-sm font-medium ${instType === value
-                            ? 'text-indigo-600'
-                            : isDark ? 'text-gray-300' : 'text-gray-700'
-                          }`}>
-                          {label}
-                        </span>
-                      </button>
-                    ))}
+            <div className="space-y-6 pt-8">
+              {[
+                { title: 'Global Compliance', desc: 'FERPA, GDPR, and COPPA compliant infrastructure.' },
+                { title: 'Rapid Deployment', desc: 'Sync your entire SIS in under 24 hours with our API Bridge.' },
+                { title: 'Neural Expansion', desc: 'Access advanced predictive analytics and AI node management.' }
+              ].map((benefit, idx) => (
+                <div key={idx} className="flex gap-4 group">
+                  <div className="flex-shrink-0 w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center group-hover:bg-primary/20 transition-colors">
+                    <CheckCircle2 className="text-primary w-5 h-5" />
+                  </div>
+                  <div>
+                    <h4 className="font-headline font-bold text-on-surface group-hover:text-primary transition-colors">{benefit.title}</h4>
+                    <p className="text-on-surface-variant text-sm font-body">{benefit.desc}</p>
                   </div>
                 </div>
+              ))}
+            </div>
+          </div>
+
+          <div className="mt-12 p-6 glass-panel rounded-2xl border border-outline-variant/10">
+            <p className="text-xs text-on-surface-variant italic font-body">
+              "The most advanced digital education bridge ever built. Our institution migrated 5,000 nodes in a single weekend."
+            </p>
+            <div className="mt-4 flex items-center gap-3">
+              <div className="w-8 h-8 rounded-full bg-surface-container-high border border-outline-variant/10"></div>
+              <div>
+                <p className="text-[10px] font-bold text-on-surface uppercase tracking-widest font-label leading-none">Prof. Elena Vance</p>
+                <p className="text-[10px] text-on-surface-variant font-label uppercase tracking-widest leading-none">Director of Digital Strategy</p>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* Right Side: Registration Form */}
+        <section className="w-full lg:w-3/5 flex items-center justify-center p-6 md:p-16 relative bg-surface">
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full h-full bg-[radial-gradient(circle_at_50%_50%,rgba(83,221,252,0.03),transparent_70%)] pointer-events-none"></div>
+          
+          <div className="w-full max-w-2xl relative z-10">
+            {/* Steps Header */}
+            <div className="flex items-center gap-4 mb-12 overflow-x-auto pb-4 scrollbar-hide">
+              <div className="flex items-center gap-2 group flex-shrink-0">
+                <span className="w-8 h-8 rounded-full bg-primary text-on-primary font-bold flex items-center justify-center text-xs">01</span>
+                <span className="font-label text-[10px] tracking-widest uppercase font-bold text-on-surface">Institution Profile</span>
+              </div>
+              <div className="h-px w-8 bg-outline-variant/20 flex-shrink-0"></div>
+              <div className="flex items-center gap-2 group opacity-40 flex-shrink-0">
+                <span className="w-8 h-8 rounded-full bg-surface-variant text-on-surface-variant font-bold flex items-center justify-center text-xs">02</span>
+                <span className="font-label text-[10px] tracking-widest uppercase font-bold text-on-surface">Admin Credentials</span>
               </div>
             </div>
 
-            {/* Divider */}
-            <div className={`border-t ${isDark ? 'border-gray-700' : 'border-gray-200'}`}></div>
+            <form onSubmit={handleSubmit} className="space-y-12">
+              {/* Institution Details Section */}
+              <div className="space-y-8">
+                <div className="text-left">
+                  <h2 className="font-headline text-3xl font-bold text-on-surface mb-2 tracking-tight flex items-center gap-3">
+                    <Building2 className="text-primary" />
+                    Institution Details
+                  </h2>
+                  <p className="text-on-surface-variant font-body text-sm">Define the core parameters of your academic node.</p>
+                </div>
 
-            {/* Admin Account Section */}
-            <div>
-              <h3 className={`text-lg font-semibold mb-4 flex items-center gap-2 ${isDark ? 'text-white' : 'text-gray-900'
-                }`}>
-                <User className="w-5 h-5 text-indigo-600" />
-                Admin Account
-              </h3>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                  {/* Institution Name */}
+                  <div className="space-y-1 group">
+                    <label className="font-label text-[10px] uppercase tracking-widest text-primary/70 group-focus-within:text-primary transition-colors font-bold">Institution Name</label>
+                    <div className="relative">
+                      <input
+                        value={instName}
+                        onChange={(e) => setInstName(e.target.value)}
+                        className="w-full py-3 px-0 border-0 border-b-2 border-outline-variant/30 bg-transparent text-on-surface placeholder:text-outline-variant/50 font-body focus:outline-none focus:border-primary transition-all"
+                        placeholder="e.g., Nova Academica"
+                        required
+                      />
+                    </div>
+                  </div>
 
-              <div className="space-y-4">
-                {/* Admin Name */}
-                <div>
-                  <label className={`block text-sm font-medium mb-2 ${isDark ? 'text-gray-300' : 'text-gray-700'
-                    }`}>
-                    Admin Name *
-                  </label>
-                  <div className="relative">
-                    <User className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+                  {/* Institution Type */}
+                  <div className="space-y-1 group">
+                    <label className="font-label text-[10px] uppercase tracking-widest text-primary/70 font-bold">Node Category</label>
+                    <div className="flex gap-2">
+                        {institutionTypes.map((type) => (
+                          <button
+                            key={type.value}
+                            type="button"
+                            onClick={() => setInstType(type.value)}
+                            title={type.desc}
+                            className={`flex flex-col items-center justify-center p-3 rounded-xl border transition-all flex-1 gap-1 ${
+                              instType === type.value 
+                                ? 'bg-primary/10 border-primary shadow-[0_0_15px_rgba(83,221,252,0.1)]' 
+                                : 'bg-surface-container-high border-outline-variant/10 hover:border-outline-variant/30 grayscale hover:grayscale-0'
+                            }`}
+                          >
+                             <type.icon size={18} className={instType === type.value ? 'text-primary' : 'text-on-surface-variant'} />
+                             <span className={`text-[9px] font-bold uppercase tracking-tighter ${instType === type.value ? 'text-primary' : 'text-on-surface-variant'}`}>{type.value}</span>
+                          </button>
+                        ))}
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Admin Section */}
+              <div className="space-y-8 pt-8 border-t border-outline-variant/10">
+                <div className="text-left">
+                  <h2 className="font-headline text-3xl font-bold text-on-surface mb-2 tracking-tight flex items-center gap-3">
+                    <User className="text-secondary" />
+                    Admin Command
+                  </h2>
+                  <p className="text-on-surface-variant font-body text-sm">Primary contact for managing your account and school settings.</p>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                  <div className="space-y-1 group">
+                    <label className="font-label text-[10px] uppercase tracking-widest text-primary/70 group-focus-within:text-primary transition-colors font-bold">Admin Persona</label>
                     <input
                       value={adminName}
                       onChange={(e) => setAdminName(e.target.value)}
-                      placeholder="John Doe"
+                      className="w-full py-3 px-0 border-0 border-b-2 border-outline-variant/30 bg-transparent text-on-surface placeholder:text-outline-variant/50 font-body focus:outline-none focus:border-primary transition-all"
+                      placeholder="John Sheridan"
                       required
-                      className={`w-full pl-11 pr-4 py-3 rounded-xl border transition-all outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent ${isDark
-                          ? 'border-gray-600 bg-gray-700 text-white placeholder-gray-400'
-                          : 'border-gray-300 bg-white text-gray-900 placeholder-gray-400'
-                        }`}
                     />
                   </div>
-                </div>
-
-                {/* Admin Email */}
-                <div>
-                  <label className={`block text-sm font-medium mb-2 ${isDark ? 'text-gray-300' : 'text-gray-700'
-                    }`}>
-                    Admin Email *
-                  </label>
-                  <div className="relative">
-                    <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+                  <div className="space-y-1 group">
+                    <label className="font-label text-[10px] uppercase tracking-widest text-primary/70 group-focus-within:text-primary transition-colors font-bold">Communication Protocol</label>
                     <input
                       value={adminEmail}
                       onChange={(e) => setAdminEmail(e.target.value)}
+                      className="w-full py-3 px-0 border-0 border-b-2 border-outline-variant/30 bg-transparent text-on-surface placeholder:text-outline-variant/50 font-body focus:outline-none focus:border-primary transition-all"
+                      placeholder="admin@nova.edu"
                       type="email"
-                      placeholder="admin@example.com"
                       required
-                      className={`w-full pl-11 pr-4 py-3 rounded-xl border transition-all outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent ${isDark
-                          ? 'border-gray-600 bg-gray-700 text-white placeholder-gray-400'
-                          : 'border-gray-300 bg-white text-gray-900 placeholder-gray-400'
-                        }`}
                     />
                   </div>
                 </div>
 
-                {/* Password */}
-                <div>
-                  <label className={`block text-sm font-medium mb-2 ${isDark ? 'text-gray-300' : 'text-gray-700'
-                    }`}>
-                    Password *
-                  </label>
+                <div className="space-y-1 group max-w-md">
+                  <label className="font-label text-[10px] uppercase tracking-widest text-primary/70 group-focus-within:text-primary transition-colors font-bold">Access Encryption Key</label>
                   <div className="relative">
-                    <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
                     <input
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
-                      type="password"
-                      placeholder="••••••••"
+                      className="w-full py-3 px-0 border-0 border-b-2 border-outline-variant/30 bg-transparent text-on-surface placeholder:text-outline-variant/50 font-body focus:outline-none focus:border-primary transition-all pr-12"
+                      placeholder="••••••••••••"
+                      type={showPassword ? 'text' : 'password'}
                       required
-                      className={`w-full pl-11 pr-4 py-3 rounded-xl border transition-all outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent ${isDark
-                          ? 'border-gray-600 bg-gray-700 text-white placeholder-gray-400'
-                          : 'border-gray-300 bg-white text-gray-900 placeholder-gray-400'
-                        }`}
                     />
+                    <button
+                      type="button"
+                      onClick={() => setShowPassword(!showPassword)}
+                      className="absolute right-0 top-1/2 -translate-y-1/2 text-outline-variant/30 group-focus-within:text-primary transition-all"
+                    >
+                      <span className="material-symbols-outlined text-lg">{showPassword ? 'visibility_off' : 'visibility'}</span>
+                    </button>
                   </div>
                 </div>
               </div>
-            </div>
 
-            {/* Error Message */}
-            {error && (
-              <div className={`p-4 rounded-lg border flex items-start gap-3 ${isDark ? 'bg-red-900/20 border-red-800' : 'bg-red-50 border-red-200'
-                }`}>
-                <div className="w-1 h-full bg-red-500 rounded-full"></div>
-                <p className={`text-sm ${isDark ? 'text-red-300' : 'text-red-800'}`}>
-                  {error}
-                </p>
+              {/* Error and Actions */}
+              <div className="space-y-6 pt-4">
+                {error && (
+                  <div className="p-4 rounded-xl bg-error/10 border border-error/20 flex items-start gap-3 animate-fade-in text-left">
+                    <Info size={18} className="text-error flex-shrink-0 mt-0.5" />
+                    <p className="text-sm text-error">{error}</p>
+                  </div>
+                )}
+
+                <div className="flex flex-col sm:flex-row items-center gap-6">
+                  <button
+                    disabled={loading}
+                    className="w-full sm:w-auto flex-1 py-5 px-10 bg-gradient-primary text-on-primary-container font-headline font-extrabold text-lg rounded-full shadow-[0_10px_30px_rgba(83,221,252,0.2)] hover:shadow-[0_15px_40px_rgba(83,221,252,0.4)] hover:scale-[1.02] active:scale-95 transition-all duration-300 flex items-center justify-center gap-3 disabled:opacity-50"
+                    type="submit"
+                  >
+                    {loading ? (
+                      <div className="w-6 h-6 border-2 border-on-primary-container/30 border-t-on-primary-container rounded-full animate-spin"></div>
+                    ) : (
+                      <>
+                        Initiate Node Alpha
+                        <ArrowRight size={20} />
+                      </>
+                    )}
+                  </button>
+                  <p className="text-on-surface-variant text-[10px] font-label uppercase tracking-widest max-w-[200px] leading-relaxed text-center sm:text-left">
+                    By initiating, you agree to the <span onClick={() => toast.info('Terms of Orbit protocol is managed by global administration.')} className="text-secondary cursor-pointer hover:text-primary transition-colors">Terms of Orbit</span> and <span onClick={() => toast.info('Security Protocol documentation is encrypted for your protection.')} className="text-secondary cursor-pointer hover:text-primary transition-colors">Security Protocol</span>.
+                  </p>
+                </div>
               </div>
-            )}
+            </form>
 
-            {/* Info Box */}
-            <div className={`p-4 rounded-lg border ${isDark ? 'bg-blue-900/20 border-blue-800' : 'bg-blue-50 border-blue-200'
-              }`}>
-              <p className={`text-sm ${isDark ? 'text-blue-300' : 'text-blue-800'}`}>
-                💡 This will create an <strong>Institution Admin</strong> account for your institution.
-                Teachers and students will be added separately after setup.
-              </p>
-            </div>
-
-            {/* Submit Button */}
-            <button
-              disabled={loading}
-              onClick={handleSubmit}
-              type="submit"
-              className="w-full py-3 px-6 rounded-xl bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white font-semibold shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300 flex items-center justify-center gap-2 group"
-            >
-              {loading ? (
-                <>
-                  <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
-                  Creating Institution...
-                </>
-              ) : (
-                <>
-                  Create Institution
-                  <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
-                </>
-              )}
-            </button>
-          </div>
-
-          {/* Sign In Link */}
-          <div className="relative my-6">
-            <div className="absolute inset-0 flex items-center">
-              <div className={`w-full border-t ${isDark ? 'border-gray-700' : 'border-gray-300'}`}></div>
-            </div>
-            <div className="relative flex justify-center text-sm">
-              <span className={`px-4 ${isDark ? 'bg-gray-800 text-gray-400' : 'bg-white text-gray-500'}`}>
-                Already have an account?
-              </span>
+            <div className="mt-16 pt-8 border-t border-outline-variant/10 flex flex-col md:flex-row justify-between items-center gap-4 text-center md:text-left">
+               <div>
+                  <p className="text-on-surface-variant text-xs font-body">Existing node in the network?</p>
+                  <Link to="/login" className="font-label text-secondary hover:text-primary transition-colors uppercase tracking-widest text-[10px] font-bold">Return to Terminal</Link>
+               </div>
+               <div className="flex gap-4 opacity-30 select-none hidden md:flex">
+                  <div className="w-12 h-0.5 bg-outline-variant"></div>
+                  <div className="w-12 h-0.5 bg-outline-variant"></div>
+                  <div className="w-12 h-0.5 bg-outline-variant"></div>
+               </div>
             </div>
           </div>
-
-          <div className="text-center">
-            <button
-              onClick={() => navigate('/login')}
-              className={`font-semibold inline-flex items-center gap-1 group transition-colors ${isDark ? 'text-indigo-400 hover:text-indigo-300' : 'text-indigo-600 hover:text-indigo-700'
-                }`}
-            >
-              Sign in here
-              <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-            </button>
-          </div>
-        </div>
-
-        {/* Footer */}
-        <p className={`text-center mt-6 text-sm ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>
-          By creating an account, you agree to our Terms of Service and Privacy Policy
-        </p>
-      </div>
+        </section>
+      </main>
     </div>
   );
 }

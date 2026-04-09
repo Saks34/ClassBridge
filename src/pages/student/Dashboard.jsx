@@ -1,160 +1,261 @@
 import { useEffect, useState } from 'react';
+import { Link } from 'react-router-dom';
 import api from '../../services/api';
 import LoadingSpinner from '../../components/shared/LoadingSpinner';
 import ClassCard from '../../components/student/ClassCard';
 import { useAuth } from '../../context/AuthContext';
-import { useTheme } from '../../context/ThemeContext';
 import usePageTitle from '../../hooks/usePageTitle';
-import { Calendar, BookOpen, Clock, Zap, Video, Award } from 'lucide-react';
-
-function todayISODate() {
-  const d = new Date();
-  const yyyy = d.getFullYear();
-  const mm = String(d.getMonth() + 1).padStart(2, '0');
-  const dd = String(d.getDate()).padStart(2, '0');
-  return `${yyyy}-${mm}-${dd}`;
-}
+import { Calendar, BookOpen, Clock, Zap, Video, Award, TrendingUp, Shield, ArrowUpRight, Compass } from 'lucide-react';
 
 export default function StudentDashboard() {
-  usePageTitle('Dashboard', 'Student');
-  const { isDark } = useTheme();
+  usePageTitle('Student Dashboard', 'Student');
   const [loading, setLoading] = useState(true);
   const [todayClasses, setTodayClasses] = useState([]);
   const [error, setError] = useState(null);
   const { user } = useAuth();
   const [watchHistory, setWatchHistory] = useState([]);
+  const [personalStats, setPersonalStats] = useState(null);
 
-  useEffect(() => {
-    loadTodayClasses();
-    loadWatchStats();
-  }, []);
+  useEffect(() => { loadDashboardData(); }, []);
 
-  const loadTodayClasses = async () => {
+  const loadDashboardData = async () => {
     setLoading(true);
     setError(null);
     try {
-      const date = todayISODate();
       const batchId = user?.batch?._id || user?.batch;
+      if (!batchId) { setError('No batch assigned to your account'); setLoading(false); return; }
 
-      if (!batchId) {
-        setError('No batch assigned to your account');
-        setLoading(false);
-        return;
-      }
+      const [timetableRes, watchRes, statsRes] = await Promise.all([
+        api.get('/timetables/by-batch', { params: { batchId } }),
+        api.get('/watch-history/me'),
+        api.get('/analytics/student')
+      ]);
 
-      const { data } = await api.get('/timetables/by-batch', {
-        params: { batchId, date },
-      });
-
-      const today = new Date().toISOString().split('T')[0];
-      const todaySlots = (data.slots || []).filter(
-        (s) => !s.date || s.date === today
-      );
+      const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+      const todayName = days[new Date().getDay()];
+      const todaySlots = (timetableRes.data.data.slots || []).filter(s => s.day === todayName);
 
       setTodayClasses(todaySlots);
+      setWatchHistory(watchRes.data || []);
+      setPersonalStats(statsRes.data.data);
     } catch (e) {
-      setError(e?.response?.data?.message || 'Failed to load classes');
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const loadWatchStats = async () => {
-    try {
-      const { data } = await api.get('/watch-history/me');
-      setWatchHistory(data || []);
-    } catch (e) {
-      console.error('Failed to load watch history');
-    }
+      const message = e?.response?.data?.message || "We couldn't load your dashboard. Please refresh, or contact your administrator if this keeps happening.";
+      setError(message);
+    } finally { setLoading(false); }
   };
 
   const liveClasses = todayClasses.filter(c => c.status === 'Live' || c.liveClass?.status === 'Live');
+  const nextClass = todayClasses[0];
 
-  if (loading) return <LoadingSpinner centered />;
+  if (loading) return <div className="h-[80vh] flex items-center justify-center"><LoadingSpinner centered /></div>;
 
-  const statsCards = [
-    { icon: BookOpen, label: "Today's Classes", value: todayClasses.length, gradient: 'from-blue-500 to-cyan-500' },
-    { icon: Zap, label: 'Live Now', value: liveClasses.length, gradient: 'from-rose-500 to-pink-500', pulse: liveClasses.length > 0 },
-    { icon: Clock, label: 'Upcoming', value: todayClasses.filter(c => c.status === 'Scheduled').length, gradient: 'from-violet-500 to-purple-500' },
-    { icon: Video, label: 'Attended', value: watchHistory.length, gradient: 'from-orange-500 to-amber-500' },
-    { icon: Award, label: 'Study Hours', value: (watchHistory.reduce((acc, curr) => acc + (curr.lastPosition || 0), 0) / 3600).toFixed(1), gradient: 'from-emerald-500 to-teal-500' },
-  ];
+  const studyHours = (watchHistory.reduce((acc, curr) => acc + (curr.lastPosition || 0), 0) / 3600).toFixed(1);
 
   return (
-    <div className="max-w-6xl mx-auto space-y-6">
-      {/* Hero */}
-      <div className={`relative overflow-hidden rounded-2xl ${isDark ? 'bg-[#111118]/60' : 'bg-white/60'} backdrop-blur-xl border ${isDark ? 'border-white/5' : 'border-gray-200/50'}`}>
-        <div className={`absolute top-0 right-0 w-60 h-60 bg-gradient-to-br from-violet-500/20 to-transparent rounded-full blur-3xl`}></div>
-
-        <div className="relative p-6">
-          <div className="flex items-center gap-3 mb-1">
-            <span className={`text-xs font-medium px-2 py-1 rounded-full ${isDark ? 'bg-white/10 text-gray-300' : 'bg-gray-100 text-gray-600'}`}>
-              {new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'short', day: 'numeric' })}
-            </span>
-          </div>
-          <h1 className={`text-2xl font-bold ${isDark ? 'text-white' : 'text-gray-900'} mb-1`}>
-            Your Learning Hub
+    <div className="max-w-screen-2xl mx-auto space-y-12 animate-fade-in">
+      {/* Page Header */}
+      <header className="mb-8 flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+        <div>
+          <h1 className="text-4xl md:text-5xl lg:text-6xl font-extrabold font-headline text-on-surface tracking-tight leading-[1.1] mb-2 flex items-center gap-4">
+            Student <span className="text-gradient-secondary">Dashboard</span>
           </h1>
-          <p className={`text-sm ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>
-            Track classes, join live sessions, and access materials
+          <p className="text-on-surface-variant text-base md:text-lg font-body max-w-2xl leading-relaxed">
+            Your learning hub on ClassBridge. Track your progress, see what&apos;s next, and join live classes without missing a beat.
           </p>
-
-          {/* Stats */}
-          <div className="grid grid-cols-2 md:grid-cols-5 gap-3 mt-5">
-            {statsCards.map((stat, i) => {
-              const Icon = stat.icon;
-              return (
-                <div key={i} className={`p-4 rounded-xl ${isDark ? 'bg-white/5' : 'bg-gray-50'} border ${isDark ? 'border-white/5' : 'border-gray-100'}`}>
-                  <div className="flex items-center gap-3">
-                    <div className={`p-2 rounded-lg bg-gradient-to-br ${stat.gradient} ${stat.pulse ? 'animate-pulse' : ''}`}>
-                      <Icon className="text-white" size={16} />
-                    </div>
-                    <div>
-                      <p className={`text-xl font-bold ${isDark ? 'text-white' : 'text-gray-900'}`}>{stat.value}</p>
-                      <p className={`text-xs ${isDark ? 'text-gray-500' : 'text-gray-500'}`}>{stat.label}</p>
-                    </div>
-                  </div>
-                </div>
-              );
-            })}
-          </div>
         </div>
-      </div>
+        <div className="flex flex-wrap gap-3 items-center justify-start md:justify-end">
+          <span className="px-3 py-1 rounded-full border border-outline-variant/30 text-xs font-label uppercase tracking-widest bg-surface-container-low text-on-surface-variant">
+            Role: <span className="font-bold text-on-surface ml-1">Student</span>
+          </span>
+          <Link
+            to="/home"
+            className="text-xs font-label uppercase tracking-widest px-4 py-2 rounded-full border border-outline-variant/30 text-on-surface-variant hover:text-primary hover:border-primary transition-colors bg-transparent"
+          >
+            Home
+          </Link>
+        </div>
+      </header>
 
       {error && (
-        <div className={`p-4 ${isDark ? 'bg-red-500/10 border-red-500/30 text-red-400' : 'bg-red-50 border-red-200 text-red-700'} border rounded-xl text-sm`}>
-          {error}
+        <div className="p-6 bg-error/10 border border-error/20 rounded-[1.5rem] flex items-center gap-4 text-error font-body shadow-xl shadow-error/5">
+             <Shield className="shrink-0" size={24} />
+             <div>
+                <div className="font-bold text-sm uppercase tracking-widest font-label mb-1">System Alert</div>
+                <div className="text-sm opacity-90">{error}</div>
+             </div>
         </div>
       )}
 
-      {/* Classes */}
-      <section>
-        <div className="flex items-center gap-3 mb-4">
-          <div className={`p-2 rounded-lg bg-gradient-to-br from-blue-500 to-cyan-500`}>
-            <Calendar className="text-white" size={18} />
-          </div>
-          <div>
-            <h2 className={`text-lg font-bold ${isDark ? 'text-white' : 'text-gray-900'}`}>Today's Classes</h2>
-            <p className={`text-xs ${isDark ? 'text-gray-500' : 'text-gray-500'}`}>{todayClasses.length} scheduled</p>
+      {/* Primary CTA: Next class */}
+      {nextClass && (
+        <div className="mb-4">
+          <div className="rounded-[2rem] bg-gradient-to-r from-primary to-secondary text-on-primary-container p-6 md:p-8 flex flex-col md:flex-row md:items-center md:justify-between gap-4 shadow-xl shadow-primary/20">
+            <div>
+              <p className="text-xs font-label uppercase tracking-[0.2em] mb-2 opacity-80">Next class</p>
+              <h2 className="text-xl md:text-2xl font-headline font-bold">
+                Next class at <span className="underline decoration-on-primary-container/60 decoration-dotted">{nextClass.startTime || 'upcoming'}</span>
+              </h2>
+              <p className="text-sm mt-1 opacity-90 font-body">
+                Be ready to join on time and keep your attendance on track.
+              </p>
+            </div>
+            <button
+              type="button"
+              className="inline-flex items-center justify-center px-6 py-3 rounded-full bg-on-primary-container text-primary text-sm font-headline font-bold shadow-md hover:bg-background transition-all"
+            >
+              Join
+            </button>
           </div>
         </div>
+      )}
 
-        {todayClasses.length === 0 ? (
-          <div className={`${isDark ? 'bg-[#111118]/60 border-white/5' : 'bg-white/60 border-gray-200/50'} backdrop-blur-xl border p-12 text-center rounded-2xl`}>
-            <div className={`mx-auto w-16 h-16 rounded-2xl ${isDark ? 'bg-blue-600/10' : 'bg-blue-50'} flex items-center justify-center mb-4`}>
-              <BookOpen size={28} className={isDark ? 'text-blue-400' : 'text-blue-600'} />
+      {/* Metrics Row */}
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
+           <div className="bg-surface-container-low p-8 rounded-[2rem] border border-outline-variant/10 relative overflow-hidden group hover:bg-surface-bright/10 transition-all duration-500">
+                <div className="font-label text-[10px] tracking-widest text-primary uppercase mb-4 flex items-center gap-2 font-bold">
+                    <Calendar size={14} /> Total Classes
+                </div>
+                <div className="text-5xl font-bold text-on-surface mb-2 font-headline tracking-tighter">{todayClasses.length}</div>
+                <div className="text-on-surface-variant text-[10px] font-label uppercase tracking-widest font-bold">Planned sessions today</div>
+           </div>
+           
+           <div className="bg-surface-container-low p-8 rounded-[2rem] border border-outline-variant/10 relative overflow-hidden group hover:bg-surface-bright/10 transition-all duration-500">
+                <div className="font-label text-[10px] tracking-widest text-secondary uppercase mb-4 flex items-center gap-2 font-bold">
+                    <Zap size={14} className={liveClasses.length > 0 ? 'animate-pulse fill-secondary' : ''} /> Live Classes
+                </div>
+                <div className="text-5xl font-bold text-on-surface mb-2 font-headline tracking-tighter">{liveClasses.length}</div>
+                <div className="text-on-surface-variant text-[10px] font-label uppercase tracking-widest font-bold">Classes currently ongoing</div>
+           </div>
+
+           <div className="bg-surface-container-low p-8 rounded-[2rem] border border-outline-variant/10 relative overflow-hidden group hover:bg-surface-bright/10 transition-all duration-500">
+                <div className="font-label text-[10px] tracking-widest text-tertiary uppercase mb-4 flex items-center gap-2 font-bold">
+                    <Award size={14} /> Study Time
+                </div>
+                <div className="text-5xl font-bold text-on-surface mb-2 font-headline tracking-tighter">{studyHours}h</div>
+                <div className="text-on-surface-variant text-[10px] font-label uppercase tracking-widest font-bold">Total hours learned</div>
+           </div>
+
+           <div className="bg-surface-container-highest p-8 rounded-[2rem] border border-outline-variant/10 relative overflow-hidden group hover:bg-surface-bright/5 transition-all duration-500">
+                <div className="font-label text-[10px] tracking-widest text-on-surface-variant/70 uppercase mb-4 flex items-center gap-2 font-bold">
+                    <Shield size={14} /> Account Security
+                </div>
+                <div className="text-3xl font-bold text-on-surface mb-2 font-headline uppercase">{personalStats?.linkStatus || 'Protected'}</div>
+                <div className="text-secondary text-[10px] font-label uppercase tracking-widest font-bold flex items-center gap-2">
+                    <span className={`w-1.5 h-1.5 rounded-full bg-secondary ${personalStats?.terminalSecure ? 'animate-pulse' : ''}`}></span>
+                    Account {personalStats?.terminalSecure ? 'Secure' : 'Verifying'}
+                </div>
             </div>
-            <h3 className={`text-lg font-bold ${isDark ? 'text-white' : 'text-gray-900'} mb-1`}>No Classes Today</h3>
-            <p className={`text-sm ${isDark ? 'text-gray-500' : 'text-gray-500'}`}>Enjoy your free time! 🎉</p>
-          </div>
-        ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
-            {todayClasses.map((classData) => (
-              <ClassCard key={classData._id} classData={classData} />
-            ))}
-          </div>
-        )}
-      </section>
+      </div>
+
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
+        {/* Main Feed: Today's Classes */}
+        <div className="lg:col-span-2 space-y-8">
+            <div className="flex items-center justify-between mb-2">
+                <h2 className="text-2xl font-bold text-on-surface font-headline tracking-tight flex items-center gap-3">
+                    <Compass className="text-secondary" size={24} />
+                    Today's Schedule
+                </h2>
+                <div className="text-[10px] font-label text-on-surface-variant/60 uppercase tracking-widest font-bold">{new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })}</div>
+            </div>
+
+            {todayClasses.length === 0 ? (
+                <div className="bg-surface-container-low/50 glass-panel p-16 rounded-[2.5rem] border border-outline-variant/5 text-center shadow-2xl">
+                    <div className="w-20 h-20 bg-surface-container border border-outline-variant/10 rounded-full flex items-center justify-center mx-auto mb-6 shadow-xl">
+                        <BookOpen className="text-on-surface-variant/40" size={32} />
+                    </div>
+                    <p className="font-headline text-xl text-on-surface font-bold mb-2">No Classes Today</p>
+                    <p className="font-body text-on-surface-variant/70 text-sm max-w-xs mx-auto">There are no classes scheduled for your batch today. Take some time to review your previous lessons.</p>
+                    <div className="mt-6">
+                      <Link
+                        to="/student/library"
+                        className="inline-flex items-center justify-center px-5 py-2.5 rounded-full border border-outline-variant/40 text-xs font-label uppercase tracking-widest text-on-surface-variant hover:border-primary hover:text-primary transition-colors bg-transparent"
+                      >
+                        View Recordings
+                      </Link>
+                    </div>
+                </div>
+            ) : (
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    {todayClasses.map((classData) => (<ClassCard key={classData._id} classData={classData} />))}
+                </div>
+            )}
+        </div>
+
+        {/* Side Portal: Learning Stats & Tips */}
+        <div className="space-y-8 lg:sticky lg:top-24 h-fit">
+            <div className="bg-surface-container-low rounded-[2.5rem] border border-outline-variant/10 p-10 relative overflow-hidden">
+                <div className="absolute top-0 right-0 p-4 opacity-10">
+                    <TrendingUp size={40} className="text-secondary" />
+                </div>
+                <h3 className="text-xl font-bold font-headline text-on-surface mb-6 tracking-tight">Academic Progress</h3>
+                
+                <div className="space-y-8">
+                    <div className="space-y-3">
+                        <div className="flex justify-between text-[10px] font-label uppercase tracking-widest font-bold mb-1">
+                            <span className="text-on-surface-variant/70">Overall Attendance</span>
+                            <span className="text-secondary">{personalStats?.neuralProgress?.attendance || 88}%</span>
+                        </div>
+                        <div className="h-1.5 w-full bg-surface-variant/30 rounded-full overflow-hidden">
+                            <div className="h-full bg-gradient-to-r from-secondary/40 to-secondary transition-all duration-1000" style={{ width: `${personalStats?.neuralProgress?.attendance || 88}%` }}></div>
+                        </div>
+                    </div>
+                    
+                    <div className="space-y-3">
+                        <div className="flex justify-between text-[10px] font-label uppercase tracking-widest font-bold mb-1">
+                            <span className="text-on-surface-variant/70">Mastery Score</span>
+                            <span className="text-primary">{personalStats?.neuralProgress?.mastery || 74}%</span>
+                        </div>
+                        <div className="h-1.5 w-full bg-surface-variant/30 rounded-full overflow-hidden">
+                            <div className="h-full bg-gradient-to-r from-primary/40 to-primary transition-all duration-1000" style={{ width: `${personalStats?.neuralProgress?.mastery || 74}%` }}></div>
+                        </div>
+                    </div>
+
+                    <div className="pt-8 border-t border-outline-variant/10">
+                         <button
+                           className="w-full flex items-center justify-between text-[10px] font-label uppercase tracking-widest text-on-surface-variant/40 cursor-not-allowed bg-surface-container-low/60 rounded-full px-4 py-3"
+                           type="button"
+                           disabled
+                           aria-disabled="true"
+                         >
+                            <span>Detailed Performance Analytics</span>
+                            <span className="px-2 py-0.5 rounded-full text-[9px] bg-outline-variant/20 text-on-surface-variant font-bold">
+                              Coming soon
+                            </span>
+                         </button>
+                    </div>
+                </div>
+            </div>
+
+            {/* Quick Access Card */}
+            <div className="p-8 rounded-[2.5rem] bg-gradient-to-br from-secondary/5 to-surface-variant/20 border border-outline-variant/10 relative overflow-hidden group">
+                <div className="absolute -top-12 -right-12 w-32 h-32 bg-secondary/10 rounded-full blur-3xl transition-opacity group-hover:opacity-100 opacity-50"></div>
+                <Video className="text-secondary mb-6" size={32} strokeWidth={1.5} />
+                <h4 className="text-lg font-bold text-on-surface mb-3 font-headline tracking-tight">Recent Recordings</h4>
+                <p className="text-on-surface-variant/70 text-sm font-body leading-relaxed mb-8">
+                   You have <span className="text-on-surface font-bold">{watchHistory.length}</span> lesson recordings available for review.
+                </p>
+                <div className="flex items-center gap-3">
+                    <Link
+                      to="/student/library"
+                      className="text-primary font-label text-[10px] font-bold uppercase tracking-[0.2em] flex items-center gap-2 hover:gap-4 transition-all"
+                    >
+                       OPEN CLASS ARCHIVES <ArrowUpRight size={14} />
+                    </Link>
+                </div>
+            </div>
+
+            {/* Tip of the Day */}
+            <div className="bg-surface-container glass-panel p-8 rounded-[2rem] border border-outline-variant/10 shadow-xl">
+                 <div className="flex items-center gap-3 mb-4">
+                    <Zap size={14} className="text-primary" />
+                    <span className="text-[9px] font-label text-on-surface-variant/60 uppercase tracking-widest font-bold">Daily Study Tip</span>
+                 </div>
+                  <p className="font-body text-on-surface-variant/80 text-xs italic leading-relaxed">
+                    "{personalStats?.learnerProtocol || 'Regularly reviewing your recordings helps reinforce key concepts and improves learning retention.'}"
+                  </p>
+            </div>
+        </div>
+      </div>
     </div>
   );
 }

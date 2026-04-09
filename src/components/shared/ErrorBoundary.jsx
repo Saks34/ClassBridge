@@ -20,60 +20,59 @@ class ErrorBoundary extends React.Component {
 
     handleReset = () => {
         this.setState({ hasError: false, error: null, errorInfo: null });
-        window.location.href = '/';
+        window.location.href = '/home';
     };
 
     render() {
         if (this.state.hasError) {
             return (
-                <div className="min-h-screen bg-gradient-to-br from-red-50 to-orange-50 flex items-center justify-center p-6">
-                    <div className="max-w-2xl w-full bg-white rounded-2xl shadow-2xl p-8 border border-red-100">
-                        <div className="text-center mb-6">
-                            <div className="text-6xl mb-4">⚠️</div>
-                            <h1 className="text-3xl font-bold text-gray-900 mb-2">
-                                Something went wrong
+                <div className="min-h-screen bg-surface flex items-center justify-center p-6 font-body">
+                    <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_0%,rgba(var(--primary-rgb),0.1),transparent_50%)] pointer-events-none"></div>
+                    
+                    <div className="max-w-2xl w-full glass-panel border border-outline-variant/10 rounded-[3rem] p-12 lg:p-16 shadow-2xl relative z-10 overflow-hidden text-center">
+                        <div className="absolute top-0 right-0 w-32 h-32 bg-primary/5 blur-3xl rounded-full translate-x-1/2 -translate-y-1/2"></div>
+                        
+                        <div className="mb-10 flex flex-col items-center">
+                            <div className="w-24 h-24 rounded-3xl bg-error/10 border border-error/20 flex items-center justify-center mb-8 shadow-inner animate-pulse" aria-hidden="true">
+                                <span className="material-symbols-outlined text-error text-5xl">warning</span>
+                            </div>
+                            <h1 className="text-4xl md:text-5xl font-extrabold font-headline text-on-surface tracking-tighter leading-tight mb-4">
+                                System <span className="text-gradient-primary">Error</span>
                             </h1>
-                            <p className="text-gray-600">
-                                We apologize for the inconvenience. An unexpected error occurred.
+                            <p className="text-on-surface-variant text-lg font-body max-w-sm">
+                                An unexpected error has occurred while loading this page.
                             </p>
                         </div>
 
-                        {process.env.NODE_ENV === 'development' && this.state.error && (
-                            <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg">
-                                <h3 className="font-semibold text-red-900 mb-2">Error Details:</h3>
-                                <p className="text-sm text-red-800 font-mono mb-2">
+                        {this.state.error && (
+                            <div className="mb-10 p-6 rounded-2xl bg-surface-container-high/50 border border-outline-variant/10 text-left overflow-hidden">
+                                <p className="text-[10px] font-label uppercase tracking-widest text-primary/70 font-bold mb-3">Error Details</p>
+                                <p className="text-sm font-mono text-on-surface leading-normal opacity-80 mb-0 break-words">
                                     {this.state.error.toString()}
                                 </p>
-                                {this.state.errorInfo && (
-                                    <details className="text-xs text-red-700">
-                                        <summary className="cursor-pointer font-semibold mb-1">
-                                            Stack Trace
-                                        </summary>
-                                        <pre className="whitespace-pre-wrap overflow-auto max-h-40 bg-red-100 p-2 rounded">
-                                            {this.state.errorInfo.componentStack}
-                                        </pre>
-                                    </details>
-                                )}
                             </div>
                         )}
 
-                        <div className="flex flex-col sm:flex-row gap-3 justify-center">
+                        <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
                             <button
                                 onClick={this.handleReset}
-                                className="px-6 py-3 bg-gradient-to-r from-violet-600 to-purple-600 text-white rounded-xl font-semibold hover:shadow-lg transition-all hover:scale-105"
+                                className="w-full sm:w-auto px-10 py-4 bg-gradient-primary text-on-primary font-label text-[10px] font-black uppercase tracking-[0.2em] rounded-full shadow-lg hover:shadow-primary/20 hover:scale-105 active:scale-95 transition-all flex items-center justify-center gap-3 group"
                             >
-                                Return to Home
+                                <span className="material-symbols-outlined text-lg group-hover:rotate-12 transition-transform">dashboard</span>
+                                Return to Dashboard
                             </button>
                             <button
                                 onClick={() => window.location.reload()}
-                                className="px-6 py-3 bg-gray-100 text-gray-700 rounded-xl font-semibold hover:bg-gray-200 transition-all"
+                                className="w-full sm:w-auto px-10 py-4 bg-surface-container-high text-on-surface-variant font-label text-[10px] font-black uppercase tracking-[0.2em] rounded-full hover:bg-surface-bright/10 hover:text-on-surface transition-all flex items-center justify-center gap-3 border border-outline-variant/10 group"
                             >
+                                <span className="material-symbols-outlined text-lg group-hover:rotate-90 transition-transform">refresh</span>
                                 Reload Page
                             </button>
                         </div>
 
-                        <div className="mt-6 text-center text-sm text-gray-500">
-                            <p>If this problem persists, please contact support.</p>
+                        <div className="mt-12 pt-8 border-t border-outline-variant/5 text-on-surface-variant/40 flex justify-center items-center gap-2">
+                             <div className="w-1.5 h-1.5 rounded-full bg-error animate-ping"></div>
+                             <p className="text-[10px] font-label uppercase tracking-widest font-bold">System recovery active</p>
                         </div>
                     </div>
                 </div>

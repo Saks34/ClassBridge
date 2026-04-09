@@ -1,65 +1,42 @@
 import { useAuth } from '../../context/AuthContext';
-import { Menu, X, Bell, LogOut, Sun, Moon } from 'lucide-react';
+import { Search, Bell, Sun, Moon } from 'lucide-react';
 import { useTheme } from '../../context/ThemeContext';
+import NotificationDropdown from '../shared/NotificationDropdown';
 
-export default function TopBar({ sidebarOpen, setSidebarOpen }) {
-    const { user, logout } = useAuth();
+export default function TopBar() {
+    const { user } = useAuth();
     const { isDark, toggleTheme } = useTheme();
 
-    const cardBg = isDark
-        ? 'bg-gray-900/60 backdrop-blur-xl border-white/10'
-        : 'bg-white/60 backdrop-blur-xl border-gray-200/50';
-
-    const textPrimary = isDark ? 'text-white' : 'text-gray-900';
-    const textMuted = isDark ? 'text-gray-500' : 'text-gray-500';
-
     return (
-        <header className={`${cardBg} border-b shadow-lg px-6 py-4 flex items-center justify-between`}>
-            <div className="flex items-center gap-4">
-                <button
-                    onClick={() => setSidebarOpen(!sidebarOpen)}
-                    className={`p-2.5 ${isDark ? 'bg-white/10 hover:bg-white/20' : 'bg-white/60 hover:bg-white/80'} rounded-xl transition-all hover:scale-110 ${textPrimary}`}
-                    aria-label={sidebarOpen ? "Close sidebar" : "Open sidebar"}
-                >
-                    {sidebarOpen ? <X size={20} /> : <Menu size={20} />}
-                </button>
-                <div>
-                    <h2 className={`text-xl font-bold ${textPrimary}`}>Institution Admin</h2>
-                    <p className={`text-xs ${textMuted}`}>Welcome back, {user?.name?.split(' ')[0] || 'User'} 👋</p>
+        <header className="flex justify-between items-center w-full px-8 h-20 sticky top-0 bg-surface/20 backdrop-blur-md z-40 border-b border-outline-variant/10">
+            <div className="flex items-center gap-6">
+                
+                <div className="hidden lg:flex items-center gap-6">
+                    <div className="relative group">
+                        <span className="absolute inset-y-0 left-3 flex items-center text-on-surface-variant group-focus-within:text-primary transition-colors pointer-events-none">
+                            <Search size={18} />
+                        </span>
+                        <input 
+                            className="bg-surface-container-low border-0 border-b border-transparent focus:border-primary/30 rounded-full pl-10 pr-6 py-2 text-sm text-on-surface placeholder:text-on-surface-variant/50 focus:ring-4 focus:ring-primary/5 w-80 transition-all outline-none" 
+                            placeholder="Search neural pathways..." 
+                            type="text" 
+                        />
+                    </div>
                 </div>
             </div>
 
-            <div className="flex items-center gap-4">
-                <button
-                    className={`p-2.5 ${isDark ? 'bg-white/10 hover:bg-white/20' : 'bg-white/60 hover:bg-white/80'} rounded-xl transition-all hover:scale-110 relative ${textPrimary}`}
-                    aria-label="Notifications (3 unread)"
-                >
-                    <Bell size={20} />
-                    <span className="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full animate-pulse"></span>
-                </button>
-                <button
-                    onClick={toggleTheme}
-                    className={`p-2.5 ${isDark ? 'bg-white/10 hover:bg-white/20' : 'bg-white/60 hover:bg-white/80'} rounded-xl transition-all hover:scale-110 ${textPrimary}`}
-                    aria-label="Toggle theme"
-                >
-                    {isDark ? <Sun size={20} /> : <Moon size={20} />}
-                </button>
-                <div className={`flex items-center gap-3 px-4 py-2 ${isDark ? 'bg-white/10' : 'bg-white/60'} rounded-xl`}>
-                    <div className="w-9 h-9 rounded-lg bg-gradient-to-br from-violet-500 to-purple-600 flex items-center justify-center text-white font-bold shadow-md">
-                        {user?.name?.substring(0, 2).toUpperCase() || 'AD'}
-                    </div>
-                    <div className="text-right hidden md:block">
-                        <p className={`text-sm font-semibold ${textPrimary}`}>{user?.name}</p>
-                        <p className={`text-xs ${textMuted}`}>{user?.role}</p>
-                    </div>
+            <div className="flex items-center gap-4 md:gap-6">
+                <div className="flex items-center gap-2 md:gap-4 border-r border-outline-variant/10 pr-4 md:pr-6">
+                    <button
+                        onClick={toggleTheme}
+                        className="w-10 h-10 flex items-center justify-center rounded-xl bg-surface-container-high text-on-surface-variant hover:text-primary transition-all active:scale-95 group relative"
+                    >
+                        {isDark ? <Sun size={18} className="group-hover:rotate-45 transition-transform" /> : <Moon size={18} className="group-hover:-rotate-12 transition-transform" />}
+                        <span className="absolute -bottom-10 right-0 p-2 bg-inverse-surface text-inverse-on-surface border border-outline-variant/20 rounded text-[8px] font-label uppercase tracking-widest opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none">Change Spectrum</span>
+                    </button>
+                    <NotificationDropdown />
+                    
                 </div>
-                <button
-                    onClick={logout}
-                    className={`flex items-center gap-2 px-4 py-2.5 ${isDark ? 'bg-red-500/20 hover:bg-red-500/30 text-red-400' : 'bg-red-50 hover:bg-red-100 text-red-600'} rounded-xl transition-all hover:scale-105`}
-                >
-                    <LogOut size={18} />
-                    <span className="font-medium hidden md:inline">Logout</span>
-                </button>
             </div>
         </header>
     );

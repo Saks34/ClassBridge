@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>The Observatory | Command Center</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@200;400;700;800&amp;family=Inter:wght@300;400;600&amp;family=Space+Grotesk:wght@300;500;700&amp;family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "secondary-fixed-dim": "#50ebd5",
+                        "surface-variant": "#192540",
+                        "surface-container-low": "#091328",
+                        "on-primary": "#004b58",
+                        "surface-tint": "#53ddfc",
+                        "on-secondary-fixed-variant": "#00675c",
+                        "on-primary-fixed": "#003640",
+                        "inverse-primary": "#00687b",
+                        "inverse-on-surface": "#4d556b",
+                        "on-surface": "#dee5ff",
+                        "surface-bright": "#1f2b49",
+                        "primary-container": "#21bedc",
+                        "tertiary": "#a9a0ff",
+                        "secondary": "#62fae3",
+                        "surface-container-high": "#141f38",
+                        "tertiary-fixed": "#afa6ff",
+                        "secondary-dim": "#50ebd5",
+                        "primary-fixed": "#53ddfc",
+                        "on-primary-container": "#00343e",
+                        "on-background": "#dee5ff",
+                        "error-container": "#9f0519",
+                        "surface-container-highest": "#192540",
+                        "on-tertiary-fixed": "#13005b",
+                        "on-tertiary": "#271284",
+                        "on-error": "#490006",
+                        "inverse-surface": "#faf8ff",
+                        "tertiary-dim": "#9b90fe",
+                        "outline-variant": "#40485d",
+                        "primary-fixed-dim": "#40ceed",
+                        "on-primary-fixed-variant": "#005564",
+                        "secondary-container": "#006b5f",
+                        "on-error-container": "#ffa8a3",
+                        "primary-dim": "#40ceed",
+                        "tertiary-container": "#9b90fe",
+                        "surface-container-lowest": "#000000",
+                        "error": "#ff716c",
+                        "background": "#060e20",
+                        "primary": "#53ddfc",
+                        "error-dim": "#d7383b",
+                        "surface-dim": "#060e20",
+                        "surface": "#060e20",
+                        "on-tertiary-container": "#1a0072",
+                        "on-tertiary-fixed-variant": "#352591",
+                        "on-secondary-fixed": "#004840",
+                        "on-surface-variant": "#a3aac4",
+                        "outline": "#6d758c",
+                        "on-secondary-container": "#dcfff7",
+                        "surface-container": "#0f1930",
+                        "on-secondary": "#005c52",
+                        "secondary-fixed": "#62fae3",
+                        "tertiary-fixed-dim": "#a196ff"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.125rem",
+                        "lg": "0.25rem",
+                        "xl": "0.5rem",
+                        "full": "0.75rem"
+                    },
+                    "fontFamily": {
+                        "headline": ["Manrope"],
+                        "body": ["Inter"],
+                        "label": ["Space Grotesk"]
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .glass-panel {
+            backdrop-filter: blur(25px);
+        }
+        body {
+            background-color: #060e20;
+            color: #dee5ff;
+            font-family: 'Inter', sans-serif;
+        }
+        .text-glow-primary {
+            text-shadow: 0 0 10px rgba(83, 221, 252, 0.4);
+        }
+    </style>
+</head>
+<body class="overflow-x-hidden">
+<!-- SideNavBar -->
+<aside class="flex flex-col fixed left-0 top-0 h-full h-screen w-64 border-r border-slate-800/50 bg-slate-950/40 backdrop-blur-xl shadow-[0_20px_40px_rgba(0,0,0,0.4),0_0_15px_rgba(83,221,252,0.05)] z-50">
+<div class="p-8">
+<div class="text-xl font-black text-sky-400 tracking-tighter mb-2">THE BRIDGE</div>
+<div class="text-3xl font-bold font-manrope text-white">The Observatory</div>
+<div class="font-space-grotesk tracking-widest uppercase text-xs text-slate-400 mt-1">Command Center</div>
+</div>
+<nav class="flex-1 px-4 mt-4 space-y-2">
+<a class="flex items-center gap-4 px-4 py-3 rounded-xl transition-all duration-300 text-sky-400 font-bold border-r-2 border-sky-400 bg-sky-400/10 scale-98" href="#">
+<span class="material-symbols-outlined" data-icon="dashboard">dashboard</span>
+<span class="font-space-grotesk tracking-widest uppercase text-xs">Command</span>
+</a>
+<a class="flex items-center gap-4 px-4 py-3 rounded-xl transition-all duration-300 text-slate-400 font-medium hover:bg-sky-400/10 hover:text-sky-300" href="#">
+<span class="material-symbols-outlined" data-icon="podcasts">podcasts</span>
+<span class="font-space-grotesk tracking-widest uppercase text-xs">Transmissions</span>
+</a>
+<a class="flex items-center gap-4 px-4 py-3 rounded-xl transition-all duration-300 text-slate-400 font-medium hover:bg-sky-400/10 hover:text-sky-300" href="#">
+<span class="material-symbols-outlined" data-icon="travel_explore">travel_explore</span>
+<span class="font-space-grotesk tracking-widest uppercase text-xs">Exploration</span>
+</a>
+<a class="flex items-center gap-4 px-4 py-3 rounded-xl transition-all duration-300 text-slate-400 font-medium hover:bg-sky-400/10 hover:text-sky-300" href="#">
+<span class="material-symbols-outlined" data-icon="auto_stories">auto_stories</span>
+<span class="font-space-grotesk tracking-widest uppercase text-xs">Resources</span>
+</a>
+<a class="flex items-center gap-4 px-4 py-3 rounded-xl transition-all duration-300 text-slate-400 font-medium hover:bg-sky-400/10 hover:text-sky-300" href="#">
+<span class="material-symbols-outlined" data-icon="terminal">terminal</span>
+<span class="font-space-grotesk tracking-widest uppercase text-xs">Logs</span>
+</a>
+</nav>
+<div class="px-4 pb-8 space-y-4">
+<button class="w-full py-4 rounded-full bg-gradient-to-r from-primary to-primary-container text-on-primary-container font-bold font-label uppercase text-xs tracking-widest shadow-lg shadow-primary/20 transition-transform active:scale-95">
+                Initiate Launch
+            </button>
+<div class="pt-4 space-y-2">
+<a class="flex items-center gap-4 px-4 py-2 text-slate-400 hover:text-sky-300 transition-colors" href="#">
+<span class="material-symbols-outlined" data-icon="settings">settings</span>
+<span class="font-space-grotesk text-xs uppercase tracking-widest">Settings</span>
+</a>
+<a class="flex items-center gap-4 px-4 py-2 text-slate-400 hover:text-sky-300 transition-colors" href="#">
+<span class="material-symbols-outlined" data-icon="help">help</span>
+<span class="font-space-grotesk text-xs uppercase tracking-widest">Support</span>
+</a>
+</div>
+<div class="flex items-center gap-3 px-4 pt-4 border-t border-slate-800/30">
+<div class="w-10 h-10 rounded-full overflow-hidden bg-surface-container-highest">
+<img alt="Admin Avatar" data-alt="professional male administrator in high-tech setting with soft blue cinematic lighting and digital interface reflection in eyes" src="https://lh3.googleusercontent.com/aida-public/AB6AXuC9XnPnBi2AUi-Ev7CaMf-msaTGc7vMqshg2kZyiBKZsjWNwoRO2lIUqtpBRz03Jd-m855CjMBy-ZNG908_RB15t-HGYB-GUukkKFwoZuiG7WAAGheyq1vXa5xHgT4b61QMeianG5XWbfxtb5Qa3-Zfmdsu8ShYGIbbTuE_iG1i-hMy5otebFL7g3nvor_CJEQQDhHabYjVqPhSM0RO89e_LyATkbr07mlFwZDQs4XNHV85NLsO0_MrrllPWeCSjQ3nHLePHhr6plE"/>
+</div>
+<div>
+<div class="text-sm font-bold text-white">Commander Kane</div>
+<div class="text-[10px] text-sky-400 font-label tracking-tighter">ADMIN LEVEL 07</div>
+</div>
+</div>
+</div>
+</aside>
+<!-- TopNavBar -->
+<header class="flex justify-between items-center w-full pl-72 pr-8 h-20 fixed top-0 bg-slate-950/20 backdrop-blur-md z-40">
+<div class="flex items-center gap-6">
+<div class="relative group">
+<span class="absolute inset-y-0 left-3 flex items-center text-slate-400 group-focus-within:text-sky-400 transition-colors">
+<span class="material-symbols-outlined" data-icon="search">search</span>
+</span>
+<input class="bg-surface-container-low border-none rounded-full pl-10 pr-6 py-2 text-sm text-on-surface placeholder:text-slate-500 focus:ring-2 focus:ring-primary/30 w-80 transition-all" placeholder="Search neural pathways..." type="text"/>
+</div>
+<div class="text-lg font-bold text-white font-manrope">Command Actions</div>
+</div>
+<div class="flex items-center gap-6">
+<div class="flex gap-4">
+<button class="w-10 h-10 flex items-center justify-center rounded-xl bg-surface-container-high text-slate-300 hover:text-sky-400 transition-colors active:scale-105 opacity-80">
+<span class="material-symbols-outlined" data-icon="notifications">notifications</span>
+</button>
+<button class="w-10 h-10 flex items-center justify-center rounded-xl bg-surface-container-high text-slate-300 hover:text-sky-400 transition-colors active:scale-105 opacity-80">
+<span class="material-symbols-outlined" data-icon="account_circle">account_circle</span>
+</button>
+</div>
+<button class="px-6 py-2 rounded-full bg-surface-variant text-sky-400 font-label text-sm font-bold hover:bg-sky-400/20 transition-all border border-sky-400/20">
+                New Batch
+            </button>
+</div>
+</header>
+<!-- Main Content -->
+<main class="pl-72 pr-8 pt-28 pb-12 min-h-screen">
+<header class="mb-12">
+<h1 class="text-6xl font-extrabold font-manrope text-white tracking-tight leading-none mb-4">Institutional Overview</h1>
+<p class="text-on-surface-variant text-lg font-body max-w-2xl">Visualizing the pulse of ClassBridge's decentralized learning network. Real-time telemetry from across the planetary nodes.</p>
+</header>
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+<!-- Left Column: Metrics & Analytics -->
+<div class="lg:col-span-2 space-y-8">
+<!-- Metric Cards -->
+<div class="grid grid-cols-3 gap-6">
+<div class="bg-surface-container-low p-8 rounded-3xl relative overflow-hidden group hover:bg-surface-container-high transition-all duration-500">
+<div class="absolute top-0 right-0 w-32 h-32 bg-primary/5 rounded-full -mr-16 -mt-16 blur-3xl transition-opacity group-hover:opacity-100 opacity-50"></div>
+<div class="font-label text-xs tracking-widest text-sky-400 uppercase mb-4">Total Nodes</div>
+<div class="text-5xl font-bold text-white mb-2 font-manrope">1.2k</div>
+<div class="flex items-center gap-2 text-secondary text-sm font-medium">
+<span class="material-symbols-outlined text-xs" data-icon="trending_up">trending_up</span>
+                            +12.4%
+                        </div>
+</div>
+<div class="bg-surface-container-low p-8 rounded-3xl relative overflow-hidden group hover:bg-surface-container-high transition-all duration-500">
+<div class="absolute top-0 right-0 w-32 h-32 bg-secondary/5 rounded-full -mr-16 -mt-16 blur-3xl transition-opacity group-hover:opacity-100 opacity-50"></div>
+<div class="font-label text-xs tracking-widest text-sky-400 uppercase mb-4">Engagement</div>
+<div class="text-5xl font-bold text-white mb-2 font-manrope">94%</div>
+<div class="flex items-center gap-2 text-secondary text-sm font-medium">
+<span class="material-symbols-outlined text-xs" data-icon="bolt">bolt</span>
+                            Peak Efficiency
+                        </div>
+</div>
+<div class="bg-surface-container-low p-8 rounded-3xl relative overflow-hidden group hover:bg-surface-container-high transition-all duration-500">
+<div class="absolute top-0 right-0 w-32 h-32 bg-tertiary/5 rounded-full -mr-16 -mt-16 blur-3xl transition-opacity group-hover:opacity-100 opacity-50"></div>
+<div class="font-label text-xs tracking-widest text-sky-400 uppercase mb-4">Latency</div>
+<div class="text-5xl font-bold text-white mb-2 font-manrope">12ms</div>
+<div class="flex items-center gap-2 text-primary text-sm font-medium">
+<span class="material-symbols-outlined text-xs" data-icon="shield">shield</span>
+                            Ultra-Stable
+                        </div>
+</div>
+</div>
+<!-- Main Chart Area -->
+<div class="bg-surface-container-low rounded-[2.5rem] p-10 relative">
+<div class="flex justify-between items-end mb-10">
+<div>
+<h3 class="text-2xl font-bold text-white font-manrope">Neural Network Performance</h3>
+<p class="text-on-surface-variant text-sm mt-1">Cross-regional transmission synchronization (24h)</p>
+</div>
+<div class="flex gap-4">
+<div class="flex items-center gap-2">
+<span class="w-3 h-3 rounded-full bg-primary"></span>
+<span class="text-xs font-label text-slate-400 uppercase tracking-widest">Active nodes</span>
+</div>
+<div class="flex items-center gap-2">
+<span class="w-3 h-3 rounded-full bg-secondary"></span>
+<span class="text-xs font-label text-slate-400 uppercase tracking-widest">Sync speed</span>
+</div>
+</div>
+</div>
+<!-- Mock Chart Visualization -->
+<div class="h-80 w-full flex items-end justify-between gap-1 relative">
+<!-- Background Grid -->
+<div class="absolute inset-0 flex flex-col justify-between opacity-10">
+<div class="w-full h-px bg-slate-400"></div>
+<div class="w-full h-px bg-slate-400"></div>
+<div class="w-full h-px bg-slate-400"></div>
+<div class="w-full h-px bg-slate-400"></div>
+</div>
+<!-- Chart Bars with Gradients -->
+<div class="w-full h-40 bg-gradient-to-t from-primary/10 to-primary rounded-t-lg transition-all duration-1000"></div>
+<div class="w-full h-64 bg-gradient-to-t from-primary/10 to-primary rounded-t-lg transition-all duration-1000"></div>
+<div class="w-full h-52 bg-gradient-to-t from-primary/10 to-primary rounded-t-lg transition-all duration-1000"></div>
+<div class="w-full h-72 bg-gradient-to-t from-secondary/10 to-secondary rounded-t-lg transition-all duration-1000"></div>
+<div class="w-full h-48 bg-gradient-to-t from-primary/10 to-primary rounded-t-lg transition-all duration-1000"></div>
+<div class="w-full h-80 bg-gradient-to-t from-primary/10 to-primary rounded-t-lg transition-all duration-1000 shadow-[0_0_20px_rgba(83,221,252,0.3)]"></div>
+<div class="w-full h-60 bg-gradient-to-t from-primary/10 to-primary rounded-t-lg transition-all duration-1000"></div>
+<div class="w-full h-32 bg-gradient-to-t from-secondary/10 to-secondary rounded-t-lg transition-all duration-1000"></div>
+<div class="w-full h-56 bg-gradient-to-t from-primary/10 to-primary rounded-t-lg transition-all duration-1000"></div>
+<div class="w-full h-68 bg-gradient-to-t from-primary/10 to-primary rounded-t-lg transition-all duration-1000"></div>
+</div>
+<div class="flex justify-between mt-6 px-1">
+<span class="text-[10px] font-label text-slate-500 uppercase">00:00</span>
+<span class="text-[10px] font-label text-slate-500 uppercase">06:00</span>
+<span class="text-[10px] font-label text-slate-500 uppercase">12:00</span>
+<span class="text-[10px] font-label text-slate-500 uppercase">18:00</span>
+<span class="text-[10px] font-label text-slate-500 uppercase">Current</span>
+</div>
+</div>
+<!-- Secondary Grid -->
+<div class="grid grid-cols-2 gap-8">
+<div class="bg-surface-container-low rounded-3xl p-8 group">
+<div class="flex justify-between items-start mb-6">
+<h4 class="text-xl font-bold font-manrope text-white">Resource Allocation</h4>
+<span class="material-symbols-outlined text-primary" data-icon="extension">extension</span>
+</div>
+<div class="space-y-6">
+<div class="space-y-2">
+<div class="flex justify-between text-xs font-label uppercase tracking-widest mb-1">
+<span class="text-slate-400">Curriculum Data</span>
+<span class="text-white">82%</span>
+</div>
+<div class="h-2 w-full bg-surface-variant rounded-full overflow-hidden">
+<div class="h-full w-[82%] bg-gradient-to-r from-primary to-secondary"></div>
+</div>
+</div>
+<div class="space-y-2">
+<div class="flex justify-between text-xs font-label uppercase tracking-widest mb-1">
+<span class="text-slate-400">Node Storage</span>
+<span class="text-white">45%</span>
+</div>
+<div class="h-2 w-full bg-surface-variant rounded-full overflow-hidden">
+<div class="h-full w-[45%] bg-gradient-to-r from-tertiary to-primary"></div>
+</div>
+</div>
+</div>
+</div>
+<div class="bg-surface-container-highest rounded-3xl p-8 relative overflow-hidden">
+<img alt="Space tech" class="absolute inset-0 w-full h-full object-cover opacity-20 mix-blend-overlay" data-alt="high resolution satellite view of earth at night with illuminated city networks and atmospheric blue glow" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAX9X3fp5ir0yvKcg1QUXJjk1bvPLWYMOJ7PKlPsR8l816UBXGuPc7R6n1Oezk4CKggSvVNs-FF8lBOPQsAS_l2U-JRD-kUK7sVSvcinl4cRJEzm2rOQdhPXGOZoJ5SH5IsevHZh5eWJxLuqudfOc4xeBiVwEuLJHWOm4bCSkBrm33Bl4YyZK_P-ETkLGKYVz5uaGbKkcSM_oQVymLPw4EgtwAphuMo6whAKpb4gKFZPDjJpSqeLx2tGwtU2DbUnoI6QtwJJKjT0qA"/>
+<div class="relative z-10">
+<h4 class="text-xl font-bold font-manrope text-white mb-2">Global Expansion</h4>
+<p class="text-on-surface-variant text-sm mb-6">Predicting node growth for Q4 activation sequences.</p>
+<button class="px-6 py-2 rounded-full border border-primary/40 text-primary text-xs font-label tracking-widest uppercase font-bold hover:bg-primary/10 transition-colors">View Projection</button>
+</div>
+</div>
+</div>
+</div>
+<!-- Right Column: Live Activity Feed -->
+<div class="space-y-6">
+<div class="flex items-center justify-between px-2 mb-2">
+<h3 class="text-xl font-bold font-manrope text-white">Live Activity</h3>
+<div class="flex gap-1">
+<span class="w-1.5 h-1.5 rounded-full bg-secondary animate-pulse"></span>
+<span class="w-1.5 h-1.5 rounded-full bg-secondary opacity-50 animate-pulse delay-75"></span>
+<span class="w-1.5 h-1.5 rounded-full bg-secondary opacity-25 animate-pulse delay-150"></span>
+</div>
+</div>
+<div class="relative flex flex-col gap-4">
+<!-- Overlapping Glassmorphic Cards -->
+<div class="bg-slate-900/40 glass-panel p-6 rounded-3xl border border-white/5 shadow-xl transition-all hover:translate-x-2">
+<div class="flex gap-4 items-start">
+<div class="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center shrink-0">
+<span class="material-symbols-outlined text-primary" data-icon="hub">hub</span>
+</div>
+<div>
+<div class="text-white font-semibold text-sm mb-1">Node Access: Node 7482 active</div>
+<div class="text-slate-400 text-xs">Acknowledge from Seattle Gateway A1</div>
+<div class="mt-2 text-[10px] font-label text-sky-400 uppercase">2 mins ago</div>
+</div>
+</div>
+</div>
+<div class="bg-slate-900/40 glass-panel p-6 rounded-3xl border border-white/5 shadow-xl transition-all hover:translate-x-2 relative -mt-4 z-10">
+<div class="flex gap-4 items-start">
+<div class="w-10 h-10 rounded-full bg-secondary/20 flex items-center justify-center shrink-0">
+<span class="material-symbols-outlined text-secondary" data-icon="sync">sync</span>
+</div>
+<div>
+<div class="text-white font-semibold text-sm mb-1">Transmission: Curriculum sync complete</div>
+<div class="text-slate-400 text-xs">Propagated to 412 active sub-nodes in EU-West</div>
+<div class="mt-2 text-[10px] font-label text-secondary uppercase">15 mins ago</div>
+</div>
+</div>
+</div>
+<div class="bg-slate-900/40 glass-panel p-6 rounded-3xl border border-white/5 shadow-xl transition-all hover:translate-x-2 relative -mt-4 z-20">
+<div class="flex gap-4 items-start">
+<div class="w-10 h-10 rounded-full bg-tertiary/20 flex items-center justify-center shrink-0">
+<span class="material-symbols-outlined text-tertiary" data-icon="lock">lock</span>
+</div>
+<div>
+<div class="text-white font-semibold text-sm mb-1">Neural Encryption Updated</div>
+<div class="text-slate-400 text-xs">Version 2.8.4 applied across all protocols</div>
+<div class="mt-2 text-[10px] font-label text-tertiary uppercase">42 mins ago</div>
+</div>
+</div>
+</div>
+<div class="bg-slate-900/40 glass-panel p-6 rounded-3xl border border-white/5 shadow-xl transition-all hover:translate-x-2 relative -mt-4 z-30 opacity-80 scale-95">
+<div class="flex gap-4 items-start">
+<div class="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center shrink-0">
+<span class="material-symbols-outlined text-primary" data-icon="warning">warning</span>
+</div>
+<div>
+<div class="text-white font-semibold text-sm mb-1">Sub-Node Latency Alert</div>
+<div class="text-slate-400 text-xs">Node cluster 9901 reporting 45ms jitter</div>
+<div class="mt-2 text-[10px] font-label text-primary uppercase">1 hour ago</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Maintenance Card -->
+<div class="bg-surface-container-low rounded-3xl p-8 mt-12 relative overflow-hidden group">
+<div class="absolute -bottom-4 -right-4 w-24 h-24 bg-primary/10 rounded-full blur-2xl"></div>
+<div class="font-label text-[10px] tracking-widest text-slate-500 uppercase mb-4">Upcoming Sequence</div>
+<div class="flex items-center gap-4 mb-4">
+<div class="w-12 h-12 bg-surface-variant rounded-xl flex flex-col items-center justify-center leading-tight">
+<span class="text-xs text-sky-400 font-bold uppercase font-label">Oct</span>
+<span class="text-lg text-white font-bold">14</span>
+</div>
+<div>
+<div class="text-white font-bold text-sm">Mainnet Protocol Upgrade</div>
+<div class="text-slate-400 text-xs">Estimated downtime: 0ms</div>
+</div>
+</div>
+<div class="p-4 bg-black/20 rounded-xl border border-white/5">
+<div class="flex justify-between items-center text-[10px] font-label text-slate-400 uppercase mb-2">
+<span>Readiness</span>
+<span>98%</span>
+</div>
+<div class="h-1.5 w-full bg-surface-variant rounded-full overflow-hidden">
+<div class="h-full w-[98%] bg-primary shadow-[0_0_8px_rgba(83,221,252,0.5)]"></div>
+</div>
+</div>
+</div>
+<!-- Ad/CTA card -->
+<div class="rounded-3xl p-8 bg-gradient-to-br from-primary-container/20 to-surface-variant border border-white/5 mt-6">
+<span class="material-symbols-outlined text-primary mb-4" data-icon="auto_awesome">auto_awesome</span>
+<h5 class="text-lg font-bold text-white mb-2">Neural Expansion Pack</h5>
+<p class="text-on-surface-variant text-sm mb-4">Unlock advanced predictive analytics and AI-driven node management tools.</p>
+<button class="text-secondary font-label text-xs font-bold uppercase tracking-widest flex items-center gap-2 hover:gap-4 transition-all">
+                        Upgrade Command Level <span class="material-symbols-outlined text-sm" data-icon="arrow_forward">arrow_forward</span>
+</button>
+</div>
+</div>
+</div>
+</main>
+<!-- Background Elements for Dimensionality -->
+<div class="fixed top-[-10%] right-[-10%] w-[50%] h-[50%] bg-primary/5 rounded-full blur-[120px] pointer-events-none -z-10"></div>
+<div class="fixed bottom-[-5%] left-[-5%] w-[40%] h-[40%] bg-secondary/5 rounded-full blur-[100px] pointer-events-none -z-10"></div>
+</body></html>

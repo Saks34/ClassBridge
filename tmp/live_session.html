@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>ClassBridge | The Observatory</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700;800&amp;family=Inter:wght@300;400;500;600&amp;family=Space+Grotesk:wght@400;500;700&amp;family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "on-secondary-fixed-variant": "#00675c",
+                        "surface-dim": "#060e20",
+                        "primary": "#53ddfc",
+                        "tertiary-fixed": "#afa6ff",
+                        "secondary-container": "#006b5f",
+                        "on-secondary-fixed": "#004840",
+                        "on-primary-container": "#00343e",
+                        "secondary-fixed-dim": "#50ebd5",
+                        "inverse-primary": "#00687b",
+                        "tertiary-fixed-dim": "#a196ff",
+                        "on-primary-fixed": "#003640",
+                        "on-error-container": "#ffa8a3",
+                        "secondary-fixed": "#62fae3",
+                        "inverse-surface": "#faf8ff",
+                        "error-dim": "#d7383b",
+                        "primary-container": "#21bedc",
+                        "on-tertiary": "#271284",
+                        "on-error": "#490006",
+                        "on-surface-variant": "#a3aac4",
+                        "tertiary-container": "#9b90fe",
+                        "surface-tint": "#53ddfc",
+                        "outline": "#6d758c",
+                        "on-primary": "#004b58",
+                        "on-surface": "#dee5ff",
+                        "surface-container-lowest": "#000000",
+                        "outline-variant": "#40485d",
+                        "inverse-on-surface": "#4d556b",
+                        "background": "#060e20",
+                        "secondary-dim": "#50ebd5",
+                        "surface-container-high": "#141f38",
+                        "primary-fixed": "#53ddfc",
+                        "surface-container-low": "#091328",
+                        "surface-container": "#0f1930",
+                        "on-tertiary-container": "#1a0072",
+                        "tertiary": "#a9a0ff",
+                        "tertiary-dim": "#9b90fe",
+                        "secondary": "#62fae3",
+                        "error": "#ff716c",
+                        "primary-dim": "#40ceed",
+                        "on-tertiary-fixed": "#13005b",
+                        "on-tertiary-fixed-variant": "#352591",
+                        "surface-variant": "#192540",
+                        "primary-fixed-dim": "#40ceed",
+                        "surface-container-highest": "#192540",
+                        "on-background": "#dee5ff",
+                        "surface-bright": "#1f2b49",
+                        "on-primary-fixed-variant": "#005564",
+                        "on-secondary-container": "#dcfff7",
+                        "on-secondary": "#005c52",
+                        "surface": "#060e20",
+                        "error-container": "#9f0519"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.125rem",
+                        "lg": "0.25rem",
+                        "xl": "0.5rem",
+                        "full": "0.75rem"
+                    },
+                    "fontFamily": {
+                        "headline": ["Manrope"],
+                        "body": ["Inter"],
+                        "label": ["Space Grotesk"]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+            display: inline-block;
+            vertical-align: middle;
+        }
+        .glass-panel {
+            background: rgba(25, 37, 64, 0.4);
+            backdrop-filter: blur(30px);
+            -webkit-backdrop-filter: blur(30px);
+        }
+        .video-glow {
+            box-shadow: 0 0 30px rgba(83, 221, 252, 0.1);
+        }
+        .pulse-live {
+            animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+        }
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: .5; }
+        }
+    </style>
+</head>
+<body class="bg-surface text-on-surface font-body overflow-hidden">
+<!-- Top Navigation Shell -->
+<nav class="fixed top-0 w-full z-50 bg-[#060e20]/80 backdrop-blur-xl flex justify-between items-center px-8 h-16 w-full shadow-[0_0_15px_rgba(83,221,252,0.05)]">
+<div class="flex items-center gap-8">
+<span class="text-2xl font-bold bg-gradient-to-r from-[#53ddfc] to-[#21bedc] bg-clip-text text-transparent font-headline tracking-tight">ClassBridge</span>
+<div class="hidden md:flex gap-6 font-headline tracking-tight text-sm">
+<a class="text-[#53ddfc] border-b-2 border-[#53ddfc] pb-1 transition-colors" href="#">Classroom</a>
+<a class="text-[#a3aac4] hover:text-[#53ddfc] transition-colors" href="#">Recordings</a>
+<a class="text-[#a3aac4] hover:text-[#53ddfc] transition-colors" href="#">Library</a>
+<a class="text-[#a3aac4] hover:text-[#53ddfc] transition-colors" href="#">Analytics</a>
+</div>
+</div>
+<div class="flex items-center gap-4">
+<button class="text-[#a3aac4] hover:text-[#53ddfc] transition-colors">
+<span class="material-symbols-outlined" data-icon="notifications">notifications</span>
+</button>
+<button class="text-[#a3aac4] hover:text-[#53ddfc] transition-colors">
+<span class="material-symbols-outlined" data-icon="settings">settings</span>
+</button>
+<div class="w-8 h-8 rounded-full overflow-hidden border border-primary/20">
+<img alt="Instructor Profile" data-alt="professional portrait of a senior professor in a modern tech setting with soft atmospheric lighting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuC7SNPk_37xW7uJXfsaVqclesZ8zEjyuC6MrGUJbd3UXnxfuSweCkFNjZM5PlHZuQ-s81WhFBut0Vs9xOUYVEuHHZ9747b0sDLz64GrWVW-idqrBcKZDH3-jcF1D4uiMI_emkH8-cSCQGPj8XtsMrdoOwlDH2Nfwa4EISHUAQ3SB7MVNhOZ7cqyyiOYLAgj8GOBQYAuRJXPCwxvMSslfsouSYPAw6ECp8Pw-YQdbwptl-aaF6a8KdMs-xUz-M7tuE3KNLa8GDRrM1c"/>
+</div>
+</div>
+</nav>
+<!-- Side Navigation (The Observatory Control) -->
+<aside class="fixed left-0 top-16 h-[calc(100vh-64px)] w-20 flex flex-col items-center py-6 bg-[#091328]/60 backdrop-blur-2xl z-40">
+<div class="flex flex-col gap-8">
+<div class="text-[#53ddfc] bg-[#141f38] rounded-xl p-3 shadow-[0_0_10px_rgba(83,221,252,0.2)] transition-all duration-300 ease-out cursor-pointer group">
+<span class="material-symbols-outlined text-2xl" data-icon="sensors">sensors</span>
+<span class="sr-only">Live Control</span>
+</div>
+<div class="text-[#40485d] p-3 hover:bg-[#141f38] hover:text-[#62fae3] transition-all duration-300 ease-out cursor-pointer">
+<span class="material-symbols-outlined text-2xl" data-icon="group">group</span>
+<span class="sr-only">Students</span>
+</div>
+<div class="text-[#40485d] p-3 hover:bg-[#141f38] hover:text-[#62fae3] transition-all duration-300 ease-out cursor-pointer">
+<span class="material-symbols-outlined text-2xl" data-icon="menu_book">menu_book</span>
+<span class="sr-only">Curriculum</span>
+</div>
+<div class="text-[#40485d] p-3 hover:bg-[#141f38] hover:text-[#62fae3] transition-all duration-300 ease-out cursor-pointer">
+<span class="material-symbols-outlined text-2xl" data-icon="poll">poll</span>
+<span class="sr-only">Polls</span>
+</div>
+<div class="text-[#40485d] p-3 hover:bg-[#141f38] hover:text-[#62fae3] transition-all duration-300 ease-out cursor-pointer mt-auto">
+<span class="material-symbols-outlined text-2xl" data-icon="tune">tune</span>
+<span class="sr-only">Settings</span>
+</div>
+</div>
+</aside>
+<!-- Main Content Canvas -->
+<main class="pl-20 pt-16 h-screen w-full flex bg-surface">
+<!-- Left: Presentation Console -->
+<section class="flex-1 p-6 flex flex-col gap-6">
+<div class="flex justify-between items-end">
+<div>
+<h1 class="font-headline font-extrabold text-4xl tracking-tighter text-on-surface">Advanced Neural Networks</h1>
+<p class="font-label text-xs uppercase tracking-[0.2em] text-primary/70 mt-1">SESSION 04 • MODULE 02 • LIVE OBSERVATORY</p>
+</div>
+<div class="flex gap-3">
+<div class="bg-surface-container-high px-4 py-1.5 rounded-full flex items-center gap-2 border border-primary/10">
+<span class="w-2 h-2 rounded-full bg-primary pulse-live"></span>
+<span class="font-label text-[10px] font-bold text-primary tracking-widest">LIVE</span>
+</div>
+<div class="bg-surface-container-high px-4 py-1.5 rounded-full flex items-center gap-2 border border-error/10">
+<span class="w-2 h-2 rounded-full bg-error"></span>
+<span class="font-label text-[10px] font-bold text-error tracking-widest">RECORDING</span>
+</div>
+</div>
+</div>
+<!-- Video/Console Area -->
+<div class="flex-1 relative rounded-2xl overflow-hidden glass-panel video-glow group">
+<div class="absolute inset-0 z-0">
+<img alt="Neural Network Visualization" class="w-full h-full object-cover opacity-80" data-alt="abstract 3d visualization of neural network connections with glowing cyan particles and lines on a deep black background" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAKcn0Jr5vpis6srmp3_htbf-el1muwgncKQBsELZGx9Q9lYA5_pu-c0QF5UMwH4DkZFwwrrMUXrRKo92tgfQkAPWXSlJcrQST2Tc4O89Tx3MRz8k8cr1DRUA-LVvkdBSmK_EOTbTG9DrGrUwS_20p5GOhsyxbc5Ipdj2KnJOmbl1ktzK0paUToDltxEO7-2RcEardmX1YWg7Gx2K6ibgM5VfVzZAIWcjH00f_ZKAzcuv8C1Z78copclCjai9ra5ngEcPzCFT4wC4Q"/>
+</div>
+<!-- Floating AI Transcription Overlay -->
+<div class="absolute top-6 left-6 w-80 glass-panel p-4 rounded-xl shadow-2xl border border-white/5">
+<div class="flex items-center gap-2 mb-3">
+<span class="material-symbols-outlined text-sm text-secondary" data-icon="auto_awesome">auto_awesome</span>
+<span class="font-label text-[10px] font-bold text-secondary uppercase tracking-widest">Live Transcription</span>
+</div>
+<p class="font-body text-sm text-on-surface leading-relaxed italic">
+                        "...so when we calculate the backpropagation of the error gradient, the weights update proportionally to the learning rate η..."
+                    </p>
+</div>
+<!-- Picture in Picture Instructor -->
+<div class="absolute bottom-6 right-6 w-48 aspect-video rounded-lg overflow-hidden border-2 border-primary shadow-2xl">
+<img alt="Instructor Camera" class="w-full h-full object-cover" data-alt="close-up of a professional male instructor speaking with studio lighting and a neutral technology-themed background" src="https://lh3.googleusercontent.com/aida-public/AB6AXuClGaGwOjhgVP3Ophhq-zAMyz8YkKm6vmQMrs8EDWMPIyYEoNS4AdK9e9_5sh0spqywzQ1xBT2-VPBG_1jfvXiAcp38B-SyDpJ4OufrBnOuHCPCtECRmPUJ6KbNK66Xr1O54YEfrMjcb4VtsFMBqe8p-Aups9Um3kaKFiG6kGfK2P6trc1ryIWZMpcBHOfip3Ad4pWxTVoyjfBtrq2gI3VmhkqPO-JP91BCUS0ogXMpLSIFk3peBjYtxrfnOmTSTT3qubu_VOqbwFw"/>
+</div>
+</div>
+</section>
+<!-- Right: Moderation Console -->
+<section class="w-96 p-6 bg-surface-container-low flex flex-col gap-6 shadow-2xl">
+<div class="flex gap-1 p-1 bg-surface-container-highest rounded-full">
+<button class="flex-1 py-2 rounded-full font-label text-[10px] font-bold bg-primary text-surface tracking-widest">CHAT</button>
+<button class="flex-1 py-2 rounded-full font-label text-[10px] font-bold text-on-surface-variant tracking-widest hover:text-on-surface transition-colors">QUESTIONS</button>
+<button class="flex-1 py-2 rounded-full font-label text-[10px] font-bold text-on-surface-variant tracking-widest hover:text-on-surface transition-colors">POLLS</button>
+</div>
+<!-- Chat Content -->
+<div class="flex-1 overflow-y-auto flex flex-col gap-4 pr-2">
+<div class="space-y-1">
+<div class="flex items-center gap-2">
+<span class="font-label text-[10px] font-bold text-secondary">SARAH J.</span>
+<span class="material-symbols-outlined text-[12px] text-secondary" data-icon="signal_cellular_4_bar">signal_cellular_4_bar</span>
+</div>
+<div class="bg-surface-variant/40 p-3 rounded-2xl rounded-tl-none backdrop-blur-sm">
+<p class="text-sm text-on-surface">Could you clarify the bias term in the hidden layer?</p>
+</div>
+</div>
+<div class="space-y-1">
+<div class="flex items-center gap-2">
+<span class="font-label text-[10px] font-bold text-primary">MARCUS V.</span>
+<span class="material-symbols-outlined text-[12px] text-primary" data-icon="signal_cellular_3_bar">signal_cellular_3_bar</span>
+</div>
+<div class="bg-surface-variant/40 p-3 rounded-2xl rounded-tl-none backdrop-blur-sm">
+<p class="text-sm text-on-surface">The visualization of the gradient descent was incredibly helpful.</p>
+</div>
+</div>
+<div class="space-y-1">
+<div class="flex items-center gap-2">
+<span class="font-label text-[10px] font-bold text-tertiary">ELARA K.</span>
+<span class="material-symbols-outlined text-[12px] text-tertiary" data-icon="signal_cellular_4_bar">signal_cellular_4_bar</span>
+</div>
+<div class="bg-surface-variant/40 p-3 rounded-2xl rounded-tl-none backdrop-blur-sm">
+<p class="text-sm text-on-surface">Are we using ReLU or Leaky ReLU for the final assignment?</p>
+</div>
+</div>
+</div>
+<!-- Chat Input -->
+<div class="mt-auto pt-4 border-t border-white/5">
+<div class="relative">
+<input class="w-full bg-surface-container-highest border-none rounded-xl py-3 px-4 text-sm focus:ring-1 focus:ring-primary/50 text-on-surface placeholder:text-outline-variant" placeholder="Broadcast message..." type="text"/>
+<button class="absolute right-2 top-1.5 p-1.5 text-primary">
+<span class="material-symbols-outlined" data-icon="send">send</span>
+</button>
+</div>
+</div>
+</section>
+</main>
+<!-- Bottom Control Bar (The Anchor) -->
+<footer class="fixed bottom-8 left-1/2 -translate-x-1/2 z-50">
+<div class="bg-[#141f38]/40 backdrop-blur-3xl rounded-full px-10 py-3 border border-[#40485d]/20 shadow-[0_20px_40px_rgba(0,0,0,0.4)] flex items-center gap-8">
+<button class="flex flex-col items-center gap-1 group transition-all duration-300 hover:scale-110">
+<div class="p-3 bg-surface-variant rounded-full text-[#a3aac4] group-hover:text-white group-active:scale-95">
+<span class="material-symbols-outlined" data-icon="mic">mic</span>
+</div>
+<span class="font-label text-[10px] font-bold text-on-surface-variant">Mic</span>
+</button>
+<button class="flex flex-col items-center gap-1 group transition-all duration-300 hover:scale-110">
+<div class="p-3 bg-surface-variant rounded-full text-[#a3aac4] group-hover:text-white group-active:scale-95">
+<span class="material-symbols-outlined" data-icon="videocam">videocam</span>
+</div>
+<span class="font-label text-[10px] font-bold text-on-surface-variant">Camera</span>
+</button>
+<button class="flex flex-col items-center gap-1 group transition-all duration-300 hover:scale-110">
+<div class="p-3 bg-gradient-to-br from-[#53ddfc] to-[#21bedc] rounded-full text-[#060e20] shadow-[0_0_15px_rgba(83,221,252,0.4)] group-active:scale-95">
+<span class="material-symbols-outlined" data-icon="present_to_all">present_to_all</span>
+</div>
+<span class="font-label text-[10px] font-bold text-primary">Share</span>
+</button>
+<button class="flex flex-col items-center gap-1 group transition-all duration-300 hover:scale-110">
+<div class="p-3 bg-surface-variant rounded-full text-[#a3aac4] group-hover:text-white group-active:scale-95">
+<span class="material-symbols-outlined" data-icon="volume_off">volume_off</span>
+</div>
+<span class="font-label text-[10px] font-bold text-on-surface-variant">Mute All</span>
+</button>
+<div class="h-8 w-[1px] bg-white/10 mx-2"></div>
+<button class="px-8 py-3 bg-gradient-to-r from-error to-error-container text-white font-label text-xs font-extrabold rounded-full tracking-widest shadow-[0_0_20px_rgba(255,113,108,0.3)] hover:scale-105 active:scale-95 transition-all">
+                END SESSION
+            </button>
+</div>
+</footer>
+<!-- Invisible Glow Effects -->
+<div class="fixed top-[-20%] left-[-10%] w-[60%] h-[60%] bg-primary/5 blur-[120px] pointer-events-none rounded-full"></div>
+<div class="fixed bottom-[-20%] right-[-10%] w-[40%] h-[40%] bg-tertiary/5 blur-[120px] pointer-events-none rounded-full"></div>
+</body></html>

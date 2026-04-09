@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>ClassBridge | The Digital Observatory</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;700;800&amp;family=Inter:wght@400;500;600&amp;family=Space+Grotesk:wght@400;500;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "primary-fixed-dim": "#40ceed",
+                        "secondary-fixed-dim": "#50ebd5",
+                        "primary-dim": "#40ceed",
+                        "on-surface": "#dee5ff",
+                        "on-error": "#490006",
+                        "background": "#060e20",
+                        "on-surface-variant": "#a3aac4",
+                        "tertiary-fixed-dim": "#a196ff",
+                        "on-primary-fixed": "#003640",
+                        "secondary": "#62fae3",
+                        "on-secondary-fixed": "#004840",
+                        "surface-variant": "#192540",
+                        "secondary-dim": "#50ebd5",
+                        "on-background": "#dee5ff",
+                        "tertiary-dim": "#9b90fe",
+                        "tertiary-container": "#9b90fe",
+                        "error-container": "#9f0519",
+                        "surface-container-low": "#091328",
+                        "inverse-surface": "#faf8ff",
+                        "on-secondary": "#005c52",
+                        "inverse-primary": "#00687b",
+                        "primary": "#53ddfc",
+                        "on-tertiary-fixed-variant": "#352591",
+                        "error-dim": "#d7383b",
+                        "surface-tint": "#53ddfc",
+                        "error": "#ff716c",
+                        "surface-bright": "#1f2b49",
+                        "on-tertiary-fixed": "#13005b",
+                        "on-error-container": "#ffa8a3",
+                        "surface": "#060e20",
+                        "secondary-fixed": "#62fae3",
+                        "outline-variant": "#40485d",
+                        "surface-container": "#0f1930",
+                        "primary-fixed": "#53ddfc",
+                        "on-primary-fixed-variant": "#005564",
+                        "tertiary-fixed": "#afa6ff",
+                        "on-primary-container": "#00343e",
+                        "primary-container": "#21bedc",
+                        "surface-container-lowest": "#000000",
+                        "on-secondary-fixed-variant": "#00675c",
+                        "secondary-container": "#006b5f",
+                        "on-secondary-container": "#dcfff7",
+                        "on-primary": "#004b58",
+                        "surface-dim": "#060e20",
+                        "tertiary": "#a9a0ff",
+                        "on-tertiary": "#271284",
+                        "on-tertiary-container": "#1a0072",
+                        "surface-container-highest": "#192540",
+                        "outline": "#6d758c",
+                        "surface-container-high": "#141f38",
+                        "inverse-on-surface": "#4d556b"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.125rem",
+                        "lg": "0.25rem",
+                        "xl": "0.5rem",
+                        "full": "0.75rem"
+                    },
+                    "fontFamily": {
+                        "headline": ["Manrope"],
+                        "body": ["Inter"],
+                        "label": ["Space Grotesk"]
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .glass-panel {
+            background: rgba(25, 37, 64, 0.4);
+            backdrop-filter: blur(25px);
+            -webkit-backdrop-filter: blur(25px);
+        }
+        .text-glow {
+            text-shadow: 0 0 15px rgba(83, 221, 252, 0.4);
+        }
+        body {
+            background-color: #060e20;
+            color: #dee5ff;
+            font-family: 'Inter', sans-serif;
+        }
+    </style>
+</head>
+<body class="bg-surface selection:bg-primary/30">
+<!-- TopNavBar -->
+<header class="fixed top-0 w-full z-50 bg-slate-950/40 backdrop-blur-xl flex justify-between items-center px-6 py-4 w-full shadow-[0_20px_40px_rgba(0,0,0,0.4),0_0_15px_rgba(83,221,252,0.05)] font-manrope tracking-tight">
+<div class="flex items-center gap-8">
+<span class="text-2xl font-bold bg-gradient-to-r from-sky-400 to-cyan-500 bg-clip-text text-transparent">ClassBridge</span>
+<nav class="hidden md:flex gap-6 items-center">
+<a class="text-sky-400 font-bold border-b-2 border-sky-400 px-1 py-1" href="#">Dashboard</a>
+<a class="text-slate-400 hover:text-sky-200 transition-colors" href="#">Courses</a>
+<a class="text-slate-400 hover:text-sky-200 transition-colors" href="#">Resources</a>
+</nav>
+</div>
+<div class="flex items-center gap-4">
+<div class="relative group">
+<span class="material-symbols-outlined text-slate-400 group-hover:text-sky-400 transition-colors cursor-pointer">notifications</span>
+<span class="absolute -top-1 -right-1 w-2 h-2 bg-primary rounded-full"></span>
+</div>
+<span class="material-symbols-outlined text-slate-400 hover:text-sky-400 transition-colors cursor-pointer">settings</span>
+<div class="w-10 h-10 rounded-full border-2 border-primary/20 p-0.5 overflow-hidden active:scale-95 transition-transform">
+<img alt="Student avatar" class="w-full h-full object-cover rounded-full" data-alt="portrait of a confident male student smiling in a modern educational environment with soft blue lighting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAaQyJ-ISq2EP3KCt7XJ_0VPsWfLiVEf8rZaaQ6XOvl6Y85-mHWA59N9FLOsIb-2udlc8zXJKMyr275BFgiGtMqy_FIM8rwdIYAKQ3IVoEf6jbLq5hzWcEv0jsEDJOzLw1bHEeRg6gS0UPaVnuNIHfT9tuedpBjI4ApOII0bCRQHtq0K8RXe4UDdHM5fFFVj804k0BtC1i8r73Xujy5NyPSyBicJ2P2-FjSve_L4Jz1_eAL27YJ3ItCsTAWTNkGcpEEmxzrTScrtdc"/>
+</div>
+</div>
+</header>
+<!-- SideNavBar -->
+<aside class="fixed left-0 top-0 h-full w-64 z-40 bg-slate-950/60 backdrop-blur-2xl flex flex-col pt-20 pb-8 px-4 shadow-2xl hidden md:flex">
+<div class="mb-10 px-4">
+<div class="flex items-center gap-3 mb-2">
+<div class="w-8 h-8 rounded-lg bg-primary/20 flex items-center justify-center">
+<span class="material-symbols-outlined text-primary text-lg">rocket_launch</span>
+</div>
+<h2 class="text-xl font-black text-sky-400 font-headline">Observatory</h2>
+</div>
+<p class="font-label text-[10px] uppercase tracking-widest text-on-surface-variant/60">Deep Space Learning</p>
+</div>
+<nav class="flex-1 flex flex-col gap-2">
+<a class="flex items-center gap-4 py-3 px-4 rounded-lg bg-gradient-to-r from-sky-400/20 to-transparent text-sky-400 border-l-4 border-sky-400 hover:backdrop-blur-md hover:bg-white/5 transition-all duration-200 group" href="#">
+<span class="material-symbols-outlined">dashboard</span>
+<span class="font-label text-sm uppercase tracking-widest">Dashboard</span>
+</a>
+<a class="flex items-center gap-4 py-3 px-4 rounded-lg text-slate-500 hover:text-slate-200 hover:backdrop-blur-md hover:bg-white/5 transition-all duration-200 group" href="#">
+<span class="material-symbols-outlined">auto_stories</span>
+<span class="font-label text-sm uppercase tracking-widest">Learning Modules</span>
+</a>
+<a class="flex items-center gap-4 py-3 px-4 rounded-lg text-slate-500 hover:text-slate-200 hover:backdrop-blur-md hover:bg-white/5 transition-all duration-200 group" href="#">
+<span class="material-symbols-outlined">grade</span>
+<span class="font-label text-sm uppercase tracking-widest">Grades</span>
+</a>
+<a class="flex items-center gap-4 py-3 px-4 rounded-lg text-slate-500 hover:text-slate-200 hover:backdrop-blur-md hover:bg-white/5 transition-all duration-200 group" href="#">
+<span class="material-symbols-outlined">local_library</span>
+<span class="font-label text-sm uppercase tracking-widest">Library</span>
+</a>
+<a class="flex items-center gap-4 py-3 px-4 rounded-lg text-slate-500 hover:text-slate-200 hover:backdrop-blur-md hover:bg-white/5 transition-all duration-200 group" href="#">
+<span class="material-symbols-outlined">group</span>
+<span class="font-label text-sm uppercase tracking-widest">Community</span>
+</a>
+</nav>
+<button class="mt-auto bg-gradient-to-r from-primary to-primary-container text-on-primary-container font-label text-xs font-bold py-3 px-6 rounded-full uppercase tracking-tighter flex items-center justify-center gap-2 hover:scale-105 active:scale-95 transition-all duration-300 shadow-[0_0_20px_rgba(83,221,252,0.3)]">
+<span class="material-symbols-outlined text-sm">add</span>
+            New Research
+        </button>
+</aside>
+<!-- Main Content Canvas -->
+<main class="md:ml-64 pt-24 px-6 pb-12 min-h-screen">
+<!-- Hero Section -->
+<header class="mb-12">
+<h1 class="text-6xl md:text-8xl font-black font-headline tracking-tighter text-on-surface mb-2 leading-none">
+                My Learning <br/> <span class="bg-gradient-to-r from-primary via-secondary to-tertiary bg-clip-text text-transparent">Journey</span>
+</h1>
+<p class="font-label text-on-surface-variant tracking-[0.2em] text-sm uppercase max-w-2xl mt-4 opacity-80">
+                Charting your trajectory through the digital cosmos of knowledge.
+            </p>
+</header>
+<!-- Bento Grid Layout -->
+<div class="grid grid-cols-1 md:grid-cols-12 gap-8 items-start">
+<!-- Left Column: Progress (Span 4) -->
+<div class="md:col-span-4 flex flex-col gap-8">
+<section class="glass-panel p-8 rounded-[2rem] border-0 shadow-2xl">
+<h3 class="font-label text-xs text-secondary tracking-widest uppercase mb-6 flex items-center gap-2">
+<span class="material-symbols-outlined text-sm">analytics</span> Academic Pulse
+                    </h3>
+<div class="space-y-8">
+<div>
+<div class="flex justify-between items-end mb-3">
+<span class="text-on-surface font-headline font-bold text-lg">Quantum Mechanics</span>
+<span class="font-label text-primary text-sm">84%</span>
+</div>
+<div class="h-1.5 w-full bg-surface-variant/20 rounded-full overflow-hidden">
+<div class="h-full bg-gradient-to-r from-primary to-secondary w-[84%] shadow-[0_0_10px_rgba(83,221,252,0.5)]"></div>
+</div>
+</div>
+<div>
+<div class="flex justify-between items-end mb-3">
+<span class="text-on-surface font-headline font-bold text-lg">Astrophysics I</span>
+<span class="font-label text-secondary text-sm">62%</span>
+</div>
+<div class="h-1.5 w-full bg-surface-variant/20 rounded-full overflow-hidden">
+<div class="h-full bg-gradient-to-r from-secondary to-tertiary w-[62%] shadow-[0_0_10px_rgba(98,250,227,0.5)]"></div>
+</div>
+</div>
+<div>
+<div class="flex justify-between items-end mb-3">
+<span class="text-on-surface font-headline font-bold text-lg">Space Law</span>
+<span class="font-label text-tertiary text-sm">91%</span>
+</div>
+<div class="h-1.5 w-full bg-surface-variant/20 rounded-full overflow-hidden">
+<div class="h-full bg-gradient-to-r from-tertiary to-primary w-[91%] shadow-[0_0_10px_rgba(169,160,255,0.5)]"></div>
+</div>
+</div>
+</div>
+<div class="mt-10 p-6 bg-surface-container-lowest/40 rounded-xl">
+<div class="flex items-center justify-between">
+<div>
+<p class="text-on-surface-variant text-xs font-label uppercase">Total Study Time</p>
+<p class="text-3xl font-black font-headline text-on-surface mt-1">128.5<span class="text-sm font-normal text-on-surface-variant ml-1">HRS</span></p>
+</div>
+<div class="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center">
+<span class="material-symbols-outlined text-primary">schedule</span>
+</div>
+</div>
+</div>
+</section>
+<section class="bg-surface-container-low p-8 rounded-[2rem]">
+<h3 class="font-label text-xs text-on-surface-variant tracking-widest uppercase mb-6">Upcoming Milestones</h3>
+<div class="flex items-start gap-4 mb-6">
+<div class="min-w-[4px] h-12 bg-secondary rounded-full"></div>
+<div>
+<p class="font-headline font-bold text-on-surface">Orbital Dynamics Final</p>
+<p class="text-sm text-on-surface-variant">Due in 3 days • Oct 24</p>
+</div>
+</div>
+<div class="flex items-start gap-4">
+<div class="min-w-[4px] h-12 bg-tertiary/40 rounded-full"></div>
+<div>
+<p class="font-headline font-bold text-on-surface-variant">Lab Report #04</p>
+<p class="text-sm text-on-surface-variant/60">Due in 5 days • Oct 26</p>
+</div>
+</div>
+</section>
+</div>
+<!-- Center Column: Main Actions (Span 5) -->
+<div class="md:col-span-5 flex flex-col gap-8">
+<div class="relative group">
+<div class="absolute -inset-1 bg-gradient-to-r from-primary to-secondary rounded-[2.5rem] blur opacity-25 group-hover:opacity-60 transition duration-1000 group-hover:duration-200"></div>
+<button class="relative w-full aspect-[4/3] bg-surface-container-high rounded-[2.5rem] flex flex-col items-center justify-center overflow-hidden">
+<div class="absolute inset-0 opacity-20">
+<img alt="Join Live Class background" class="w-full h-full object-cover" data-alt="abstract cosmic background with glowing particles and nebulae in shades of deep blue and cyan" src="https://lh3.googleusercontent.com/aida-public/AB6AXuB3gk5CJgQLAcXGKYcZyZ4SbNFDP55O_-HObDm2lIJ6ujw8WDyKmbN6OUAzWM7rxVFVoRg0YRJsc48B9uDFP2HozIHLVF4ocYwobyTI3COkR7fcMxtbyKM6HvWsE9H5RTLplp_HhCNKHutlkQhcldxgWXjMbJS4WLFRdpPZc-KuCHGzTKFtW5p5PtpsMrdZ478yq-2aju_wtJot9BuRkh-5H-XJ_F7sEmBWFwe9zkMiWNf1122t9D-noHQhDfzPTKqP9b0hCPlyz_M"/>
+</div>
+<div class="relative z-10 text-center px-8">
+<div class="w-20 h-20 bg-primary rounded-full flex items-center justify-center mx-auto mb-6 shadow-[0_0_40px_rgba(83,221,252,0.6)]">
+<span class="material-symbols-outlined text-on-primary text-4xl" style="font-variation-settings: 'FILL' 1;">play_arrow</span>
+</div>
+<h2 class="text-4xl font-black font-headline text-on-surface mb-2 tracking-tight">Join Live Class</h2>
+<p class="font-label text-secondary tracking-widest text-xs uppercase mb-8">Interstellar Navigation Basics • Starts in 04:12</p>
+<div class="inline-flex items-center gap-2 px-6 py-3 bg-white/10 backdrop-blur-md rounded-full border border-white/10 hover:bg-white/20 transition-all">
+<span class="w-2 h-2 bg-red-500 rounded-full animate-pulse"></span>
+<span class="font-label text-sm font-bold text-white uppercase tracking-tight">42 Students Active</span>
+</div>
+</div>
+</button>
+</div>
+<div class="grid grid-cols-2 gap-4">
+<div class="glass-panel p-6 rounded-3xl group cursor-pointer hover:bg-surface-container-highest transition-all">
+<span class="material-symbols-outlined text-primary mb-4 block" style="font-size: 32px;">auto_awesome</span>
+<p class="font-headline font-bold text-on-surface">AI Tutoring</p>
+<p class="text-xs text-on-surface-variant font-label mt-1">Chat with Atlas</p>
+</div>
+<div class="glass-panel p-6 rounded-3xl group cursor-pointer hover:bg-surface-container-highest transition-all">
+<span class="material-symbols-outlined text-secondary mb-4 block" style="font-size: 32px;">hub</span>
+<p class="font-headline font-bold text-on-surface">Study Pods</p>
+<p class="text-xs text-on-surface-variant font-label mt-1">Collab Hub</p>
+</div>
+</div>
+</div>
+<!-- Right Column: Learning Path (Span 3) -->
+<div class="md:col-span-3">
+<section class="bg-surface-container-low p-8 rounded-[2rem] h-full">
+<h3 class="font-label text-xs text-on-surface-variant tracking-widest uppercase mb-10">Learning Path</h3>
+<div class="relative">
+<!-- Vertical line replacement via tonal shift -->
+<div class="absolute left-2.5 top-0 bottom-0 w-[2px] bg-surface-variant/30"></div>
+<div class="space-y-12 relative">
+<!-- Step 1 -->
+<div class="flex gap-6 items-start">
+<div class="relative z-10 w-5 h-5 rounded-full bg-primary border-4 border-surface ring-4 ring-primary/20"></div>
+<div>
+<span class="font-label text-[10px] text-primary uppercase font-bold">In Progress</span>
+<h4 class="font-headline font-bold text-on-surface mt-1 leading-tight">Warp Field Theory</h4>
+<p class="text-xs text-on-surface-variant mt-2">Lesson 08: Distorting Space-Time</p>
+</div>
+</div>
+<!-- Step 2 -->
+<div class="flex gap-6 items-start">
+<div class="relative z-10 w-5 h-5 rounded-full bg-surface-variant border-4 border-surface"></div>
+<div class="opacity-60">
+<span class="font-label text-[10px] text-on-surface-variant uppercase font-bold">Locked</span>
+<h4 class="font-headline font-bold text-on-surface mt-1 leading-tight">Singularity Hazards</h4>
+<p class="text-xs text-on-surface-variant mt-2">Prerequisite: Lesson 08</p>
+</div>
+</div>
+<!-- Step 3 -->
+<div class="flex gap-6 items-start">
+<div class="relative z-10 w-5 h-5 rounded-full bg-surface-variant border-4 border-surface"></div>
+<div class="opacity-60">
+<span class="font-label text-[10px] text-on-surface-variant uppercase font-bold">Locked</span>
+<h4 class="font-headline font-bold text-on-surface mt-1 leading-tight">Dark Matter Synthesis</h4>
+<p class="text-xs text-on-surface-variant mt-2">Module Exam at completion</p>
+</div>
+</div>
+<!-- Step 4 -->
+<div class="flex gap-6 items-start">
+<div class="relative z-10 w-5 h-5 rounded-full bg-surface-variant border-4 border-surface"></div>
+<div class="opacity-40">
+<span class="font-label text-[10px] text-on-surface-variant uppercase font-bold">Next Module</span>
+<h4 class="font-headline font-bold text-on-surface mt-1 leading-tight">Deep Space Ethics</h4>
+</div>
+</div>
+</div>
+</div>
+<div class="mt-12 bg-primary/5 rounded-2xl p-6 border border-primary/10">
+<p class="font-label text-[10px] text-primary uppercase font-bold mb-2">Mentor Feedback</p>
+<p class="text-sm italic text-on-surface">"Your understanding of gravitons is exceptional. Keep focusing on the decay rates in Lesson 08."</p>
+<div class="flex items-center gap-2 mt-4">
+<img alt="Mentor" class="w-6 h-6 rounded-full" data-alt="close-up portrait of a senior professor with grey hair and glasses in a softly lit office" src="https://lh3.googleusercontent.com/aida-public/AB6AXuD6AxGhKxLhWyTZ6IrDs8FtrL7m8dyxYL7GxL8AlmTQVFh6Ba8g6e-tilBzA7IfLaIKuydPu7_SAl7pZ2qtyd4eJ_BTIMHDddj30cBX5iABrV50WTdPrXd7DBpxwBBOOb9vhN0dIaChUncSGVYffgkQFrPAgSH79o-4RdMh1ur5sSZPTmbdZTYx8c_MxvTccXGo2kSYPkEjdsg0fBfj9B_4nZAjRB_rXOR_rFyN67CJbGOs7nniULIkSL6uPi-tsKSO4gFmGGEYNZQ"/>
+<span class="text-xs font-bold text-on-surface-variant">Prof. Aris Thorne</span>
+</div>
+</div>
+</section>
+</div>
+</div>
+<!-- Secondary Section: Featured Content -->
+<div class="mt-16 grid grid-cols-1 md:grid-cols-3 gap-8">
+<div class="md:col-span-2">
+<h3 class="font-headline text-3xl font-black text-on-surface mb-8">Deep Research Library</h3>
+<div class="flex flex-col gap-4">
+<div class="glass-panel p-6 rounded-3xl flex items-center justify-between hover:translate-x-2 transition-all cursor-pointer">
+<div class="flex items-center gap-6">
+<div class="w-16 h-16 bg-surface rounded-2xl flex items-center justify-center">
+<span class="material-symbols-outlined text-tertiary">science</span>
+</div>
+<div>
+<h5 class="font-headline font-bold text-lg text-on-surface">Bio-Synthetic Habitats</h5>
+<p class="text-sm text-on-surface-variant">Research Paper • 14 MB • PDF</p>
+</div>
+</div>
+<span class="material-symbols-outlined text-on-surface-variant">download</span>
+</div>
+<div class="glass-panel p-6 rounded-3xl flex items-center justify-between hover:translate-x-2 transition-all cursor-pointer">
+<div class="flex items-center gap-6">
+<div class="w-16 h-16 bg-surface rounded-2xl flex items-center justify-center">
+<span class="material-symbols-outlined text-secondary">movie</span>
+</div>
+<div>
+<h5 class="font-headline font-bold text-lg text-on-surface">Hyper-Sleep Protocols</h5>
+<p class="text-sm text-on-surface-variant">Video Tutorial • 1.2 GB • 4K</p>
+</div>
+</div>
+<span class="material-symbols-outlined text-on-surface-variant">play_circle</span>
+</div>
+</div>
+</div>
+<div class="relative rounded-[2rem] overflow-hidden group">
+<img alt="Global Network" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" data-alt="satellite view of earth at night with glowing city lights and atmospheric curvature in deep space blue" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBQKD1dKc-2oCCBuQN3P8qhjOgNwdePJ5wARa8NO-hvmhTkwYUhKXlOC_tVyLfIgscAIsr7gOn22XfFPVDoF4JIFBjl3C9fvVtbKVZ77lKg4f2YvFF05pB1Ogv0DONwLiA03xC_hTo-XwcV3LAPJh3D1WyRYc6UEc1IHcZ4jHpRhLZE7oeXNpybrFc9tuHO5-n9eR1_uYZ80FRDS1SE_L6rzISU6Yaaiw6OOt9eJWlE2DUROybywgp8jIgoxWenPF-x-DFpdAmU2Xo"/>
+<div class="absolute inset-0 bg-gradient-to-t from-background via-background/20 to-transparent p-8 flex flex-col justify-end">
+<h4 class="text-2xl font-black font-headline text-on-surface">Global Research Pulse</h4>
+<p class="text-sm text-on-surface-variant mt-2 font-label">See what other observatories are discovering right now.</p>
+<button class="mt-6 font-label text-xs font-bold text-primary flex items-center gap-2 hover:gap-4 transition-all">
+                        EXPLORE THE GRID <span class="material-symbols-outlined text-sm">arrow_forward</span>
+</button>
+</div>
+</div>
+</div>
+</main>
+<!-- Mobile Bottom NavBar (Suppressed on Desktop) -->
+<nav class="md:hidden fixed bottom-0 left-0 right-0 bg-slate-950/80 backdrop-blur-2xl px-6 py-4 flex justify-around items-center z-50">
+<span class="material-symbols-outlined text-primary">dashboard</span>
+<span class="material-symbols-outlined text-on-surface-variant">auto_stories</span>
+<span class="material-symbols-outlined text-on-surface-variant">grade</span>
+<span class="material-symbols-outlined text-on-surface-variant">local_library</span>
+<span class="material-symbols-outlined text-on-surface-variant">group</span>
+</nav>
+</body></html>

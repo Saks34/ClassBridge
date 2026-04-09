@@ -1,8 +1,7 @@
 import { useEffect } from 'react';
-import { useTheme } from '../../context/ThemeContext';
+import { X } from 'lucide-react';
 
 export default function Modal({ isOpen, onClose, title, children, size = 'md' }) {
-    const { isDark } = useTheme();
 
     useEffect(() => {
         if (isOpen) {
@@ -15,6 +14,13 @@ export default function Modal({ isOpen, onClose, title, children, size = 'md' })
         };
     }, [isOpen]);
 
+    // Handle Escape key
+    useEffect(() => {
+        const handleKey = (e) => { if (e.key === 'Escape') onClose(); };
+        if (isOpen) document.addEventListener('keydown', handleKey);
+        return () => document.removeEventListener('keydown', handleKey);
+    }, [isOpen, onClose]);
+
     if (!isOpen) return null;
 
     const sizeClasses = {
@@ -22,37 +28,37 @@ export default function Modal({ isOpen, onClose, title, children, size = 'md' })
         md: 'max-w-lg',
         lg: 'max-w-2xl',
         xl: 'max-w-4xl',
+        '2xl': 'max-w-6xl',
     };
 
-    const modalBg = isDark ? 'bg-gray-900 border border-white/10' : 'bg-white';
-    const textPrimary = isDark ? 'text-white' : 'text-gray-900';
-    const textSecondary = isDark ? 'text-gray-400' : 'text-admin-text-muted';
-    const borderColor = isDark ? 'border-white/10' : 'border-admin-border';
+    const modalBg = 'bg-surface backdrop-blur-2xl border border-outline-variant/20 shadow-2xl';
+    const textPrimary = 'text-on-surface';
+    const borderColor = 'border-outline-variant/20';
 
     return (
         <div
-            className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black bg-opacity-70"
+            className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm transition-opacity duration-300"
             onClick={onClose}
         >
             <div
-                className={`${modalBg} rounded-lg shadow-xl ${sizeClasses[size]} w-full max-h-[90vh] overflow-hidden`}
+                className={`${modalBg} rounded-3xl shadow-[0_20px_50px_rgba(0,0,0,0.3)] ${sizeClasses[size] || size} w-full max-h-[90vh] overflow-hidden transform transition-all duration-300 scale-100 animate-in fade-in zoom-in-95`}
                 onClick={(e) => e.stopPropagation()}
             >
-                <div className={`flex items-center justify-between p-6 border-b ${borderColor}`}>
-                    <h3 className={`text-lg font-semibold ${textPrimary}`}>{title}</h3>
+                <div className={`flex items-center justify-between px-8 py-6 border-b ${borderColor}`}>
+                    <h3 className={`text-xl font-bold ${textPrimary}`}>{title}</h3>
                     <button
                         onClick={onClose}
-                        className={`${textSecondary} hover:${textPrimary} transition-colors`}
+                        className="text-on-surface-variant/60 hover:text-on-surface hover:bg-surface-container-high rounded-xl p-2 transition-all"
+                        aria-label="Close modal"
                     >
-                        <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                        </svg>
+                        <X size={24} />
                     </button>
                 </div>
-                <div className={`p-6 overflow-y-auto max-h-[calc(90vh-140px)] ${textPrimary}`}>
+                <div className={`p-8 overflow-y-auto max-h-[calc(90vh-140px)] ${textPrimary}`}>
                     {children}
                 </div>
             </div>
         </div>
     );
 }
+

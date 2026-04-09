@@ -1,0 +1,392 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>ClassBridge | The Digital Observatory</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@200;400;600;800&amp;family=Inter:wght@300;400;500;600&amp;family=Space+Grotesk:wght@300;400;500;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "surface": "#060e20",
+                        "error-dim": "#d7383b",
+                        "secondary-container": "#006b5f",
+                        "tertiary-fixed": "#afa6ff",
+                        "on-surface-variant": "#a3aac4",
+                        "on-background": "#dee5ff",
+                        "secondary-dim": "#50ebd5",
+                        "on-primary-fixed-variant": "#005564",
+                        "secondary": "#62fae3",
+                        "inverse-on-surface": "#4d556b",
+                        "surface-container-low": "#091328",
+                        "surface-tint": "#53ddfc",
+                        "primary-fixed-dim": "#40ceed",
+                        "on-tertiary-container": "#1a0072",
+                        "on-tertiary-fixed-variant": "#352591",
+                        "tertiary-dim": "#9b90fe",
+                        "tertiary": "#a9a0ff",
+                        "surface-bright": "#1f2b49",
+                        "primary-dim": "#40ceed",
+                        "on-secondary-container": "#dcfff7",
+                        "on-primary-fixed": "#003640",
+                        "primary": "#53ddfc",
+                        "surface-dim": "#060e20",
+                        "on-tertiary-fixed": "#13005b",
+                        "on-primary": "#004b58",
+                        "inverse-surface": "#faf8ff",
+                        "secondary-fixed": "#62fae3",
+                        "primary-container": "#21bedc",
+                        "outline-variant": "#40485d",
+                        "surface-variant": "#192540",
+                        "on-secondary": "#005c52",
+                        "inverse-primary": "#00687b",
+                        "on-primary-container": "#00343e",
+                        "error": "#ff716c",
+                        "surface-container-lowest": "#000000",
+                        "surface-container": "#0f1930",
+                        "on-secondary-fixed-variant": "#00675c",
+                        "background": "#060e20",
+                        "primary-fixed": "#53ddfc",
+                        "outline": "#6d758c",
+                        "error-container": "#9f0519",
+                        "on-tertiary": "#271284",
+                        "on-surface": "#dee5ff",
+                        "on-error-container": "#ffa8a3",
+                        "surface-container-high": "#141f38",
+                        "on-error": "#490006",
+                        "on-secondary-fixed": "#004840",
+                        "tertiary-container": "#9b90fe",
+                        "secondary-fixed-dim": "#50ebd5",
+                        "surface-container-highest": "#192540",
+                        "tertiary-fixed-dim": "#a196ff"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.125rem",
+                        "lg": "0.25rem",
+                        "xl": "0.5rem",
+                        "full": "0.75rem"
+                    },
+                    "fontFamily": {
+                        "headline": ["Manrope"],
+                        "body": ["Inter"],
+                        "label": ["Space Grotesk"]
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .glass-panel {
+            backdrop-filter: blur(25px);
+            -webkit-backdrop-filter: blur(25px);
+        }
+        .tonal-shift {
+            transition: background-color 0.3s ease;
+        }
+    </style>
+</head>
+<body class="bg-surface font-body text-on-surface selection:bg-primary/30">
+<!-- TopNavBar -->
+<nav class="fixed top-0 w-full z-50 bg-[#060e20]/80 backdrop-blur-xl flex justify-between items-center px-8 h-20 w-full shadow-[0_20px_40px_rgba(0,0,0,0.4)]">
+<div class="flex items-center gap-12">
+<span class="text-2xl font-bold bg-gradient-to-r from-[#53ddfc] to-[#21bedc] bg-clip-text text-transparent font-headline tracking-tight">ClassBridge</span>
+<div class="hidden lg:flex items-center gap-8 font-headline tracking-tight text-sm">
+<a class="text-[#53ddfc] border-b-2 border-[#53ddfc] transition-colors duration-300" href="#">Dashboard</a>
+<a class="text-[#a3aac4] hover:text-[#62fae3] transition-colors duration-300" href="#">Curriculum</a>
+<a class="text-[#a3aac4] hover:text-[#62fae3] transition-colors duration-300" href="#">Students</a>
+</div>
+</div>
+<div class="flex items-center gap-6">
+<div class="hidden md:flex items-center bg-surface-container-highest rounded-full px-4 py-2 gap-3 focus-within:ring-2 focus-within:ring-primary/30 transition-all">
+<span class="material-symbols-outlined text-on-surface-variant text-sm" data-icon="search">search</span>
+<input class="bg-transparent border-none focus:ring-0 text-sm font-label uppercase tracking-widest text-on-surface-variant placeholder:text-outline-variant" placeholder="Search data..." type="text"/>
+</div>
+<div class="flex items-center gap-4">
+<button class="material-symbols-outlined text-on-surface-variant hover:text-primary transition-colors" data-icon="notifications">notifications</button>
+<button class="material-symbols-outlined text-on-surface-variant hover:text-primary transition-colors" data-icon="settings">settings</button>
+<button class="bg-gradient-to-br from-primary to-primary-container text-on-primary-container px-6 py-2 rounded-full font-headline font-bold text-sm shadow-[0_0_20px_rgba(83,221,252,0.2)] active:scale-95 duration-200">
+                    Create Lesson
+                </button>
+</div>
+</div>
+</nav>
+<!-- SideNavBar -->
+<aside class="h-screen w-72 fixed left-0 top-0 z-40 bg-[#091328]/60 backdrop-blur-3xl flex flex-col py-8 px-4 gap-y-6 shadow-[10px_0_30px_rgba(0,0,0,0.3)] hidden md:flex">
+<div class="mt-20 px-4">
+<div class="flex items-center gap-3 mb-10">
+<div class="w-10 h-10 rounded-xl bg-gradient-to-br from-primary to-secondary flex items-center justify-center">
+<span class="material-symbols-outlined text-surface text-xl" data-icon="hub">hub</span>
+</div>
+<div>
+<h2 class="font-headline font-black text-[#53ddfc]">ClassBridge</h2>
+<p class="font-label uppercase tracking-widest text-[10px] text-on-surface-variant">The Observatory</p>
+</div>
+</div>
+<div class="space-y-2">
+<a class="flex items-center gap-4 px-4 py-3 text-[#53ddfc] bg-[#141f38] shadow-[0_0_15px_rgba(83,221,252,0.1)] rounded-r-full font-label uppercase tracking-widest text-xs hover:translate-x-1 duration-200" href="#">
+<span class="material-symbols-outlined" data-icon="dashboard">dashboard</span>
+                    Command Center
+                </a>
+<a class="flex items-center gap-4 px-4 py-3 text-[#a3aac4] hover:text-white hover:bg-[#192540] transition-all duration-300 font-label uppercase tracking-widest text-xs hover:translate-x-1 duration-200" href="#">
+<span class="material-symbols-outlined" data-icon="podcasts">podcasts</span>
+                    Live Sessions
+                </a>
+<a class="flex items-center gap-4 px-4 py-3 text-[#a3aac4] hover:text-white hover:bg-[#192540] transition-all duration-300 font-label uppercase tracking-widest text-xs hover:translate-x-1 duration-200" href="#">
+<span class="material-symbols-outlined" data-icon="analytics">analytics</span>
+                    Student Analytics
+                </a>
+<a class="flex items-center gap-4 px-4 py-3 text-[#a3aac4] hover:text-white hover:bg-[#192540] transition-all duration-300 font-label uppercase tracking-widest text-xs hover:translate-x-1 duration-200" href="#">
+<span class="material-symbols-outlined" data-icon="inventory_2">inventory_2</span>
+                    Resource Library
+                </a>
+<a class="flex items-center gap-4 px-4 py-3 text-[#a3aac4] hover:text-white hover:bg-[#192540] transition-all duration-300 font-label uppercase tracking-widest text-xs hover:translate-x-1 duration-200" href="#">
+<span class="material-symbols-outlined" data-icon="hub">hub</span>
+                    Bridge Reports
+                </a>
+</div>
+</div>
+<div class="mt-auto px-4 space-y-4">
+<button class="w-full bg-surface-container-highest/50 border border-outline-variant/20 rounded-xl py-4 flex flex-col items-center justify-center gap-2 group hover:bg-surface-container-highest transition-colors">
+<span class="material-symbols-outlined text-secondary" data-icon="add_circle">add_circle</span>
+<span class="font-label uppercase tracking-widest text-[10px]">New Bridge</span>
+</button>
+<a class="flex items-center gap-4 px-4 py-3 text-[#a3aac4] hover:text-white font-label uppercase tracking-widest text-xs" href="#">
+<span class="material-symbols-outlined" data-icon="help_center">help_center</span>
+                Help Support
+            </a>
+</div>
+</aside>
+<!-- Main Content Area -->
+<main class="md:ml-72 pt-32 px-8 pb-12 min-h-screen">
+<header class="mb-12 flex flex-col md:flex-row md:items-end justify-between gap-6">
+<div>
+<span class="font-label text-secondary uppercase tracking-[0.3em] text-xs mb-2 block">Instructor Terminal</span>
+<h1 class="text-5xl md:text-6xl font-headline font-extrabold text-white tracking-tighter leading-none">
+                    My Digital Courseware
+                </h1>
+</div>
+<!-- Go Live Button -->
+<button class="relative group active:scale-95 transition-all duration-200">
+<div class="absolute -inset-1 bg-gradient-to-r from-[#0ea5e9] to-[#2dd4bf] rounded-full blur opacity-25 group-hover:opacity-60 transition duration-1000 group-hover:duration-200"></div>
+<div class="relative flex items-center gap-4 px-10 py-5 bg-gradient-to-r from-[#0ea5e9] to-[#2dd4bf] rounded-full text-surface-container-lowest font-headline font-black text-lg tracking-tight">
+<span class="material-symbols-outlined" data-icon="sensors" data-weight="fill">sensors</span>
+                    GO LIVE NOW
+                </div>
+</button>
+</header>
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+<!-- Recent Classes & Bento Section -->
+<div class="lg:col-span-8 grid grid-cols-1 md:grid-cols-2 gap-8">
+<!-- Class Card 1 -->
+<div class="group relative bg-surface-container-low rounded-3xl overflow-hidden shadow-2xl glass-panel transition-all duration-500 hover:-translate-y-2 hover:bg-surface-container-high">
+<div class="h-48 relative overflow-hidden">
+<img alt="Digital Class" class="w-full h-full object-cover opacity-60 group-hover:scale-110 transition-transform duration-700" data-alt="Futuristic glowing circuitry pattern in deep blue and teal neon with technical floating data interfaces" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCYU9cKHNOtfG5yAUq9n-k8Q4p3uGEr68dLMo0pcXEgk_GLLAbSz6MgDOydw6mh3OMtmdhNM-V7uqnidtz4DWxSNK5Z6flG91fY7B82fQrqdSi53XozhkQqyAoZRAQ2pVcq6_FY72tMcUNiF0h69Qrr_a1EvQswLd-LDy_opWcryZkcUibKS8kxbNu3NgsKePDox16QBiW1siLlmL4u8XQ1cPmdpI9v7WUaAa-qC7o27mh5P6kZmILB38fjJncwjacit5I2Tu51SQQ"/>
+<div class="absolute inset-0 bg-gradient-to-t from-surface-container-low via-transparent to-transparent"></div>
+<div class="absolute top-4 left-4 flex gap-2">
+<span class="px-3 py-1 rounded-full bg-surface/80 backdrop-blur-md text-[10px] font-label text-primary border border-primary/20 uppercase tracking-widest">Ongoing</span>
+</div>
+</div>
+<div class="p-6">
+<h3 class="text-xl font-headline font-bold text-white mb-2">Advanced Neural Networks</h3>
+<p class="text-on-surface-variant text-sm mb-6 leading-relaxed">Module 04: Cognitive mapping and architectural synchronization in deep systems.</p>
+<div class="flex items-center justify-between">
+<div class="flex -space-x-3">
+<div class="w-8 h-8 rounded-full border-2 border-surface-container-low overflow-hidden">
+<img class="w-full h-full object-cover" data-alt="Student profile portrait energetic young man" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBOTzlKN_dxIC0UlWEChoUu6jb9hcEYoXzaU7bhBJtaAN_hfA3zzlKJbS9DpdY8tgbLaFv4kbu-3078RUx5Y5s7d5_btwuGWK6szN57MDMi8vgfsHCY-UNWJYB-a0admNPEVuaVD0Zxvw2awnfLxQpEAqyT8p4mADIik30bNELUCnP3a1hb7MNyISwptL4G_Bcf2b6ctmXvV9oUoEixgXXKQ-QP2I-XTdfX1fBksvsWaJI3A_X82JRcMuNSQqCPl6O5pcP4b_CJhGo"/>
+</div>
+<div class="w-8 h-8 rounded-full border-2 border-surface-container-low overflow-hidden">
+<img class="w-full h-full object-cover" data-alt="Student profile portrait smiling woman" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBFfqR3VafcngS86UUT4c_2R5iF4dI0N0llfuizWzxZm6LsukUC7jX1S9-vjSTQVLij4csY9lous-XrtJ4grIcuwWh23BvTgbGFlUvUkFtDi1w9xaNmPfXh3Vjkntj56EZTzKqce91_LhIbe0F2J_dPfOpxXf1V7rtons6HXPusNam5rTFrQKM8qeSaiK9DdvjRs1JZBt6y_qtIlFh4SHVMRf6Jv5vMnaYXVa4d63fqBUUdvHE_4NEZUEFegfvGOddmJ7EXOL5p5RU"/>
+</div>
+<div class="w-8 h-8 rounded-full bg-surface-container-highest border-2 border-surface-container-low flex items-center justify-center text-[10px] font-label">+24</div>
+</div>
+<span class="font-label text-xs text-on-surface-variant">14:00 — 15:30</span>
+</div>
+</div>
+</div>
+<!-- Class Card 2 -->
+<div class="group relative bg-surface-container-low rounded-3xl overflow-hidden shadow-2xl glass-panel transition-all duration-500 hover:-translate-y-2 hover:bg-surface-container-high">
+<div class="h-48 relative overflow-hidden">
+<img alt="Physics Visualization" class="w-full h-full object-cover opacity-60 group-hover:scale-110 transition-transform duration-700" data-alt="Abstract 3D particle system swirling in a dark void with luminous teal and purple light streaks" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDZGb4k94e-dhHVxmV7UJkE9oWPtslgAs_OY1p2d1jz-jAvFwqo3nWI4rXDztm62rYu0BisdVHxAtD3_D5P8w4CDQFHdnPlufTuOxnb0FaujBMXyWjX-9Z5XUqwd6W3f-fHCc7GiaXxfuXDVSLaPLYLJ7bIlRrgkjT2ADBWbvz3cpwP0XZNqXhRVVXSSJr1Mh-VdwpPL7dr0GZ5nHpnuDgoPdDvA40uA-ERa-HKI9HIR9HPD35XYtS7lAg_5ebbeN_S-tsGgz9rrX8"/>
+<div class="absolute inset-0 bg-gradient-to-t from-surface-container-low via-transparent to-transparent"></div>
+<div class="absolute top-4 left-4">
+<span class="px-3 py-1 rounded-full bg-surface/80 backdrop-blur-md text-[10px] font-label text-secondary border border-secondary/20 uppercase tracking-widest">Scheduled</span>
+</div>
+</div>
+<div class="p-6">
+<h3 class="text-xl font-headline font-bold text-white mb-2">Quantum Mechanics II</h3>
+<p class="text-on-surface-variant text-sm mb-6 leading-relaxed">Introduction to entanglement and non-local digital phenomena in physics.</p>
+<div class="flex items-center justify-between">
+<div class="flex -space-x-3">
+<div class="w-8 h-8 rounded-full border-2 border-surface-container-low overflow-hidden">
+<img class="w-full h-full object-cover" data-alt="Student profile portrait calm man with glasses" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBYUxauGNw57rggjVOAZuBNdlyUkOYa2s0PuB2J6o9sMtvQoaBZxNfWjsKVoIrf00REqqXDUVH_xrbHMhqvA8YtumxqiTi7hCBfMEW9D7OK4zQ03xVUN6aHHUwdkj2jh-qWLhslGheBzjRaMIgiPV_d39-Y6CgtFswjMRcD5z2Sl3j4WrXnsEFnf9fBQOfKPuuhMbN0CZ6OjC7rY8s8GcVAExe8S_D3iHcPJLTQqdvorpAvT-9eSEIppF-P071rsPu9FHhCoqdJe1I"/>
+</div>
+<div class="w-8 h-8 rounded-full bg-surface-container-highest border-2 border-surface-container-low flex items-center justify-center text-[10px] font-label">+18</div>
+</div>
+<span class="font-label text-xs text-on-surface-variant">Tomorrow, 09:00</span>
+</div>
+</div>
+</div>
+<!-- Performance Chart Module -->
+<div class="md:col-span-2 bg-surface-container-lowest rounded-3xl p-8 glass-panel border border-outline-variant/5">
+<div class="flex items-center justify-between mb-10">
+<div>
+<h4 class="font-headline font-bold text-xl text-white">Student Performance</h4>
+<p class="font-label text-xs text-on-surface-variant uppercase tracking-widest mt-1">Real-time engagement telemetry</p>
+</div>
+<div class="flex gap-4">
+<span class="flex items-center gap-2 text-xs font-label uppercase tracking-widest text-primary">
+<span class="w-2 h-2 rounded-full bg-primary shadow-[0_0_8px_rgba(83,221,252,0.8)]"></span>
+                                Attendance
+                            </span>
+<span class="flex items-center gap-2 text-xs font-label uppercase tracking-widest text-secondary">
+<span class="w-2 h-2 rounded-full bg-secondary shadow-[0_0_8px_rgba(98,250,227,0.8)]"></span>
+                                Scores
+                            </span>
+</div>
+</div>
+<div class="relative h-48 w-full flex items-end gap-4">
+<div class="flex-1 bg-gradient-to-t from-primary/10 to-primary/40 rounded-t-lg h-[60%] group relative transition-all duration-300 hover:h-[65%]"></div>
+<div class="flex-1 bg-gradient-to-t from-secondary/10 to-secondary/40 rounded-t-lg h-[85%] group relative transition-all duration-300 hover:h-[90%]"></div>
+<div class="flex-1 bg-gradient-to-t from-primary/10 to-primary/40 rounded-t-lg h-[40%] group relative transition-all duration-300 hover:h-[45%]"></div>
+<div class="flex-1 bg-gradient-to-t from-secondary/10 to-secondary/40 rounded-t-lg h-[75%] group relative transition-all duration-300 hover:h-[80%]"></div>
+<div class="flex-1 bg-gradient-to-t from-primary/10 to-primary/40 rounded-t-lg h-[95%] group relative transition-all duration-300 hover:h-[100%]"></div>
+<div class="flex-1 bg-gradient-to-t from-secondary/10 to-secondary/40 rounded-t-lg h-[55%] group relative transition-all duration-300 hover:h-[60%]"></div>
+<div class="flex-1 bg-gradient-to-t from-primary/10 to-primary/40 rounded-t-lg h-[70%] group relative transition-all duration-300 hover:h-[75%]"></div>
+</div>
+<div class="flex justify-between mt-6 px-1">
+<span class="font-label text-[10px] text-outline">MON</span>
+<span class="font-label text-[10px] text-outline">TUE</span>
+<span class="font-label text-[10px] text-outline">WED</span>
+<span class="font-label text-[10px] text-outline">THU</span>
+<span class="font-label text-[10px] text-outline">FRI</span>
+<span class="font-label text-[10px] text-outline">SAT</span>
+<span class="font-label text-[10px] text-outline">SUN</span>
+</div>
+</div>
+</div>
+<!-- Overlapping Editorial Section (Timetable & Tasks) -->
+<div class="lg:col-span-4 flex flex-col gap-8">
+<!-- Upcoming Timetable -->
+<div class="relative bg-surface-container-low rounded-3xl p-8 glass-panel overflow-hidden border border-white/5">
+<div class="absolute -top-10 -right-10 w-40 h-40 bg-primary/10 rounded-full blur-[80px]"></div>
+<h4 class="font-headline font-bold text-xl text-white mb-8">Daily Agenda</h4>
+<div class="space-y-0 relative">
+<div class="absolute left-[7px] top-2 bottom-2 w-[1px] bg-outline-variant/30"></div>
+<!-- Event 1 -->
+<div class="relative pl-8 pb-10">
+<div class="absolute left-0 top-1.5 w-4 h-4 rounded-full bg-primary ring-4 ring-primary/20"></div>
+<span class="font-label text-[10px] text-primary uppercase tracking-[0.2em] mb-1 block">08:00 AM — LIVE</span>
+<h5 class="font-headline font-bold text-base text-white">Quantum Computing Lab</h5>
+<p class="text-on-surface-variant text-xs mt-1">Virtual Lab 7B</p>
+</div>
+<!-- Event 2 -->
+<div class="relative pl-8 pb-10 group cursor-pointer">
+<div class="absolute left-0 top-1.5 w-4 h-4 rounded-full bg-surface-variant border-2 border-outline-variant transition-colors group-hover:bg-secondary group-hover:border-transparent group-hover:ring-4 group-hover:ring-secondary/20"></div>
+<span class="font-label text-[10px] text-on-surface-variant uppercase tracking-[0.2em] mb-1 block">11:30 AM</span>
+<h5 class="font-headline font-bold text-base text-on-surface-variant group-hover:text-white transition-colors">Staff Bridge Assembly</h5>
+<p class="text-on-surface-variant text-xs mt-1">Observatory Main Deck</p>
+</div>
+<!-- Event 3 -->
+<div class="relative pl-8 pb-4 group cursor-pointer">
+<div class="absolute left-0 top-1.5 w-4 h-4 rounded-full bg-surface-variant border-2 border-outline-variant transition-colors group-hover:bg-secondary group-hover:border-transparent group-hover:ring-4 group-hover:ring-secondary/20"></div>
+<span class="font-label text-[10px] text-on-surface-variant uppercase tracking-[0.2em] mb-1 block">02:15 PM</span>
+<h5 class="font-headline font-bold text-base text-on-surface-variant group-hover:text-white transition-colors">Advanced Algorithm Ethics</h5>
+<p class="text-on-surface-variant text-xs mt-1">Lecture Hall Alpha</p>
+</div>
+</div>
+</div>
+<!-- Pending Assignments Tonal Shift -->
+<div class="bg-surface-container-high rounded-3xl p-8 shadow-xl glass-panel relative overflow-hidden group">
+<div class="flex items-center justify-between mb-6">
+<h4 class="font-headline font-bold text-xl text-white">Pending Review</h4>
+<span class="bg-error-container/30 text-error font-label text-[10px] px-2 py-1 rounded-lg uppercase tracking-widest">Urgent</span>
+</div>
+<div class="space-y-4">
+<div class="bg-surface-container-lowest/50 p-4 rounded-2xl flex items-center gap-4 border border-white/5 hover:bg-surface-container-lowest transition-colors cursor-pointer">
+<div class="w-12 h-12 rounded-xl bg-surface-variant flex items-center justify-center text-secondary">
+<span class="material-symbols-outlined" data-icon="description">description</span>
+</div>
+<div class="flex-1">
+<h6 class="text-sm font-headline font-bold text-white">Particle Dynamics Essay</h6>
+<p class="text-[10px] font-label text-on-surface-variant uppercase mt-0.5">12 submissions pending</p>
+</div>
+<span class="material-symbols-outlined text-outline-variant group-hover:text-primary" data-icon="chevron_right">chevron_right</span>
+</div>
+<div class="bg-surface-container-lowest/50 p-4 rounded-2xl flex items-center gap-4 border border-white/5 hover:bg-surface-container-lowest transition-colors cursor-pointer">
+<div class="w-12 h-12 rounded-xl bg-surface-variant flex items-center justify-center text-tertiary">
+<span class="material-symbols-outlined" data-icon="code">code</span>
+</div>
+<div class="flex-1">
+<h6 class="text-sm font-headline font-bold text-white">Neural Logic Codebase</h6>
+<p class="text-[10px] font-label text-on-surface-variant uppercase mt-0.5">5 submissions pending</p>
+</div>
+<span class="material-symbols-outlined text-outline-variant group-hover:text-primary" data-icon="chevron_right">chevron_right</span>
+</div>
+</div>
+<button class="w-full mt-8 py-3 text-center font-label text-xs uppercase tracking-[0.2em] text-on-surface-variant hover:text-white transition-colors border-t border-outline-variant/10">
+                        View All Repository
+                    </button>
+</div>
+</div>
+</div>
+<!-- Progress Bridges Section -->
+<section class="mt-12 bg-surface-container-low rounded-[2rem] p-8 glass-panel border border-white/5">
+<div class="flex flex-col md:flex-row gap-12 items-center">
+<div class="flex-1 w-full">
+<div class="flex justify-between mb-4">
+<span class="font-headline font-bold text-lg">Curriculum Synchronization</span>
+<span class="font-label text-sm text-primary">84% COMPLETED</span>
+</div>
+<div class="h-3 w-full bg-surface-variant rounded-full overflow-hidden p-[2px]">
+<div class="h-full bg-gradient-to-r from-primary to-secondary rounded-full shadow-[0_0_15px_rgba(83,221,252,0.4)]" style="width: 84%"></div>
+</div>
+</div>
+<div class="grid grid-cols-3 gap-8 text-center md:border-l border-outline-variant/10 md:pl-12">
+<div>
+<div class="text-3xl font-headline font-extrabold text-white">42</div>
+<div class="font-label text-[10px] text-on-surface-variant uppercase tracking-widest mt-1">Live Students</div>
+</div>
+<div>
+<div class="text-3xl font-headline font-extrabold text-white">12</div>
+<div class="font-label text-[10px] text-on-surface-variant uppercase tracking-widest mt-1">Modules</div>
+</div>
+<div>
+<div class="text-3xl font-headline font-extrabold text-white">4.9</div>
+<div class="font-label text-[10px] text-on-surface-variant uppercase tracking-widest mt-1">Feedback</div>
+</div>
+</div>
+</div>
+</section>
+</main>
+<!-- Mobile BottomNavBar (Suppressed on Web per JSON but visible on mobile) -->
+<nav class="md:hidden fixed bottom-0 left-0 w-full bg-surface-container-high/90 backdrop-blur-2xl px-6 py-4 flex justify-between items-center z-50 border-t border-white/5 rounded-t-[2rem]">
+<a class="flex flex-col items-center gap-1 text-primary" href="#">
+<span class="material-symbols-outlined" data-icon="dashboard">dashboard</span>
+<span class="text-[9px] font-label uppercase tracking-widest">Home</span>
+</a>
+<a class="flex flex-col items-center gap-1 text-on-surface-variant" href="#">
+<span class="material-symbols-outlined" data-icon="podcasts">podcasts</span>
+<span class="text-[9px] font-label uppercase tracking-widest">Live</span>
+</a>
+<div class="absolute -top-6 left-1/2 -translate-x-1/2 w-16 h-16 bg-gradient-to-br from-primary to-secondary rounded-full flex items-center justify-center shadow-lg shadow-primary/20 ring-4 ring-surface">
+<span class="material-symbols-outlined text-surface text-3xl" data-icon="add">add</span>
+</div>
+<a class="flex flex-col items-center gap-1 text-on-surface-variant" href="#">
+<span class="material-symbols-outlined" data-icon="analytics">analytics</span>
+<span class="text-[9px] font-label uppercase tracking-widest">Data</span>
+</a>
+<a class="flex flex-col items-center gap-1 text-on-surface-variant" href="#">
+<span class="material-symbols-outlined" data-icon="inventory_2">inventory_2</span>
+<span class="text-[9px] font-label uppercase tracking-widest">Bridge</span>
+</a>
+</nav>
+</body></html>

@@ -6,28 +6,21 @@ export default function StatusBadge({ status }) {
     const getStatusStyles = () => {
         switch (status) {
             case 'Live':
-                return 'bg-red-500 text-white shadow-lg shadow-red-500/40 animate-pulse';
+                return 'bg-red-500/20 text-red-400 border-red-500/30 shadow-[0_0_15px_rgba(239,68,68,0.2)]';
             case 'Scheduled':
-                return isDark
-                    ? 'bg-blue-500/20 text-blue-300 border border-blue-500/30'
-                    : 'bg-blue-100 text-blue-700 border border-blue-200';
+                return 'bg-primary/10 text-primary border-primary/20 shadow-[0_0_15px_rgba(83,221,252,0.1)]';
             case 'Completed':
-                return isDark
-                    ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30'
-                    : 'bg-emerald-100 text-emerald-700 border border-emerald-200';
+                return 'bg-secondary/10 text-secondary border-secondary/20';
             case 'Cancelled':
-                return isDark
-                    ? 'bg-gray-700 text-gray-400 border border-gray-600'
-                    : 'bg-gray-100 text-gray-500 border border-gray-200';
+                return 'bg-surface-variant/20 text-slate-500 border-outline-variant/10';
             default:
-                return isDark
-                    ? 'bg-gray-800 text-gray-300'
-                    : 'bg-gray-100 text-gray-600';
+                return 'bg-surface-variant/20 text-slate-400 border-outline-variant/10';
         }
     };
 
     return (
-        <span className={`px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider ${getStatusStyles()}`}>
+        <span className={`px-3 py-1.5 rounded-lg text-[8px] font-label font-black uppercase tracking-[0.2em] border flex items-center gap-2 ${getStatusStyles()}`}>
+            {status === 'Live' && <span className="w-1.5 h-1.5 rounded-full bg-red-400 animate-pulse"></span>}
             {status}
         </span>
     );

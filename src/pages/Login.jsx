@@ -1,9 +1,10 @@
 import { useState, useEffect } from 'react';
-import { useNavigate, useLocation } from 'react-router-dom';
+import { useNavigate, useLocation, Link } from 'react-router-dom';
 import toast from 'react-hot-toast';
 import api from '../services/api';
 import { useAuth } from '../context/AuthContext';
-import { Sun, Moon, GraduationCap, Mail, Lock, ArrowRight } from 'lucide-react';
+import { useTheme } from '../context/ThemeContext';
+import { Info, ArrowRight } from 'lucide-react';
 
 export default function Login() {
   const navigate = useNavigate();
@@ -13,23 +14,14 @@ export default function Login() {
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
-  const [theme, setTheme] = useState('light');
   const [success, setSuccess] = useState(null);
+  const [showPassword, setShowPassword] = useState(false);
 
   useEffect(() => {
-    // Check for success message from navigation state via Institution Signup
     if (location.state?.message) {
       setSuccess(location.state.message);
     }
-    const savedTheme = localStorage.getItem('theme') || 'light';
-    setTheme(savedTheme);
   }, [location.state]);
-
-  const toggleTheme = () => {
-    const newTheme = theme === 'light' ? 'dark' : 'light';
-    setTheme(newTheme);
-    localStorage.setItem('theme', newTheme);
-  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -76,171 +68,160 @@ export default function Login() {
     }
   };
 
-  const isDark = theme === 'dark';
+  const handleSupportClick = () => {
+    toast.info('Support: support@classbridge.edu');
+  };
 
   return (
-    <div className={`min-h-screen flex items-center justify-center p-4 transition-colors duration-300 ${isDark
-      ? 'bg-gradient-to-br from-gray-900 via-blue-900 to-indigo-900'
-      : 'bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50'
-      }`}>
-      {/* Theme Toggle */}
-      <button
-        onClick={toggleTheme}
-        className={`fixed top-6 right-6 p-3 rounded-full shadow-lg hover:shadow-xl transition-all duration-300 group ${isDark
-          ? 'bg-gray-800 border-gray-700'
-          : 'bg-white border-gray-200'
-          } border`}
-        aria-label="Toggle theme"
-      >
-        {isDark ? (
-          <Sun className="w-5 h-5 text-yellow-400 group-hover:rotate-12 transition-transform" />
-        ) : (
-          <Moon className="w-5 h-5 text-indigo-600 group-hover:rotate-12 transition-transform" />
-        )}
-      </button>
-
-      <div className="w-full max-w-md">
-        {/* Logo & Header */}
-        <div className="text-center mb-8">
-          <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-gradient-to-br from-indigo-600 to-purple-600 shadow-lg mb-4 transform hover:scale-110 transition-transform">
-            <GraduationCap className="w-8 h-8 text-white" />
+    <div className="bg-surface text-on-surface font-body selection:bg-primary/30 min-h-screen overflow-x-hidden">
+      {/* TopNavBar */}
+      <nav className="fixed top-0 w-full z-50 bg-surface/40 backdrop-blur-xl border-b border-outline-variant/10 shadow-lg">
+        <div className="flex justify-between items-center px-8 py-4 max-w-screen-2xl mx-auto font-headline tracking-tight">
+          <Link to="/" className="flex items-center gap-2">
+            <span className="text-2xl font-bold tracking-tighter bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">ClassBridge</span>
+          </Link>
+          <div className="hidden md:flex items-center gap-8">
+            <Link className="text-on-surface-variant hover:text-primary transition-colors" to="/">Home</Link>
+            <button 
+              onClick={handleSupportClick}
+              className="text-on-surface-variant hover:text-primary transition-colors"
+            >
+              Support
+            </button>
+            <Link 
+              to="/institution/signup"
+              className="border border-outline-variant/40 text-on-surface px-6 py-2 rounded-full font-bold scale-95 active:scale-90 duration-200 transition-all hover:border-primary hover:text-primary bg-transparent"
+            >
+              Register
+            </Link>
           </div>
-          <h1 className={`text-3xl font-bold mb-2 ${isDark ? 'text-white' : 'text-gray-900'}`}>
-            Welcome Back
-          </h1>
-          <p className={isDark ? 'text-gray-400' : 'text-gray-600'}>
-            Sign in to continue your learning journey
-          </p>
         </div>
+      </nav>
 
-        {/* Main Card */}
-        <div className={`rounded-2xl shadow-2xl p-8 backdrop-blur-sm ${isDark
-          ? 'bg-gray-800 border-gray-700'
-          : 'bg-white border-gray-100'
-          } border`}>
-          {success && (
-            <div className={`mb-6 p-4 rounded-lg border flex items-start gap-3 ${isDark
-              ? 'bg-green-900/20 border-green-800'
-              : 'bg-green-50 border-green-200'
-              }`}>
-              <div className="w-1 h-full bg-green-500 rounded-full"></div>
-              <p className={`text-sm ${isDark ? 'text-green-300' : 'text-green-800'}`}>
-                {success}
-              </p>
-            </div>
-          )}
+      <main className="flex flex-col md:flex-row min-h-screen pt-16">
+        {/* Left Side: Immersive Visual */}
+        <section className="hidden md:flex w-1/2 relative items-center justify-center overflow-hidden">
+          <div className="absolute inset-0 z-0">
+            <img 
+              alt="ClassBridge Platform" 
+              className="w-full h-full object-cover grayscale opacity-30 mix-blend-overlay"
+              src="https://lh3.googleusercontent.com/aida-public/AB6AXuD8UcZzdk3k7Sv3MDIfkVQy540B_fMMQjLH0aqd1Y2DNj3GqcYZF2ZKy0l_iTxWUT0A-wFz33cOukG9kYlScXkBUbaHrz7FauapjT4TlnWrWCsQCul52fEwqhEbmMdLWKrUucxl1t0g03jC54amyJrWeDd3k49PkmGDbQbzoxI8Uv5Q5_lgAlC_j8mRiKkKTi9ADWG_WTJcxtSkLhW1aved7peBDK8U0Q0j3ZLg-_Ca3zSXdUuGkuSzQhGTmSgXjXp1Sfd6bZ0zm-k"
+            />
+            <div className="absolute inset-0 bg-gradient-to-r from-transparent to-surface text-left"></div>
+          </div>
+          <div className="relative z-10 p-12 max-w-xl text-left">
+            <div className="mb-2 text-primary font-black tracking-[0.3em] uppercase text-xs">Login Portal</div>
+            <h1 className="text-5xl font-black font-headline text-white mb-6 leading-none tracking-tighter">
+              Welcome <br />
+              <span className="text-primary">Back</span>
+            </h1>
+            <p className="text-white/60 font-body text-lg leading-relaxed">
+              Log in to access your classes, study materials, and connect with your teachers.
+            </p>
+          </div>
+        </section>
 
-          <div className="space-y-5">
-            {/* Email Input */}
-            <div>
-              <label className={`block text-sm font-medium mb-2 ${isDark ? 'text-gray-300' : 'text-gray-700'
-                }`}>
-                Email Address
-              </label>
-              <div className="relative">
-                <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
-                <input
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  type="email"
-                  placeholder="you@example.com"
-                  className={`w-full pl-11 pr-4 py-3 rounded-xl border transition-all outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent ${isDark
-                    ? 'border-gray-600 bg-gray-700 text-white placeholder-gray-400'
-                    : 'border-gray-300 bg-white text-gray-900 placeholder-gray-400'
-                    }`}
-                />
-              </div>
+        {/* Right Side: Login Form */}
+        <section className="w-full md:w-1/2 flex items-center justify-center p-6 md:p-12 relative">
+          {/* Background Glow */}
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-primary/5 rounded-full blur-[120px] pointer-events-none"></div>
+          <div className="glass-panel w-full max-w-md p-8 md:p-12 rounded-[2rem] shadow-2xl relative z-10">
+            <div className="mb-10 text-center md:text-left">
+              <h2 className="font-headline text-4xl font-bold text-on-surface mb-2 tracking-tight">Login</h2>
+              <p className="text-on-surface-variant font-body">Sign in to your account to continue.</p>
             </div>
 
-            {/* Password Input */}
-            <div>
-              <label className={`block text-sm font-medium mb-2 ${isDark ? 'text-gray-300' : 'text-gray-700'
-                }`}>
-                Password
-              </label>
-              <div className="relative">
-                <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
-                <input
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  type="password"
-                  placeholder="••••••••"
-                  className={`w-full pl-11 pr-4 py-3 rounded-xl border transition-all outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent ${isDark
-                    ? 'border-gray-600 bg-gray-700 text-white placeholder-gray-400'
-                    : 'border-gray-300 bg-white text-gray-900 placeholder-gray-400'
-                    }`}
-                />
-              </div>
-            </div>
-
-            {/* Error Message */}
-            {error && (
-              <div className={`p-4 rounded-lg border flex items-start gap-3 ${isDark
-                ? 'bg-red-900/20 border-red-800'
-                : 'bg-red-50 border-red-200'
-                }`}>
-                <div className="w-1 h-full bg-red-500 rounded-full"></div>
-                <p className={`text-sm ${isDark ? 'text-red-300' : 'text-red-800'}`}>
-                  {error}
-                </p>
+            {success && (
+              <div className="mb-6 p-4 rounded-xl bg-primary/10 border border-primary/20 flex items-center gap-3 animate-fade-in">
+                <Info size={18} className="text-primary flex-shrink-0" />
+                <p className="text-sm text-primary">{success}</p>
               </div>
             )}
 
-            {/* Submit Button */}
-            <button
-              disabled={loading}
-              onClick={handleSubmit}
-              className="w-full py-3 px-6 rounded-xl bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white font-semibold shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300 flex items-center justify-center gap-2 group"
-            >
-              {loading ? (
-                <>
-                  <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
-                  Signing in...
-                </>
-              ) : (
-                <>
-                  Sign in
-                  <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
-                </>
+            <form onSubmit={handleSubmit} className="space-y-8">
+              {/* Email Field */}
+              <div className="space-y-1 group text-left">
+                <label className="font-label text-[10px] uppercase tracking-widest text-primary/70 group-focus-within:text-primary transition-colors">Email Address</label>
+                <div className="relative">
+                  <input
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    className="w-full py-3 px-0 border-0 border-b-2 border-outline-variant/30 bg-transparent text-on-surface placeholder:text-outline-variant/50 font-body focus:outline-none focus:border-primary transition-all pr-10"
+                    placeholder="name@email.com"
+                    required
+                    type="email"
+                  />
+                  <span className="material-symbols-outlined absolute right-0 top-1/2 -translate-y-1/2 text-outline-variant/30 group-focus-within:text-primary transition-all text-lg">alternate_email</span>
+                </div>
+              </div>
+
+              {/* Password Field */}
+              <div className="space-y-2 group text-left">
+                <div className="flex justify-between items-end">
+                  <label className="font-label text-[10px] uppercase tracking-widest text-primary/70 group-focus-within:text-primary transition-colors">Password</label>
+                </div>
+                <div className="relative">
+                  <input
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    className="w-full py-3 px-0 border-0 border-b-2 border-outline-variant/30 bg-transparent text-on-surface placeholder:text-outline-variant/50 font-body focus:outline-none focus:border-primary transition-all pr-10"
+                    placeholder="••••••••••••"
+                    required
+                    type={showPassword ? 'text' : 'password'}
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="absolute right-0 top-1/2 -translate-y-1/2 text-outline-variant/30 group-focus-within:text-primary transition-all"
+                    aria-label={showPassword ? 'Hide password' : 'Show password'}
+                  >
+                    <span className="material-symbols-outlined text-lg">{showPassword ? 'visibility_off' : 'visibility'}</span>
+                  </button>
+                </div>
+                <div className="mt-3 p-3 rounded-xl bg-surface-container-low border border-outline-variant/20 flex items-start gap-3">
+                  <Info size={16} className="text-primary mt-0.5 flex-shrink-0" />
+                  <p className="text-xs text-on-surface-variant">
+                    Password resets are managed by your institution. Contact your school admin or IT department.
+                  </p>
+                </div>
+              </div>
+
+              {/* Error Message */}
+              {error && (
+                <div className="p-4 rounded-xl bg-error/10 border border-error/20 flex items-start gap-3 animate-fade-in">
+                  <Info size={18} className="text-error flex-shrink-0 mt-0.5" />
+                  <p className="text-sm text-error">{error}</p>
+                </div>
               )}
-            </button>
-          </div>
 
-          {/* Divider */}
-          <div className="relative my-6">
-            <div className="absolute inset-0 flex items-center">
-              <div className={`w-full border-t ${isDark ? 'border-gray-600' : 'border-gray-300'}`}></div>
+              {/* Action */}
+              <div className="pt-4">
+                <button
+                  disabled={loading}
+                  className="w-full py-4 px-6 bg-gradient-primary text-on-primary-container font-headline font-extrabold text-lg rounded-full shadow-[0_10px_30px_rgba(83,221,252,0.2)] hover:shadow-[0_15px_40px_rgba(83,221,252,0.4)] hover:scale-[1.02] active:scale-95 transition-all duration-300 flex items-center justify-center gap-3 disabled:opacity-50"
+                  type="submit"
+                >
+                  {loading ? (
+                    <div className="w-5 h-5 border-2 border-on-primary-container/30 border-t-on-primary-container rounded-full animate-spin"></div>
+                  ) : (
+                    <>
+                      Login to Dashboard
+                      <ArrowRight size={20} />
+                    </>
+                  )}
+                </button>
+              </div>
+            </form>
+
+            <div className="mt-10 pt-8 border-t border-outline-variant/10 text-center">
+              <p className="text-on-surface-variant text-sm font-body">
+                Not registered? 
+                <Link to="/institution/signup" className="font-label text-secondary hover:text-primary transition-colors uppercase tracking-widest text-xs ml-2 font-bold focus:outline-none">Sign Up Now</Link>
+              </p>
             </div>
-            <div className="relative flex justify-center text-sm">
-              <span className={`px-4 ${isDark ? 'bg-gray-800 text-gray-400' : 'bg-white text-gray-500'}`}>
-                New to our platform?
-              </span>
-            </div>
           </div>
-
-          {/* Sign Up Link */}
-          <div className="text-center">
-            <p className={`text-sm ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>
-              Don't have an institution account?{' '}
-              <button
-                onClick={() => navigate('/institution/signup')}
-                className={`font-semibold inline-flex items-center gap-1 group transition-colors ${isDark
-                  ? 'text-indigo-400 hover:text-indigo-300'
-                  : 'text-indigo-600 hover:text-indigo-700'
-                  }`}
-              >
-                Create one here
-                <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-              </button>
-            </p>
-          </div>
-        </div>
-
-        {/* Footer */}
-        <p className={`text-center mt-6 text-sm ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>
-          By continuing, you agree to our Terms of Service and Privacy Policy
-        </p>
-      </div>
+        </section>
+      </main>
     </div>
   );
 }

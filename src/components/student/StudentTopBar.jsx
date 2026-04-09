@@ -1,87 +1,52 @@
 import { useAuth } from '../../context/AuthContext';
 import { useTheme } from '../../context/ThemeContext';
-import { Sun, Moon, LogOut, Bell, Search } from 'lucide-react';
-import { useState } from 'react';
+import { Sun, Moon, LogOut, Bell, Search, Rocket } from 'lucide-react';
 import NotificationDropdown from '../shared/NotificationDropdown';
 
 export default function StudentTopBar() {
-    const { user, logout } = useAuth();
+    const { user } = useAuth();
     const { isDark, toggleTheme } = useTheme();
-    const [searchFocused, setSearchFocused] = useState(false);
-
-    const getGreeting = () => {
-        const hour = new Date().getHours();
-        if (hour < 12) return 'Good Morning';
-        if (hour < 17) return 'Good Afternoon';
-        return 'Good Evening';
-    };
 
     return (
-        <header className={`h-16 ${isDark ? 'bg-[#111118]/60' : 'bg-white/60'} backdrop-blur-xl border-b ${isDark ? 'border-white/5' : 'border-gray-200/50'} z-40 sticky top-0 px-6`}>
-            <div className="h-full flex items-center justify-between gap-6">
-                {/* Greeting & Search */}
-                <div className="flex-1 flex items-center gap-6">
-                    <div className="hidden lg:block">
-                        <h2 className={`text-sm font-bold ${isDark ? 'text-white' : 'text-gray-900'}`}>
-                            {getGreeting()}, {user?.name?.split(' ')[0]} 👋
-                        </h2>
-                        <p className={`text-xs ${isDark ? 'text-gray-500' : 'text-gray-500'}`}>
-                            Ready to learn something new?
-                        </p>
-                    </div>
-
-                    {/* Search */}
-                    <div className={`relative flex-1 max-w-sm transition-all ${searchFocused ? 'scale-[1.01]' : ''}`}>
-                        <div className={`flex items-center ${isDark ? 'bg-white/5 border-white/10' : 'bg-gray-100/80 border-gray-200/50'} border rounded-xl`}>
-                            <Search size={16} className={`ml-3 ${isDark ? 'text-gray-500' : 'text-gray-400'}`} />
-                            <input
-                                type="text"
-                                placeholder="Search..."
-                                className={`w-full py-2 px-2 bg-transparent ${isDark ? 'text-white placeholder-gray-500' : 'text-gray-900 placeholder-gray-400'} focus:outline-none text-sm`}
-                                onFocus={() => setSearchFocused(true)}
-                                onBlur={() => setSearchFocused(false)}
-                            />
-                        </div>
+        <header className="flex justify-between items-center w-full px-8 h-20 z-40 border-b border-outline-variant/20 sticky top-0" style={{ backgroundColor: 'color-mix(in srgb, var(--surface), transparent 20%)', backdropFilter: 'blur(12px)' }}>
+            <div className="flex items-center gap-6">
+                <div className="flex items-center gap-3">
+                    <Rocket size={18} className="text-secondary" />
+                    <h2 className="text-lg font-bold text-on-surface font-headline tracking-tight leading-tight">
+                        Orbit Control
+                    </h2>
+                </div>
+                
+                <div className="hidden lg:flex items-center gap-6">
+                    <div className="relative group">
+                        <span className="absolute inset-y-0 left-3 flex items-center text-on-surface-variant group-focus-within:text-secondary transition-colors pointer-events-none">
+                            <Search size={18} />
+                        </span>
+                        <input 
+                            className="bg-surface-container-low border-0 border-b border-transparent focus:border-secondary/30 rounded-full pl-10 pr-6 py-2 text-sm text-on-surface placeholder:text-on-surface-variant/50 focus:ring-4 focus:ring-secondary/5 w-80 transition-all outline-none font-body" 
+                            placeholder="Explore knowledge nodes..." 
+                            type="text" 
+                        />
                     </div>
                 </div>
+            </div>
 
-                {/* Actions */}
-                <div className="flex items-center gap-2">
+            <div className="flex items-center gap-4 md:gap-6">
+                <div className="flex items-center gap-2 md:gap-4 border-r border-outline-variant/10 pr-4 md:pr-6">
                     <button
                         onClick={toggleTheme}
-                        className={`p-2 rounded-xl transition-all ${isDark ? 'bg-white/5 hover:bg-white/10 text-gray-400' : 'bg-gray-100 hover:bg-gray-200 text-gray-600'}`}
+                        className="w-10 h-10 flex items-center justify-center rounded-xl bg-surface-container-high text-on-surface-variant hover:text-secondary transition-all active:scale-95 group relative"
                     >
-                        {isDark ? <Sun size={18} /> : <Moon size={18} />}
+                        {isDark ? <Sun size={18} className="group-hover:rotate-45 transition-transform" /> : <Moon size={18} className="group-hover:-rotate-12 transition-transform" />}
+                        <span className="absolute -bottom-10 right-0 p-2 bg-inverse-surface text-inverse-on-surface border border-outline-variant/20 rounded text-[8px] font-label uppercase tracking-widest opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none">Spectral Mode</span>
                     </button>
-
                     <NotificationDropdown />
+                    
+                </div>
 
-                    <div className={`h-6 w-px mx-1 ${isDark ? 'bg-white/10' : 'bg-gray-200'}`}></div>
-
-                    {/* Profile */}
-                    <div className="flex items-center gap-2">
-                        <div className="text-right hidden md:block">
-                            <p className={`text-xs font-bold ${isDark ? 'text-white' : 'text-gray-900'}`}>{user?.name}</p>
-                            <p className={`text-[10px] ${isDark ? 'text-gray-500' : 'text-gray-400'}`}>Student</p>
-                        </div>
-                        <div className="relative">
-                            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-blue-600 to-violet-600 p-0.5">
-                                <div className={`w-full h-full rounded-md ${isDark ? 'bg-[#111118]' : 'bg-white'} flex items-center justify-center`}>
-                                    <span className="text-xs font-bold bg-gradient-to-br from-blue-500 to-violet-500 bg-clip-text text-transparent">
-                                        {user?.name?.substring(0, 2).toUpperCase() || 'ST'}
-                                    </span>
-                                </div>
-                            </div>
-                            <div className="absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 bg-green-500 rounded-full border-2 border-white dark:border-[#111118]"></div>
-                        </div>
-                    </div>
-
-                    <button
-                        onClick={logout}
-                        className={`p-2 rounded-xl transition-all ${isDark ? 'hover:bg-red-500/20 text-gray-400 hover:text-red-400' : 'hover:bg-red-50 text-gray-500 hover:text-red-600'}`}
-                    >
-                        <LogOut size={18} />
-                    </button>
+                <div className="hidden sm:flex items-center gap-3 pl-2">
+                    <div className="w-2.5 h-2.5 rounded-full bg-secondary shadow-[0_0_8px_rgba(98,250,227,0.4)] animate-pulse"></div>
+                    <span className="text-[10px] font-label font-black text-on-surface uppercase tracking-widest">Signal Stable</span>
                 </div>
             </div>
         </header>
