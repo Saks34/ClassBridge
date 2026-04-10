@@ -1,7 +1,7 @@
 import { useEffect, useState, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { io } from 'socket.io-client';
-import api from '../../services/api';
+import api, { API_BASE } from '../../services/api';
 import LoadingSpinner from '../../components/shared/LoadingSpinner';
 import ChatPanel from '../../components/student/ChatPanel';
 import { useAuth } from '../../context/AuthContext';
@@ -81,7 +81,7 @@ export default function StudentClassDetail() {
     useEffect(() => {
         if (!classData?._id) return;
 
-        const socket = io((import.meta.env.VITE_SOCKET_URL || 'http://localhost:5000') + '/live-classes', {
+        const socket = io((import.meta.env.VITE_SOCKET_URL || API_BASE) + '/live-classes', {
             auth: { token: localStorage.getItem('accessToken') },
             transports: ['websocket']
         });

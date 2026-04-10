@@ -54,7 +54,7 @@ export default function ChatPanel({ liveClassId, batchId, token, user }) {
     useEffect(() => {
         if (!liveClassId || !token) return;
 
-        const socket = io(API_BASE + '/live-classes', {
+        const socket = io((import.meta.env.VITE_SOCKET_URL || API_BASE) + '/live-classes', {
             auth: { token },
         });
         socketRef.current = socket;

@@ -43,7 +43,7 @@ import {
 } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { confirmToast } from '../../utils/confirmToast';
-import api from '../../services/api';
+import api, { API_BASE } from '../../services/api';
 import { useAuth } from '../../context/AuthContext';
 import { useTheme } from '../../context/ThemeContext';
 import LoadingSpinner from '../../components/shared/LoadingSpinner';
@@ -119,7 +119,7 @@ export default function TeacherClassControl() {
     useEffect(() => {
         if (!classData?._id) return;
 
-        const socket = io((import.meta.env.VITE_SOCKET_URL || 'http://localhost:5000') + '/live-classes', {
+        const socket = io((import.meta.env.VITE_SOCKET_URL || API_BASE) + '/live-classes', {
             auth: { token: localStorage.getItem('accessToken') },
             transports: ['websocket']
         });
