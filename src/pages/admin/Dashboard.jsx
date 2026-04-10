@@ -184,7 +184,7 @@ export default function Dashboard() {
                 </div>
                 
                 {/* Visual Bars based on logic from backend */}
-                {(stats.chartData || [40, 64, 52, 72, 48, 80, 60, 32, 56, 68, 44, 76]).map((h, i) => (
+                {(Array.isArray(stats.chartData) ? stats.chartData : [40, 64, 52, 72, 48, 80, 60, 32, 56, 68, 44, 76]).map((h, i) => (
                   <div 
                     key={i} 
                     style={{ height: `${h}%` }}
@@ -324,7 +324,7 @@ export default function Dashboard() {
             )}
 
             {/* Dynamic Activity Feed from backend */}
-            {(stats.recentActivity || []).map((activity, idx) => (
+            {(Array.isArray(stats.recentActivity) ? stats.recentActivity : []).map((activity, idx) => (
               <div key={idx} className={`bg-surface-container glass-panel p-6 rounded-[2rem] border border-outline-variant/10 shadow-xl transition-all hover:translate-x-2 relative ${idx > 0 ? '-mt-6' : ''} ${idx === 2 ? 'opacity-60' : ''}`}>
                 <div className="flex gap-4 items-start">
                   <div className={`w-10 h-10 rounded-full bg-${activity.color}/10 flex items-center justify-center shrink-0 border border-${activity.color}/20`}>

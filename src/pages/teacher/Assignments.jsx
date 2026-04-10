@@ -33,8 +33,9 @@ export default function TeacherAssignments() {
     const fetchBatches = async () => {
         try {
             const { data } = await api.get('/batches');
-            setBatches(data.data || []);
-            if (data.data?.length > 0) setSelectedBatch(data.data[0]._id);
+            const batchList = data.data?.batches || [];
+            setBatches(batchList);
+            if (batchList.length > 0) setSelectedBatch(batchList[0]._id);
         } catch (error) { toast.error('Failed to load batches'); }
     };
 
@@ -118,7 +119,7 @@ export default function TeacherAssignments() {
                 <div className="flex items-center gap-4">
                     <select value={selectedBatch} onChange={(e) => setSelectedBatch(e.target.value)}
                         className="px-5 py-3 rounded-2xl bg-surface-container-high border border-outline-variant/10 text-on-surface focus:outline-none focus:ring-2 focus:ring-primary/20 font-body text-sm appearance-none">
-                        {batches.map(v => (<option key={v._id} value={v._id}>{v.name}</option>))}
+                        {Array.isArray(batches) && batches.map(v => (<option key={v._id} value={v._id}>{v.name}</option>))}
                     </select>
                     <button onClick={() => setIsModalOpen(true)} className="flex items-center gap-2 bg-primary text-on-primary px-6 py-3 rounded-2xl font-label text-[10px] font-black uppercase tracking-[0.2em] shadow-lg hover:shadow-primary/20 hover:scale-105 transition-all">
                         <Plus className="w-4 h-4" /> Create Assignment
@@ -132,7 +133,7 @@ export default function TeacherAssignments() {
                 <EmptyState icon={FileText} message="No assignments found" subMessage="Create an assignment to get started." />
             ) : (
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                    {assignments.map(a => (
+                    {Array.isArray(assignments) && assignments.map(a => (
                         <div key={a._id} className="bg-surface-container-low p-6 rounded-[2rem] border border-outline-variant/10 flex flex-col hover:border-primary/20 transition-all shadow-xl">
                             <div className="flex justify-between items-start mb-3">
                                 <h3 className="font-semibold text-lg line-clamp-1 text-on-surface font-headline">{a.title}</h3>
@@ -210,7 +211,7 @@ export default function TeacherAssignments() {
                                 <EmptyState icon={PackageOpen} message="No submissions yet" subMessage="Students haven't submitted anything yet." />
                             ) : (
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                    {submissions.map(s => (
+                                    {Array.isArray(submissions) && submissions.map(s => (
                                         <div key={s._id} className="p-5 rounded-2xl border border-outline-variant/10 bg-surface-container-low flex flex-col gap-4">
                                             <div className="flex justify-between items-start">
                                                 <div className="flex items-center gap-3">
