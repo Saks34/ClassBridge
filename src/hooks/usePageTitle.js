@@ -9,7 +9,7 @@ export function usePageTitle(title, role = '') {
     useEffect(() => {
         const prevTitle = document.title;
         const rolePrefix = role ? `${role} | ` : '';
-        document.title = `${rolePrefix}${title} - ETP TeachFlow`;
+        document.title = `${rolePrefix}${title} - ClassBridge`;
 
         return () => {
             document.title = prevTitle;

@@ -1,6 +1,6 @@
-# TeachFlow - Frontend
+# ClassBridge - Frontend
 
-TeachFlow is a comprehensive educational platform designed to streamline the interaction between administrators, teachers, and students. This is the frontend application built with React and Vite.
+ClassBridge is a comprehensive educational platform designed to streamline the interaction between administrators, teachers, and students. This is the frontend application built with React and Vite.
 
 ## 🚀 Features
 
@@ -25,7 +25,7 @@ TeachFlow is a comprehensive educational platform designed to streamline the int
 
 1.  **Navigate to the website directory:**
     ```bash
-    cd teachflow/website
+    cd classbridge/website
     ```
 
 2.  **Install dependencies:**
