@@ -5,6 +5,8 @@ import api from '../services/api';
 import { useAuth } from '../context/AuthContext';
 import { useTheme } from '../context/ThemeContext';
 import { Info, ArrowRight } from 'lucide-react';
+import logo from '../assets/logo.png';
+import icon from '../assets/icon.png';
 
 export default function Login() {
   const navigate = useNavigate();
@@ -75,10 +77,10 @@ export default function Login() {
   return (
     <div className="bg-surface text-on-surface font-body selection:bg-primary/30 min-h-screen overflow-x-hidden">
       {/* TopNavBar */}
-      <nav className="fixed top-0 w-full z-50 bg-surface/40 backdrop-blur-xl border-b border-outline-variant/10 shadow-lg">
-        <div className="flex justify-between items-center px-8 py-4 max-w-screen-2xl mx-auto font-headline tracking-tight">
+      <nav className="fixed top-0 w-full z-10 bg-surface/40 backdrop-blur-xl border-b border-outline-variant/10 shadow-lg">
+        <div className="flex justify-between items-center px-8  max-w-screen-2xl mx-auto font-headline tracking-tight">
           <Link to="/" className="flex items-center gap-2">
-            <span className="text-2xl font-bold tracking-tighter bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">ClassBridge</span>
+            <img src={logo} alt="ClassBridge" className=" object-contain dark:brightness-0 dark:invert transition-all" style={{width: '150px', height: '100px'}}/>
           </Link>
           <div className="hidden md:flex items-center gap-8">
             <Link className="text-on-surface-variant hover:text-primary transition-colors" to="/">Home</Link>
@@ -101,7 +103,7 @@ export default function Login() {
       <main className="flex flex-col md:flex-row min-h-screen pt-16">
         {/* Left Side: Immersive Visual */}
         <section className="hidden md:flex w-1/2 relative items-center justify-center overflow-hidden">
-          <div className="absolute inset-0 z-0">
+          <div className="absolute inset-0 z-2">
             <img 
               alt="ClassBridge Platform" 
               className="w-full h-full object-cover grayscale opacity-30 mix-blend-overlay"
@@ -125,7 +127,7 @@ export default function Login() {
         <section className="w-full md:w-1/2 flex items-center justify-center p-6 md:p-12 relative">
           {/* Background Glow */}
           <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-primary/5 rounded-full blur-[120px] pointer-events-none"></div>
-          <div className="glass-panel w-full max-w-md p-8 md:p-12 rounded-[2rem] shadow-2xl relative z-10">
+          <div className="glass-panel w-full max-w-md rounded-[2rem] shadow-2xl relative z-10" style={{padding:"1.6rem 1.4rem"}}>
             <div className="mb-10 text-center md:text-left">
               <h2 className="font-headline text-4xl font-bold text-on-surface mb-2 tracking-tight">Login</h2>
               <p className="text-on-surface-variant font-body">Sign in to your account to continue.</p>
@@ -213,7 +215,7 @@ export default function Login() {
               </div>
             </form>
 
-            <div className="mt-10 pt-8 border-t border-outline-variant/10 text-center">
+            <div className="mt-8 border-t border-outline-variant/10 text-center">
               <p className="text-on-surface-variant text-sm font-body">
                 Not registered? 
                 <Link to="/institution/signup" className="font-label text-secondary hover:text-primary transition-colors uppercase tracking-widest text-xs ml-2 font-bold focus:outline-none">Sign Up Now</Link>

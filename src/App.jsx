@@ -1,5 +1,6 @@
 import { Routes, Route, Navigate } from 'react-router-dom'
 import { Toaster } from 'react-hot-toast'
+import { Analytics } from "@vercel/analytics/react"
 import './App.css'
 import Login from './pages/Login.jsx'
 import LandingPage from './pages/LandingPage.jsx'
@@ -123,6 +124,7 @@ export default function App() {
 
           <Route path="*" element={<NotFound />} />
         </Routes>
+        <Analytics />
       </ThemeProvider>
     </ErrorBoundary>
   )

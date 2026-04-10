@@ -3,6 +3,8 @@ import { useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
 import { Sun, Moon } from 'lucide-react';
 import { useTheme } from '../context/ThemeContext';
+import logo from '../assets/logo.png';
+import icon from '../assets/icon.png';
 
 
 export default function LandingPage() {
@@ -48,10 +50,9 @@ export default function LandingPage() {
         <div className="bg-surface text-on-surface font-body selection:bg-primary selection:text-on-primary min-h-screen">
             {/* TopAppBar */}
             <nav className={`fixed top-0 w-full z-50 transition-all duration-300 ${isScrolled ? 'bg-surface/90 backdrop-blur-xl shadow-lg border-b border-outline-variant/10' : 'bg-transparent'}`}>
-                <div className="flex justify-between items-center px-8 py-4 max-w-7xl mx-auto">
+                <div className="flex justify-between items-center px-8 max-w-7xl mx-auto">
                     <div className="flex items-center gap-3">
-                        <span className="material-symbols-outlined text-2xl font-black tracking-tighter text-primary">polyline</span>
-                        <span className="font-headline tracking-tight text-lg font-bold text-primary">ClassBridge</span>
+                        <img src={logo} alt="ClassBridge" className=" object-contain dark:brightness-0 dark:invert transition-all" style={{width: '150px', height: '100px'}}/>
                     </div>
                     <div className="hidden md:flex items-center gap-8">
                         {navLinks.map((link) => (
@@ -283,8 +284,7 @@ export default function LandingPage() {
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 px-12 py-16 max-w-7xl mx-auto text-left">
                     <div className="space-y-4">
                         <div className="flex items-center gap-2">
-                            <span className="material-symbols-outlined text-primary">polyline</span>
-                            <span className="text-xl font-bold text-primary">ClassBridge</span>
+                            <img src={logo} alt="ClassBridge" className="h-16 w-auto object-contain dark:brightness-0 dark:invert transition-all" />
                         </div>
                         <p className="font-body text-sm text-on-surface-variant leading-relaxed">
                             Building digital pathways between knowledge and ambition. The digital classroom for the modern age.

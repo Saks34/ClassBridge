@@ -15,10 +15,13 @@ export default function StudentLayout() {
     };
 
     return (
-        <div className="flex h-screen bg-background text-on-background transition-all duration-500 overflow-hidden">
+        <div 
+            className="flex h-screen bg-background text-on-background transition-all duration-500 overflow-hidden"
+            style={{ '--sidebar-offset': isCollapsed ? '80px' : '256px' }}
+        >
             <StudentSidebar isCollapsed={isCollapsed} onToggle={toggleSidebar} />
 
-            <div className={`flex-1 flex flex-col overflow-hidden relative z-10 transition-all duration-500 ${isCollapsed ? 'pl-20' : 'pl-64'}`}>
+            <div className={`flex-1 flex flex-col min-w-0 overflow-hidden relative z-10 transition-all duration-500 ${isCollapsed ? 'pl-20' : 'pl-64'}`}>
                 <StudentTopBar isSidebarCollapsed={isCollapsed} />
                 <main className="flex-1 overflow-y-auto p-6">
                     <Outlet />

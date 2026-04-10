@@ -1,5 +1,5 @@
 import React, { useState, useRef } from 'react';
-import { Upload, Download, X, AlertCircle, FileText, CheckCircle2 } from 'lucide-react';
+import { Upload, Download, X, AlertCircle, FileText, CheckCircle2, ArrowRight } from 'lucide-react';
 import api from '../../services/api';
 import { toast } from 'react-hot-toast';
 import Modal from './Modal';
@@ -11,24 +11,18 @@ const BulkImportModal = ({ isOpen, onClose, type, role, onSuccess }) => {
   const [loading, setLoading] = useState(false);
   const [data, setData] = useState(null);
   const [results, setResults] = useState(null);
+  const [dragOver, setDragOver] = useState(false);
   const fileInputRef = useRef(null);
   const { user } = useAuth();
 
   const handleDownloadSample = async () => {
     try {
       let url = '';
-      if (type === 'users') {
-        url = `/institutions/bulk-staff/sample?role=${role}`;
-      } else if (type === 'batches') {
-        url = `/batches/sample`;
-      } else if (type === 'timetable') {
-        url = `/timetables/sample`;
-      }
+      if (type === 'users') url = `/institutions/bulk-staff/sample?role=${role}`;
+      else if (type === 'batches') url = `/batches/sample`;
+      else if (type === 'timetable') url = `/timetables/sample`;
 
-      const response = await api.get(url, {
-        responseType: 'blob'
-      });
-
+      const response = await api.get(url, { responseType: 'blob' });
       const downloadUrl = window.URL.createObjectURL(new Blob([response.data]));
       const link = document.createElement('a');
       link.href = downloadUrl;
@@ -36,7 +30,7 @@ const BulkImportModal = ({ isOpen, onClose, type, role, onSuccess }) => {
       document.body.appendChild(link);
       link.click();
       link.remove();
-    } catch (error) {
+    } catch {
       toast.error('Failed to download sample file');
     }
   };
@@ -45,37 +39,39 @@ const BulkImportModal = ({ isOpen, onClose, type, role, onSuccess }) => {
     const lines = text.split('\n');
     const headers = lines[0].split(',').map(h => h.trim());
     const rows = [];
-
     for (let i = 1; i < lines.length; i++) {
       if (!lines[i].trim()) continue;
       const values = lines[i].split(',').map(v => v.trim());
       const obj = {};
-      headers.forEach((h, index) => {
-        obj[h.toLowerCase().replace(/[^a-z]/g, '')] = values[index];
+      headers.forEach((h, idx) => {
+        obj[h.toLowerCase().replace(/[^a-z]/g, '')] = values[idx];
       });
       rows.push(obj);
     }
     return rows;
   };
 
-  const handleFileChange = (e) => {
-    const selectedFile = e.target.files[0];
+  const processFile = (selectedFile) => {
     if (selectedFile && selectedFile.type === 'text/csv') {
       setFile(selectedFile);
       const reader = new FileReader();
-      reader.onload = (event) => {
-        const parsedData = parseCSV(event.target.result);
-        setData(parsedData);
-      };
+      reader.onload = (event) => setData(parseCSV(event.target.result));
       reader.readAsText(selectedFile);
     } else {
       toast.error('Please select a valid CSV file');
     }
   };
 
+  const handleFileChange = (e) => processFile(e.target.files[0]);
+
+  const handleDrop = (e) => {
+    e.preventDefault();
+    setDragOver(false);
+    processFile(e.dataTransfer.files[0]);
+  };
+
   const handleImport = async () => {
     if (!data || data.length === 0) return;
-
     setLoading(true);
     try {
       let url = '';
@@ -84,11 +80,7 @@ const BulkImportModal = ({ isOpen, onClose, type, role, onSuccess }) => {
       if (type === 'users') {
         url = '/institutions/bulk-staff';
         payload = {
-          users: data.map(d => ({
-            name: d.name,
-            email: d.email,
-            role: d.role || role
-          })),
+          users: data.map(d => ({ name: d.name, email: d.email, role: d.role || role, batch: d.batchname || d.batch })),
           sendEmail: true
         };
       } else if (type === 'batches') {
@@ -105,23 +97,17 @@ const BulkImportModal = ({ isOpen, onClose, type, role, onSuccess }) => {
         url = '/timetables/bulk';
         payload = {
           slots: data.map(d => ({
-            day: d.day,
-            startTime: d.starttime,
-            endTime: d.endtime,
-            subject: d.subject,
-            batch: d.batchid,
-            teacher: d.teacherid
+            day: d.day, startTime: d.starttime, endTime: d.endtime,
+            subject: d.subject, batch: d.batchname || d.batch, teacher: d.teacheremail || d.teacher
           }))
         };
       }
 
       const response = await api.post(url, payload);
-
       setResults(response.data.data || response.data);
       if (onSuccess) onSuccess();
       toast.success('Import completed successfully');
     } catch (error) {
-      console.error('Import error:', error);
       toast.error(error.response?.data?.message || 'Import failed');
     } finally {
       setLoading(false);
@@ -135,35 +121,56 @@ const BulkImportModal = ({ isOpen, onClose, type, role, onSuccess }) => {
     if (fileInputRef.current) fileInputRef.current.value = '';
   };
 
+  const typeName = type?.charAt(0).toUpperCase() + type?.slice(1);
+
   return (
-    <Modal isOpen={isOpen} onClose={onClose} title={`Bulk Import ${type}`} maxWidth="2xl">
-      <div className="space-y-6">
+    <Modal isOpen={isOpen} onClose={onClose} title={`Bulk Import ${typeName}`} maxWidth="2xl">
+      <div className="space-y-5">
         {!results ? (
           <>
-            <div className="flex justify-between items-center p-4 bg-primary/10 rounded-xl border border-primary/20">
-              <div className="flex gap-3">
-                <div className="p-2 bg-primary/20 rounded-lg text-primary">
-                  <FileText className="w-5 h-5" />
-                </div>
-                <div>
-                  <h4 className="font-semibold text-on-surface">Step 1: Download Sample</h4>
-                  <p className="text-sm text-on-surface-variant">Get the CSV template with the correct format</p>
+            {/* Step 1 — Download template */}
+            <div
+              style={{
+                background: 'linear-gradient(135deg, color-mix(in srgb, var(--md-sys-color-primary) 8%, transparent), color-mix(in srgb, var(--md-sys-color-primary) 4%, transparent))',
+                border: '1px solid color-mix(in srgb, var(--md-sys-color-primary) 18%, transparent)',
+              }}
+              className="flex items-center justify-between gap-4 p-4 rounded-2xl"
+            >
+              <div className="flex items-center gap-3 min-w-0">
+                <span
+                  style={{ background: 'color-mix(in srgb, var(--md-sys-color-primary) 15%, transparent)' }}
+                  className="flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center text-primary text-xs font-bold"
+                >
+                  1
+                </span>
+                <div className="min-w-0">
+                  <p className="font-semibold text-on-surface text-sm">Download the CSV template</p>
+                  <p className="text-xs text-on-surface-variant/60 mt-0.5 truncate">
+                    Fill it with your data, then upload below
+                  </p>
                 </div>
               </div>
               <button
                 onClick={handleDownloadSample}
-                className="flex items-center gap-2 px-4 py-2 bg-surface-container-high text-primary border border-outline-variant/10 rounded-lg hover:bg-primary/10 transition-colors shadow-sm"
+                className="flex-shrink-0 flex items-center gap-1.5 px-3 py-2 text-sm font-medium text-primary rounded-xl transition-all hover:bg-primary/10 active:scale-95"
               >
                 <Download className="w-4 h-4" />
-                Download Sample
+                Template
               </button>
             </div>
 
-            <div 
-              className={`p-8 border-2 border-dashed rounded-2xl text-center transition-colors ${
-                file ? 'border-primary/50 bg-primary/5' : 'border-outline-variant/30 bg-surface-container-high'
-              }`}
-            >
+            {/* Step 2 — Upload */}
+            <div>
+              <div className="flex items-center gap-2 mb-2.5">
+                <span
+                  style={{ background: 'color-mix(in srgb, var(--md-sys-color-primary) 15%, transparent)' }}
+                  className="w-6 h-6 rounded-full flex items-center justify-center text-primary text-xs font-bold flex-shrink-0"
+                >
+                  2
+                </span>
+                <p className="font-semibold text-on-surface text-sm">Upload your CSV</p>
+              </div>
+
               <input
                 type="file"
                 ref={fileInputRef}
@@ -171,153 +178,256 @@ const BulkImportModal = ({ isOpen, onClose, type, role, onSuccess }) => {
                 accept=".csv"
                 className="hidden"
               />
+
               {!file ? (
-                <div className="space-y-3">
-                  <div className="flex justify-center">
-                    <div className="p-4 bg-surface-container-highest rounded-full text-on-surface-variant/40">
-                      <Upload className="w-8 h-8" />
-                    </div>
+                <div
+                  onDragOver={(e) => { e.preventDefault(); setDragOver(true); }}
+                  onDragLeave={() => setDragOver(false)}
+                  onDrop={handleDrop}
+                  onClick={() => fileInputRef.current.click()}
+                  className="cursor-pointer rounded-2xl border-2 border-dashed transition-all duration-200 flex flex-col items-center justify-center gap-3 py-10"
+                  style={{
+                    borderColor: dragOver
+                      ? 'var(--md-sys-color-primary)'
+                      : 'color-mix(in srgb, var(--md-sys-color-outline) 30%, transparent)',
+                    background: dragOver
+                      ? 'color-mix(in srgb, var(--md-sys-color-primary) 5%, transparent)'
+                      : 'color-mix(in srgb, var(--md-sys-color-surface-container-high) 60%, transparent)',
+                  }}
+                >
+                  <div
+                    className="w-14 h-14 rounded-2xl flex items-center justify-center"
+                    style={{ background: 'color-mix(in srgb, var(--md-sys-color-surface-container-highest) 80%, transparent)' }}
+                  >
+                    <Upload
+                      className="w-6 h-6 transition-colors"
+                      style={{ color: dragOver ? 'var(--md-sys-color-primary)' : 'var(--md-sys-color-on-surface-variant)' }}
+                    />
                   </div>
-                  <div>
-                    <button
-                      onClick={() => fileInputRef.current.click()}
-                      className="text-primary font-semibold hover:underline"
-                    >
-                      Click to upload
-                    </button>
-                    <span className="text-on-surface-variant/60"> or drag and drop</span>
-                    <p className="text-xs text-on-surface-variant/40 mt-1">Only CSV files are supported</p>
+                  <div className="text-center">
+                    <p className="text-sm font-medium text-on-surface">
+                      <span className="text-primary">Click to upload</span>
+                      <span className="text-on-surface-variant/60"> or drag & drop</span>
+                    </p>
+                    <p className="text-xs text-on-surface-variant/40 mt-1">CSV files only</p>
                   </div>
                 </div>
               ) : (
-                <div className="flex items-center justify-between bg-surface-container-high p-4 rounded-xl border border-primary/10">
-                  <div className="flex items-center gap-3">
-                    <div className="p-2 bg-primary/10 rounded-lg text-primary">
-                      <FileText className="w-5 h-5" />
-                    </div>
-                    <div className="text-left">
-                      <p className="font-medium text-on-surface">{file.name}</p>
-                      <p className="text-xs text-on-surface-variant/60">{(file.size / 1024).toFixed(1)} KB • {data?.length || 0} rows found</p>
-                    </div>
-                  </div>
-                  <button 
-                    onClick={reset}
-                    className="p-2 text-on-surface-variant/40 hover:text-error transition-colors"
+                <div
+                  className="flex items-center gap-3 p-4 rounded-2xl border"
+                  style={{
+                    background: 'color-mix(in srgb, var(--md-sys-color-primary) 5%, transparent)',
+                    borderColor: 'color-mix(in srgb, var(--md-sys-color-primary) 20%, transparent)',
+                  }}
+                >
+                  <div
+                    className="p-2.5 rounded-xl flex-shrink-0"
+                    style={{ background: 'color-mix(in srgb, var(--md-sys-color-primary) 15%, transparent)' }}
                   >
-                    <X className="w-5 h-5" />
+                    <FileText className="w-5 h-5 text-primary" />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-semibold text-on-surface truncate">{file.name}</p>
+                    <p className="text-xs text-on-surface-variant/60 mt-0.5">
+                      {(file.size / 1024).toFixed(1)} KB
+                      <span
+                        className="ml-2 font-medium"
+                        style={{ color: 'var(--md-sys-color-primary)' }}
+                      >
+                        {data?.length || 0} rows detected
+                      </span>
+                    </p>
+                  </div>
+                  <button
+                    onClick={reset}
+                    className="p-1.5 rounded-lg text-on-surface-variant/40 hover:text-error hover:bg-error/10 transition-all flex-shrink-0"
+                  >
+                    <X className="w-4 h-4" />
                   </button>
                 </div>
               )}
             </div>
 
+            {/* Preview table */}
             {data && data.length > 0 && (
-              <div className="rounded-xl border border-outline-variant/10 overflow-hidden bg-surface-container-high">
-                <div className="max-h-48 overflow-y-auto">
-                  <table className="w-full text-sm text-left">
-                    <thead className="bg-surface-container-highest border-b border-outline-variant/10 text-on-surface-variant font-bold">
+              <div
+                className="rounded-2xl overflow-hidden border"
+                style={{ borderColor: 'color-mix(in srgb, var(--md-sys-color-outline) 12%, transparent)' }}
+              >
+                <div
+                  className="px-4 py-2.5 flex items-center justify-between border-b"
+                  style={{
+                    background: 'var(--md-sys-color-surface-container-highest)',
+                    borderColor: 'color-mix(in srgb, var(--md-sys-color-outline) 10%, transparent)',
+                  }}
+                >
+                  <span className="text-xs font-semibold text-on-surface-variant uppercase tracking-wider">Preview</span>
+                  <span className="text-xs text-on-surface-variant/50">{data.length} total rows</span>
+                </div>
+                <div className="overflow-x-auto max-h-44 overflow-y-auto">
+                  <table className="w-full text-xs text-left">
+                    <thead style={{ background: 'var(--md-sys-color-surface-container-high)' }}>
                       <tr>
                         {Object.keys(data[0]).map(header => (
-                          <th key={header} className="px-4 py-2 font-semibold capitalize">{header}</th>
+                          <th
+                            key={header}
+                            className="px-4 py-2.5 font-semibold capitalize whitespace-nowrap text-on-surface-variant"
+                          >
+                            {header}
+                          </th>
                         ))}
                       </tr>
                     </thead>
-                    <tbody className="divide-y divide-outline-variant/5">
+                    <tbody>
                       {data.slice(0, 5).map((row, i) => (
-                        <tr key={i} className="hover:bg-surface-bright/5">
+                        <tr
+                          key={i}
+                          className="border-t transition-colors hover:bg-surface-container-high/50"
+                          style={{ borderColor: 'color-mix(in srgb, var(--md-sys-color-outline) 6%, transparent)' }}
+                        >
                           {Object.values(row).map((val, j) => (
-                            <td key={j} className="px-4 py-2 text-on-surface-variant max-w-[150px] truncate">{val}</td>
+                            <td key={j} className="px-4 py-2.5 text-on-surface-variant max-w-[140px] truncate">
+                              {val || <span className="text-on-surface-variant/30 italic">—</span>}
+                            </td>
                           ))}
                         </tr>
                       ))}
                     </tbody>
                   </table>
-                  {data.length > 5 && (
-                    <div className="p-2 text-center text-xs text-on-surface-variant/40 bg-surface-container-highest/30">
-                      + {data.length - 5} more rows
-                    </div>
-                  )}
                 </div>
+                {data.length > 5 && (
+                  <div
+                    className="px-4 py-2 text-center text-xs text-on-surface-variant/40"
+                    style={{ background: 'var(--md-sys-color-surface-container-high)' }}
+                  >
+                    + {data.length - 5} more rows not shown
+                  </div>
+                )}
               </div>
             )}
 
-            <div className="flex justify-end gap-3 mt-6">
+            {/* Actions */}
+            <div className="flex items-center justify-between pt-1">
               <button
                 onClick={onClose}
-                className="px-6 py-2.5 text-on-surface-variant font-medium hover:bg-surface-container-highest rounded-xl transition-all"
+                className="px-5 py-2.5 text-sm font-medium text-on-surface-variant rounded-xl hover:bg-surface-container-highest transition-colors"
               >
                 Cancel
               </button>
               <button
                 disabled={!file || loading}
                 onClick={handleImport}
-                className={`px-6 py-2.5 rounded-xl font-medium transition-all flex items-center gap-2 ${
-                  !file || loading
-                    ? 'bg-surface-container-highest text-on-surface-variant/30 cursor-not-allowed'
-                    : 'bg-primary text-on-primary hover:opacity-90 shadow-lg shadow-primary/20 active:scale-95'
-                }`}
+                className="flex items-center gap-2 px-6 py-2.5 rounded-xl text-sm font-semibold transition-all active:scale-95"
+                style={{
+                  background: !file || loading
+                    ? 'color-mix(in srgb, var(--md-sys-color-surface-container-highest) 80%, transparent)'
+                    : 'var(--md-sys-color-primary)',
+                  color: !file || loading
+                    ? 'color-mix(in srgb, var(--md-sys-color-on-surface) 30%, transparent)'
+                    : 'var(--md-sys-color-on-primary)',
+                  cursor: !file || loading ? 'not-allowed' : 'pointer',
+                  boxShadow: !file || loading ? 'none' : '0 4px 16px color-mix(in srgb, var(--md-sys-color-primary) 30%, transparent)',
+                }}
               >
                 {loading ? (
                   <>
-                    <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                    Processing...
+                    <div className="w-4 h-4 border-2 border-current/30 border-t-current rounded-full animate-spin" />
+                    Processing…
                   </>
                 ) : (
                   <>
-                    <Upload className="w-4 h-4" />
                     Start Import
+                    <ArrowRight className="w-4 h-4" />
                   </>
                 )}
               </button>
             </div>
           </>
         ) : (
-          <div className="text-center py-8 space-y-4">
-            <div className="flex justify-center">
-              <div className="p-4 bg-primary/10 rounded-full text-primary">
-                <CheckCircle2 className="w-12 h-12" />
+          /* Results screen */
+          <div className="py-4 space-y-6">
+            {/* Header */}
+            <div className="text-center space-y-3">
+              <div className="flex justify-center">
+                <div
+                  className="w-16 h-16 rounded-2xl flex items-center justify-center"
+                  style={{ background: 'color-mix(in srgb, var(--md-sys-color-primary) 12%, transparent)' }}
+                >
+                  <CheckCircle2 className="w-8 h-8 text-primary" />
+                </div>
               </div>
-            </div>
-            <div>
-              <h3 className="text-xl font-bold text-on-surface">Import Processed</h3>
-              <p className="text-on-surface-variant/60 mt-1">Here's the summary of your import</p>
-            </div>
-            
-            <div className="grid grid-cols-2 gap-4 max-w-sm mx-auto">
-              <div className="p-4 bg-surface-container-high rounded-2xl border border-outline-variant/10">
-                <p className="text-2xl font-bold text-primary">{results.created || 0}</p>
-                <p className="text-sm text-on-surface-variant">Successful</p>
-              </div>
-              <div className="p-4 bg-surface-container-high rounded-2xl border border-outline-variant/10">
-                <p className="text-2xl font-bold text-error">{results.failed || results.clashes?.length || 0}</p>
-                <p className="text-sm text-on-surface-variant">Failed/Skipped</p>
+              <div>
+                <h3 className="text-lg font-bold text-on-surface">Import Complete</h3>
+                <p className="text-sm text-on-surface-variant/60 mt-0.5">Here's a summary of what happened</p>
               </div>
             </div>
 
+            {/* Stats */}
+            <div className="grid grid-cols-2 gap-3">
+              <div
+                className="p-5 rounded-2xl text-center"
+                style={{
+                  background: 'color-mix(in srgb, var(--md-sys-color-primary) 8%, transparent)',
+                  border: '1px solid color-mix(in srgb, var(--md-sys-color-primary) 15%, transparent)',
+                }}
+              >
+                <p className="text-3xl font-bold text-primary">{results.created ?? 0}</p>
+                <p className="text-xs font-medium text-on-surface-variant mt-1 uppercase tracking-wide">Successful</p>
+              </div>
+              <div
+                className="p-5 rounded-2xl text-center"
+                style={{
+                  background: 'color-mix(in srgb, var(--md-sys-color-error) 8%, transparent)',
+                  border: '1px solid color-mix(in srgb, var(--md-sys-color-error) 15%, transparent)',
+                }}
+              >
+                <p className="text-3xl font-bold text-error">{results.failed ?? results.clashes?.length ?? 0}</p>
+                <p className="text-xs font-medium text-on-surface-variant mt-1 uppercase tracking-wide">Failed</p>
+              </div>
+            </div>
+
+            {/* Errors */}
             {results.errors?.length > 0 && (
-              <div className="mt-4 text-left max-h-40 overflow-y-auto p-4 bg-error/10 rounded-xl border border-error/20">
-                <h4 className="flex items-center gap-2 text-error font-semibold text-sm mb-2">
-                  <AlertCircle className="w-4 h-4" />
-                  Error Details:
-                </h4>
-                <ul className="space-y-1">
+              <div
+                className="rounded-2xl overflow-hidden border"
+                style={{
+                  background: 'color-mix(in srgb, var(--md-sys-color-error) 5%, transparent)',
+                  borderColor: 'color-mix(in srgb, var(--md-sys-color-error) 18%, transparent)',
+                }}
+              >
+                <div
+                  className="flex items-center gap-2 px-4 py-3 border-b"
+                  style={{ borderColor: 'color-mix(in srgb, var(--md-sys-color-error) 15%, transparent)' }}
+                >
+                  <AlertCircle className="w-4 h-4 text-error flex-shrink-0" />
+                  <span className="text-sm font-semibold text-error">
+                    {results.errors.length} error{results.errors.length !== 1 ? 's' : ''} found
+                  </span>
+                </div>
+                <ul className="max-h-36 overflow-y-auto divide-y" style={{ divideColor: 'color-mix(in srgb, var(--md-sys-color-error) 10%, transparent)' }}>
                   {results.errors.slice(0, 10).map((err, i) => (
-                    <li key={i} className="text-xs text-error/80">
-                      • {err.message || err.reason || 'Unknown error'}
+                    <li key={i} className="px-4 py-2.5 text-xs text-error/80 flex items-start gap-2">
+                      <span className="mt-0.5 flex-shrink-0 text-error/40">#{i + 1}</span>
+                      {err.message || err.reason || 'Unknown error'}
                     </li>
                   ))}
                   {results.errors.length > 10 && (
-                    <li className="text-xs text-error/60 italic">... and {results.errors.length - 10} more</li>
+                    <li className="px-4 py-2.5 text-xs text-error/50 italic text-center">
+                      … and {results.errors.length - 10} more
+                    </li>
                   )}
                 </ul>
               </div>
             )}
 
             <button
-              onClick={() => {
-                reset();
-                onClose();
+              onClick={() => { reset(); onClose(); }}
+              className="w-full py-3 rounded-2xl text-sm font-semibold transition-all active:scale-[0.98]"
+              style={{
+                background: 'var(--md-sys-color-primary)',
+                color: 'var(--md-sys-color-on-primary)',
+                boxShadow: '0 4px 16px color-mix(in srgb, var(--md-sys-color-primary) 25%, transparent)',
               }}
-              className="w-full mt-6 px-6 py-3 bg-secondary text-on-secondary-container font-semibold rounded-2xl hover:opacity-90 transition-all shadow-lg active:scale-[0.98]"
             >
               Done
             </button>

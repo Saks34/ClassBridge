@@ -20,6 +20,8 @@ import {
   ChevronRight
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
+import logo from '../../assets/logo.png';
+import icon from '../../assets/icon.png';
 
 export default function Sidebar({ isCollapsed, onToggle }) {
     const { logout, user } = useAuth();
@@ -50,6 +52,13 @@ export default function Sidebar({ isCollapsed, onToggle }) {
 
     return (
         <aside className={`fixed left-0 top-0 bottom-0 transition-all duration-500 bg-surface-container/60 backdrop-blur-3xl border-r border-outline-variant/10 flex flex-col z-50 shadow-xl ${isCollapsed ? 'w-20' : 'w-72'}`}>
+            {/* Ambient Sidebar Glows - Enhanced Visibility */}
+            <div className="absolute inset-0 overflow-hidden pointer-events-none z-0">
+                <div className="absolute -top-20 -left-20 w-80 h-80 bg-primary/20 rounded-full blur-[80px] animate-pulse"></div>
+                <div className="absolute top-1/2 -right-20 w-64 h-64 bg-secondary/15 rounded-full blur-[60px] animate-pulse" style={{ animationDelay: '1.5s' }}></div>
+                <div className="absolute -bottom-20 -left-20 w-80 h-80 bg-tertiary/15 rounded-full blur-[80px] animate-pulse" style={{ animationDelay: '3s' }}></div>
+            </div>
+
             {/* Collapse Toggle */}
             <button 
                 onClick={onToggle}
@@ -58,16 +67,21 @@ export default function Sidebar({ isCollapsed, onToggle }) {
                 {isCollapsed ? <ChevronRight size={14} /> : <ChevronLeft size={14} />}
             </button>
 
+            {/* Content container to ensure it stays above glows */}
+            <div className="relative z-10 flex flex-col h-full overflow-hidden">
+
             {/* Bridge Logo Section */}
-            <div className={`p-8 pb-6 transition-all duration-500 ${isCollapsed ? 'opacity-0 scale-0 h-0 p-0 overflow-hidden' : 'opacity-100 scale-100'}`}>
-                <div className="text-xl font-black text-primary tracking-tighter mb-1 select-none whitespace-nowrap uppercase">ClassBridge</div>
+            <div className={`p-8 pb-4 transition-all duration-500 ${isCollapsed ? 'opacity-0 scale-0 h-0 p-0 overflow-hidden' : 'opacity-100 scale-100 flex flex-col items-center'}`}>
+                <img src={logo} alt="ClassBridge Logo" className="object-contain mb-4 dark:brightness-0 dark:invert transition-all" style={{width: '100px', height: '100px'}}/>
                 <div className="text-2xl font-extrabold font-headline text-on-surface tracking-tight leading-none whitespace-nowrap">Admin Panel</div>
                 <div className="font-label tracking-[0.2em] uppercase text-[10px] text-on-surface-variant/60 mt-2 whitespace-nowrap">Administrator Portal</div>
             </div>
 
             {isCollapsed && (
                 <div className="flex flex-col items-center py-8">
-                     <div className="w-10 h-10 bg-primary/20 rounded-xl flex items-center justify-center font-black text-primary border border-primary/30 shadow-lg shadow-primary/10">CB</div>
+                     <div className="w-12 h-12 bg-primary/10 rounded-2xl flex items-center justify-center border border-primary/20 shadow-lg shadow-primary/5 overflow-hidden group hover:scale-110 transition-transform duration-300">
+                        <img src={icon} alt="CB" className="w-8 h-8 object-contain" />
+                     </div>
                 </div>
             )}
 
@@ -162,6 +176,7 @@ export default function Sidebar({ isCollapsed, onToggle }) {
                     </div>
                 </div>
             </div>
-        </aside>
+        </div>
+    </aside>
     );
 }

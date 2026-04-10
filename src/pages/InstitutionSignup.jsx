@@ -4,6 +4,8 @@ import toast from 'react-hot-toast';
 import api from '../services/api';
 import { useTheme } from '../context/ThemeContext';
 import { Info, ArrowRight, Building2, User, School, BookOpen, Briefcase, Eye, EyeOff, CheckCircle2 } from 'lucide-react';
+import logo from '../assets/logo.png';
+import icon from '../assets/icon.png';
 
 export default function InstitutionSignup() {
   const navigate = useNavigate();
@@ -59,9 +61,9 @@ export default function InstitutionSignup() {
     <div className="bg-surface text-on-surface font-body selection:bg-primary/30 min-h-screen overflow-x-hidden">
       {/* TopNavBar */}
       <nav className="fixed top-0 w-full z-50 bg-surface/40 backdrop-blur-xl border-b border-outline-variant/10 shadow-lg">
-        <div className="flex justify-between items-center px-8 py-4 max-w-screen-2xl mx-auto font-headline tracking-tight">
+        <div className="flex justify-between items-center px-8  max-w-screen-2xl mx-auto font-headline tracking-tight">
           <Link to="/" className="flex items-center gap-2">
-            <span className="text-2xl font-bold tracking-tighter bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">ClassBridge</span>
+            <img src={logo} alt="ClassBridge" className=" object-contain dark:brightness-0 dark:invert transition-all" style={{width: '150px', height: '100px'}}/>
           </Link>
           <div className="hidden md:flex items-center gap-8">
             <Link className="text-on-surface-variant hover:text-primary transition-colors" to="/">Return to Base</Link>
@@ -269,17 +271,20 @@ export default function InstitutionSignup() {
                       </>
                     )}
                   </button>
-                  <p className="text-on-surface-variant text-[10px] font-label uppercase tracking-widest max-w-[200px] leading-relaxed text-center sm:text-left">
-                    By initiating, you agree to the <span onClick={() => toast.info('Terms of Orbit protocol is managed by global administration.')} className="text-secondary cursor-pointer hover:text-primary transition-colors">Terms of Orbit</span> and <span onClick={() => toast.info('Security Protocol documentation is encrypted for your protection.')} className="text-secondary cursor-pointer hover:text-primary transition-colors">Security Protocol</span>.
-                  </p>
+                  
                 </div>
               </div>
             </form>
 
-            <div className="mt-16 pt-8 border-t border-outline-variant/10 flex flex-col md:flex-row justify-between items-center gap-4 text-center md:text-left">
+            <div className="mt-16 pt-8 border-t border-outline-variant/10 flex flex-col md:flex-row justify-between items-center gap-4 text-center md:text-left" style={{display:"flex",flexDirection:"row",justifyContent:"space-between",width:"75vw"}}>
                <div>
                   <p className="text-on-surface-variant text-xs font-body">Existing node in the network?</p>
                   <Link to="/login" className="font-label text-secondary hover:text-primary transition-colors uppercase tracking-widest text-[10px] font-bold">Return to Terminal</Link>
+               </div>
+               <div >
+                  <p className="text-on-surface-variant text-[10px] font-label uppercase tracking-widest max-w-[200px] leading-relaxed text-center sm:text-left">
+                    By initiating, you agree to the <span onClick={() => toast.info('Terms of Orbit protocol is managed by global administration.')} className="text-secondary cursor-pointer hover:text-primary transition-colors">Terms of Orbit</span> and <span onClick={() => toast.info('Security Protocol documentation is encrypted for your protection.')} className="text-secondary cursor-pointer hover:text-primary transition-colors">Security Protocol</span>.
+                  </p>
                </div>
                <div className="flex gap-4 opacity-30 select-none hidden md:flex">
                   <div className="w-12 h-0.5 bg-outline-variant"></div>

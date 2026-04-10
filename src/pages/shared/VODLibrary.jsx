@@ -18,7 +18,9 @@ import {
     Share2,
     CheckCircle2,
     Zap,
-    History
+    History,
+    LayoutGrid,
+    ArrowLeft
 } from 'lucide-react';
 import api from '../../services/api';
 import { useAuth } from '../../context/AuthContext';
@@ -65,7 +67,6 @@ export default function VODLibrary() {
             const items = data.data || [];
             setRecordings(items);
 
-            // Calculate stats
             const totalSec = items.reduce((acc, curr) => acc + (curr.actualDuration || 0), 0);
             const completed = items.filter(i => i.isWatched).length;
             setStats({
@@ -109,240 +110,284 @@ export default function VODLibrary() {
         });
     };
 
+    const formatDuration = (seconds) => {
+        if (!seconds) return null;
+        const h = Math.floor(seconds / 3600);
+        const m = Math.floor((seconds % 3600) / 60);
+        if (h > 0) return `${h}h ${m}m`;
+        return `${m}m`;
+    };
+
     const handleShare = (id) => {
         const url = `${window.location.origin}/student/class/${id}`;
         navigator.clipboard.writeText(url);
-        toast.success('Resource link copied to clipboard!');
+        toast.success('Link copied to clipboard!');
     };
+
+    const openVideo = (rec) => {
+        const videoId = rec.recordings?.[0]?.youtubeVideoId;
+        setSelectedVideoId(videoId);
+        setSelectedLiveClassId(rec._id);
+    };
+
+    const closeVideo = () => {
+        setSelectedVideoId(null);
+        // keep selectedLiveClassId so summary modal still works
+    };
+
+    const selectedRec = recordings.find(r => r._id === selectedLiveClassId);
 
     if (loading) return <LoadingSpinner centered />;
 
-    const featuredVideo = filteredRecordings.length > 0 ? filteredRecordings[0] : null;
-
     return (
-        <div className="min-h-screen bg-surface text-on-surface pb-20">
-            {/* Hero Section */}
-            <div className="relative h-[480px] overflow-hidden">
-                {/* Background Pattern */}
-                <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none">
-                    <div className="absolute top-[-10%] left-[-5%] w-[60%] h-[120%] bg-primary/10 blur-[130px] rounded-full animate-pulse-slow"></div>
-                    <div className="absolute bottom-[-10%] right-[-5%] w-[50%] h-[120%] bg-secondary/10 blur-[130px] rounded-full animate-pulse-slow-reverse"></div>
-                    <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')] opacity-[0.03] mix-blend-overlay"></div>
+        <div className="min-h-screen bg-surface text-on-surface pb-24">
+
+            {/* ── Page Header ─────────────────────────────────────────── */}
+            <div className="relative overflow-hidden border-b border-outline-variant/10">
+                {/* Ambient blobs — restrained, not full-bleed */}
+                <div className="pointer-events-none absolute inset-0 -z-0">
+                    <div className="absolute -top-32 -left-24 w-[480px] h-[480px] rounded-full bg-primary/10 blur-[100px]" />
+                    <div className="absolute -bottom-20 right-0 w-[360px] h-[360px] rounded-full bg-secondary/8 blur-[90px]" />
                 </div>
 
-                {/* Hero Content */}
-                <div className="relative z-10 max-w-[1600px] mx-auto px-8 h-full flex flex-col justify-center">
-                    <div className="max-w-3xl space-y-6">
-                        <div className="flex items-center gap-2 mb-4">
-                            <div className="px-3 py-1 rounded-full bg-primary/20 text-primary border border-primary/20 text-[10px] font-black uppercase tracking-[0.3em] flex items-center gap-2 animate-fade-in">
-                                <Zap size={14} className="fill-primary" />
-                                Exclusive Archives
-                            </div>
+                <div className="relative z-10 max-w-[1600px] mx-auto px-5 md:px-10 py-10 md:py-14">
+                    {/* Label row */}
+                    <div className="flex items-center gap-2 mb-5">
+                        <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-primary/15 border border-primary/20 text-primary text-[10px] font-extrabold uppercase tracking-[0.25em]">
+                            <Zap size={12} className="fill-primary" />
+                            Recorded Sessions
+                        </span>
+                    </div>
+
+                    {/* Title + Stats in one row on desktop */}
+                    <div className="flex flex-col lg:flex-row lg:items-end lg:justify-between gap-8">
+                        <div>
+                            <h1 className="text-3xl md:text-5xl font-black tracking-tight leading-none">
+                                Knowledge Vault
+                                <span className="block text-gradient-primary text-2xl md:text-4xl mt-1 font-bold opacity-80">
+                                    Every lecture, on demand.
+                                </span>
+                            </h1>
+                            <p className="mt-3 text-sm text-on-surface-variant/60 max-w-lg leading-relaxed">
+                                Revisit any session, get AI-generated summaries, and track your study progress across all subjects.
+                            </p>
                         </div>
-                        <h1 className="text-6xl md:text-8xl font-black font-headline tracking-tighter leading-none animate-fade-in-up">
-                            KNOWLEDGE <br />
-                            <span className="text-gradient-primary">QUANTUM VAULT</span>
-                        </h1>
-                        <p className="text-lg text-on-surface-variant font-body max-w-xl leading-relaxed opacity-80 animate-fade-in-up delay-100">
-                            Access every session, every insight, and every fundamental building block. Synthesized by AI, stored for your academic mastery.
-                        </p>
-                        
-                        <div className="flex flex-wrap gap-8 pt-6 animate-fade-in-up delay-200">
-                            <div className="flex items-center gap-4 group cursor-default">
-                                <div className="w-12 h-12 rounded-[1.25rem] bg-surface-container-high border border-outline-variant/10 flex items-center justify-center text-primary group-hover:scale-110 transition-transform">
-                                    <Clock size={24} />
-                                </div>
+
+                        {/* Stats pills */}
+                        <div className="flex items-center gap-4 shrink-0">
+                            <div className="flex items-center gap-3 px-5 py-3 rounded-2xl bg-surface-container border border-outline-variant/10">
+                                <Clock size={18} className="text-primary shrink-0" />
                                 <div>
-                                    <div className="text-[10px] font-black uppercase text-on-surface-variant/40 tracking-widest">Studied Time</div>
-                                    <div className="text-2xl font-black font-headline">{stats.totalHours} <span className="text-xs font-bold text-on-surface-variant/40">HRS</span></div>
+                                    <div className="text-[10px] font-bold text-on-surface-variant/40 uppercase tracking-widest leading-none">Watch time</div>
+                                    <div className="text-lg font-black leading-tight">{stats.totalHours}<span className="text-xs font-semibold text-on-surface-variant/40 ml-1">hrs</span></div>
                                 </div>
                             </div>
-                            <div className="flex items-center gap-4 group cursor-default">
-                                <div className="w-12 h-12 rounded-[1.25rem] bg-surface-container-high border border-outline-variant/10 flex items-center justify-center text-secondary group-hover:scale-110 transition-transform">
-                                    <CheckCircle2 size={24} />
-                                </div>
+                            <div className="flex items-center gap-3 px-5 py-3 rounded-2xl bg-surface-container border border-outline-variant/10">
+                                <CheckCircle2 size={18} className="text-secondary shrink-0" />
                                 <div>
-                                    <div className="text-[10px] font-black uppercase text-on-surface-variant/40 tracking-widest">Completed Sessions</div>
-                                    <div className="text-2xl font-black font-headline">{stats.completedCount} / {recordings.length}</div>
+                                    <div className="text-[10px] font-bold text-on-surface-variant/40 uppercase tracking-widest leading-none">Completed</div>
+                                    <div className="text-lg font-black leading-tight">
+                                        {stats.completedCount}
+                                        <span className="text-xs font-semibold text-on-surface-variant/40 ml-1">/ {recordings.length}</span>
+                                    </div>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
-
-                {/* Bottom Blur Overlay */}
-                <div className="absolute bottom-0 left-0 right-0 h-40 bg-gradient-to-t from-surface to-transparent z-10"></div>
             </div>
 
-            {/* Main Content Area */}
-            <div className="max-w-[1600px] mx-auto px-8 -mt-20 relative z-20">
-                
-                {/* Search & Filter Bar */}
-                <div className="sticky top-6 p-4 rounded-[2.5rem] bg-surface-container/60 backdrop-blur-2xl border border-outline-variant/10 shadow-2xl flex flex-col lg:flex-row gap-6 mb-12 animate-fade-in transition-all">
-                    <div className="relative flex-1 group">
-                        <Search className="absolute left-6 top-1/2 -translate-y-1/2 text-on-surface-variant group-focus-within:text-primary transition-all duration-300 w-5 h-5 opacity-40" />
+            {/* ── Sticky Filter Bar ────────────────────────────────────── */}
+            <div className="sticky top-0 z-30 bg-surface/80 backdrop-blur-xl border-b border-outline-variant/10 shadow-sm">
+                <div className="max-w-[1600px] mx-auto px-5 md:px-10 py-3 flex flex-col sm:flex-row gap-3 items-stretch sm:items-center">
+                    {/* Search */}
+                    <div className="relative flex-1 min-w-0">
+                        <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-on-surface-variant/40 pointer-events-none" />
                         <input
                             type="text"
-                            placeholder="Quantum scan titles, faculty, or topics..."
+                            placeholder="Search by title, teacher, or topic…"
                             value={searchTerm}
                             onChange={(e) => setSearchTerm(e.target.value)}
-                            className="w-full pl-16 pr-6 py-4 rounded-[1.75rem] bg-surface/50 hover:bg-surface transition-all outline-none text-on-surface placeholder:text-on-surface-variant/30 font-body text-sm border border-transparent focus:border-primary/20 focus:ring-4 focus:ring-primary/5 shadow-inner"
+                            className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-surface-container border border-outline-variant/10 focus:border-primary/40 focus:ring-2 focus:ring-primary/10 outline-none text-sm text-on-surface placeholder:text-on-surface-variant/30 transition-all"
                         />
+                        {searchTerm && (
+                            <button
+                                onClick={() => setSearchTerm('')}
+                                className="absolute right-3 top-1/2 -translate-y-1/2 text-on-surface-variant/40 hover:text-on-surface transition-colors"
+                            >
+                                <X size={14} />
+                            </button>
+                        )}
                     </div>
-                    
-                    <div className="flex items-center gap-3 overflow-x-auto no-scrollbar pb-2 lg:pb-0 px-2">
-                        {subjects.map((s, i) => (
+
+                    {/* Subject chips — scrollable row */}
+                    <div className="flex items-center gap-2 overflow-x-auto no-scrollbar shrink-0">
+                        {subjects.map((s) => (
                             <button
                                 key={s}
                                 onClick={() => setSelectedSubject(s)}
-                                className={`h-12 px-6 rounded-2xl text-[10px] font-black uppercase tracking-[0.2em] transition-all whitespace-nowrap flex items-center gap-2 ${
+                                className={`h-9 px-4 rounded-lg text-[11px] font-bold whitespace-nowrap transition-all duration-200 ${
                                     selectedSubject === s
-                                        ? 'bg-primary text-on-primary shadow-xl shadow-primary/20 scale-105 z-10'
-                                        : 'bg-surface-container-high text-on-surface-variant border border-outline-variant/5 hover:border-outline-variant/20 hover:text-on-surface'
+                                        ? 'bg-primary text-on-primary shadow-md shadow-primary/20'
+                                        : 'bg-surface-container-high text-on-surface-variant/70 border border-outline-variant/10 hover:border-outline-variant/30 hover:text-on-surface'
                                 }`}
-                                style={{ animationDelay: `${i * 50}ms` }}
                             >
-                                {s === 'All' ? <History size={14} /> : <BookOpen size={14} />}
                                 {s}
                             </button>
                         ))}
                     </div>
                 </div>
+            </div>
 
-                {/* Grid Header */}
-                <div className="flex items-center justify-between mb-8 animate-fade-in">
-                    <div className="flex items-center gap-3">
-                        <div className="w-1.5 h-1.5 rounded-full bg-primary shadow-[0_0_10px_rgba(var(--primary-rgb),0.5)]"></div>
-                        <h2 className="text-sm font-black uppercase tracking-[0.4em] text-on-surface-variant/60">Search Results</h2>
-                        <span className="px-2 py-0.5 rounded-md bg-surface-container-high border border-outline-variant/10 text-[10px] font-black text-primary">
-                            {filteredRecordings.length} NODES
-                        </span>
-                    </div>
+            {/* ── Main Content ─────────────────────────────────────────── */}
+            <div className="max-w-[1600px] mx-auto px-5 md:px-10 pt-8">
+
+                {/* Result count */}
+                <div className="flex items-center gap-2 mb-6">
+                    <LayoutGrid size={14} className="text-on-surface-variant/40" />
+                    <span className="text-xs font-semibold text-on-surface-variant/50 uppercase tracking-widest">
+                        {filteredRecordings.length} {filteredRecordings.length === 1 ? 'session' : 'sessions'}
+                        {selectedSubject !== 'All' && <span className="text-primary ml-1">· {selectedSubject}</span>}
+                        {searchTerm && <span className="text-primary ml-1">· "{searchTerm}"</span>}
+                    </span>
                 </div>
 
-                {/* Cards Grid */}
+                {/* Grid */}
                 {filteredRecordings.length === 0 ? (
-                    <div className="py-32">
-                        <EmptyState 
-                            icon={MonitorPlay} 
-                            message="No knowledge fragments found" 
-                            subMessage="The archive nodes match zero patterns for your current search. Broaden your quantum scan range." 
-                        />
+                    <div className="py-24 flex flex-col items-center gap-4 text-center">
+                        <div className="w-16 h-16 rounded-2xl bg-surface-container-high border border-outline-variant/10 flex items-center justify-center text-on-surface-variant/30">
+                            <MonitorPlay size={28} />
+                        </div>
+                        <div>
+                            <p className="font-bold text-on-surface/60">No recordings found</p>
+                            <p className="text-sm text-on-surface-variant/40 mt-1">Try adjusting your search or filter.</p>
+                        </div>
+                        {(searchTerm || selectedSubject !== 'All') && (
+                            <button
+                                onClick={() => { setSearchTerm(''); setSelectedSubject('All'); }}
+                                className="mt-2 px-4 py-2 rounded-xl bg-primary/10 text-primary text-sm font-semibold hover:bg-primary/20 transition-colors"
+                            >
+                                Clear filters
+                            </button>
+                        )}
                     </div>
                 ) : (
-                    <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-8">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-5">
                         {filteredRecordings.map((rec, idx) => {
                             const videoId = rec.recordings?.[0]?.youtubeVideoId;
+                            const duration = formatDuration(rec.actualDuration);
+                            const subject = rec.timetableId?.subject || rec.subject;
+                            const teacher = rec.timetableId?.teacher?.name || 'Academic Observer';
+                            const title = rec.title || subject;
+                            const date = formatDate(rec.actualEndTime || rec.createdAt);
+
                             return (
                                 <div 
                                     key={rec._id}
-                                    className="group relative flex flex-col bg-surface-container/40 rounded-[2.5rem] border border-outline-variant/10 hover:border-primary/30 transition-all duration-700 hover:-translate-y-2 hover:shadow-[0_40px_80px_-20px_rgba(0,0,0,0.3)] cursor-pointer overflow-hidden animate-fade-in-up"
-                                    style={{ animationDelay: `${idx * 80}ms` }}
+                                    className="group flex flex-col bg-surface-container/50 rounded-2xl border border-outline-variant/10 hover:border-primary/25 transition-all duration-300 hover:shadow-xl hover:shadow-black/20 overflow-hidden"
+                                    style={{ animationDelay: `${idx * 50}ms` }}
                                 >
-                                    {/* Thumbnail Area */}
-                                    <div 
-                                        className="aspect-[16/10] relative overflow-hidden bg-black"
-                                        onClick={() => {
-                                            setSelectedVideoId(videoId);
-                                            setSelectedLiveClassId(rec._id);
-                                        }}
+                                    {/* Thumbnail */}
+                                    <button
+                                        onClick={() => openVideo(rec)}
+                                        className="relative block aspect-video w-full overflow-hidden bg-surface-container-highest focus:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+                                        aria-label={`Play ${title}`}
                                     >
                                         <img 
                                             src={`https://img.youtube.com/vi/${videoId}/maxresdefault.jpg`} 
-                                            alt={rec.title}
-                                            className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-110 opacity-70 group-hover:opacity-100"
+                                            alt={title}
+                                            className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
                                             onError={(e) => { e.target.src = `https://img.youtube.com/vi/${videoId}/hqdefault.jpg`; }}
                                         />
-                                        
-                                        {/* Play Overlay */}
-                                        <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-500 scale-125 group-hover:scale-100">
-                                            <div className="w-20 h-20 rounded-full bg-white/10 backdrop-blur-md border border-white/20 flex items-center justify-center text-white shadow-2xl">
-                                                <Play fill="white" size={32} />
+
+                                        {/* Dark overlay on hover */}
+                                        <div className="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+
+                                        {/* Play button */}
+                                        <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300">
+                                            <div className="w-14 h-14 rounded-full bg-white/15 backdrop-blur-sm border border-white/25 flex items-center justify-center shadow-xl">
+                                                <Play fill="white" size={22} className="ml-0.5" />
                                             </div>
                                         </div>
 
-                                        {/* Top Badges */}
-                                        <div className="absolute top-5 left-5 right-5 flex justify-between items-start">
-                                            <span className="px-3.5 py-1.5 rounded-full text-[9px] font-black uppercase tracking-widest bg-black/40 backdrop-blur-md text-white border border-white/10 shadow-lg select-none">
-                                                {rec.timetableId?.subject || rec.subject}
+                                        {/* Subject badge */}
+                                        <div className="absolute top-3 left-3">
+                                            <span className="px-2.5 py-1 rounded-lg text-[10px] font-bold bg-black/50 backdrop-blur-sm text-white border border-white/10">
+                                                {subject}
                                             </span>
-                                            
-                                            <div className="flex gap-2">
-                                                <button 
-                                                    onClick={(e) => {
-                                                        e.stopPropagation();
-                                                        handleShare(rec._id);
-                                                    }}
-                                                    className="w-8 h-8 rounded-full bg-black/40 backdrop-blur-md text-white/60 hover:text-white border border-white/10 flex items-center justify-center transition-all hover:bg-primary/40 hover:scale-110"
-                                                >
-                                                    <Share2 size={14} />
-                                                </button>
-                                            </div>
                                         </div>
 
-                                        {/* Duration */}
-                                        <div className="absolute bottom-5 right-5 px-3 py-1.5 rounded-xl bg-black/60 backdrop-blur-md text-primary text-[9px] font-black tracking-widest border border-primary/20 flex items-center gap-2">
-                                            <div className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse"></div>
-                                            {rec.actualDuration ? `${Math.floor(rec.actualDuration / 60)}m` : '00:00'}
+                                        {/* Actions: share */}
+                                        <div className="absolute top-3 right-3 flex gap-1.5 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                                            <button 
+                                                onClick={(e) => { e.stopPropagation(); handleShare(rec._id); }}
+                                                className="w-8 h-8 rounded-lg bg-black/50 backdrop-blur-sm text-white/70 hover:text-white border border-white/10 flex items-center justify-center transition-colors"
+                                                aria-label="Copy link"
+                                            >
+                                                <Share2 size={13} />
+                                            </button>
                                         </div>
 
-                                        {/* Progress Bar (Visual Only) */}
-                                        {rec.isWatched && (
-                                            <div className="absolute bottom-0 left-0 right-0 h-1 bg-primary/20">
-                                                <div className="h-full bg-primary w-full"></div>
+                                        {/* Duration pill */}
+                                        {duration && (
+                                            <div className="absolute bottom-3 right-3 px-2.5 py-1 rounded-lg bg-black/60 backdrop-blur-sm text-[10px] font-bold text-white/90 border border-white/10">
+                                                {duration}
                                             </div>
                                         )}
-                                    </div>
 
-                                    {/* Content Area */}
-                                    <div className="p-8 flex-1 flex flex-col">
-                                        <div className="flex items-center gap-3 mb-4">
-                                            <span className="text-[10px] flex items-center gap-2 text-on-surface-variant font-black uppercase tracking-[0.2em] opacity-40">
-                                                <CalendarIcon size={12} className="text-primary" />
-                                                {formatDate(rec.actualEndTime || rec.createdAt)}
+                                        {/* Watched bar */}
+                                        {rec.isWatched && (
+                                            <div className="absolute bottom-0 inset-x-0 h-[3px] bg-secondary/80" />
+                                        )}
+                                    </button>
+
+                                    {/* Card Body */}
+                                    <div className="flex flex-col flex-1 p-5">
+                                        {/* Date + watched badge */}
+                                        <div className="flex items-center justify-between mb-2">
+                                            <span className="text-[11px] text-on-surface-variant/40 font-medium flex items-center gap-1.5">
+                                                <CalendarIcon size={11} />
+                                                {date}
                                             </span>
                                             {rec.isWatched && (
-                                                <div className="px-2 py-0.5 rounded bg-secondary/10 text-secondary text-[8px] font-black uppercase tracking-widest flex items-center gap-1 border border-secondary/10">
-                                                    <Trophy size={10} />
-                                                    MASTERY
-                                                </div>
+                                                <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded bg-secondary/15 text-secondary text-[9px] font-bold uppercase tracking-wide border border-secondary/15">
+                                                    <Trophy size={9} />
+                                                    Watched
+                                                </span>
                                             )}
                                         </div>
 
-                                        <h3 className="text-xl font-black font-headline text-on-surface leading-tight tracking-tight uppercase mb-6 line-clamp-2 min-h-[3rem] group-hover:text-primary transition-colors">
-                                            {rec.title || rec.timetableId?.subject}
+                                        {/* Title */}
+                                        <h3 className="text-base font-bold text-on-surface leading-snug line-clamp-2 mb-4 group-hover:text-primary transition-colors duration-200 min-h-[2.75rem]">
+                                            {title}
                                         </h3>
 
-                                        <div className="mt-auto space-y-6 pt-6 border-t border-outline-variant/10">
-                                            <div className="flex items-center justify-between">
-                                                <div className="flex items-center gap-3">
-                                                    <div className="w-10 h-10 rounded-full border border-outline-variant/20 overflow-hidden bg-surface-container-highest group-hover:rotate-6 transition-transform">
-                                                        <img 
-                                                            src={`https://ui-avatars.com/api/?name=${encodeURIComponent(rec.timetableId?.teacher?.name || 'T')}&background=060e20&color=62fae3`} 
-                                                            alt="Teacher"
-                                                            className="w-full h-full object-cover"
-                                                        />
-                                                    </div>
-                                                    <div>
-                                                        <div className="text-[10px] text-on-surface-variant/40 font-black uppercase tracking-widest leading-none mb-1">Archived by</div>
-                                                        <div className="text-[12px] text-on-surface font-bold">
-                                                            {rec.timetableId?.teacher?.name || 'Academic Observer'}
-                                                        </div>
-                                                    </div>
+                                        {/* Footer: teacher + AI summary */}
+                                        <div className="mt-auto pt-4 border-t border-outline-variant/10 flex items-center justify-between">
+                                            <div className="flex items-center gap-2.5 min-w-0">
+                                                <img 
+                                                    src={`https://ui-avatars.com/api/?name=${encodeURIComponent(teacher)}&background=060e20&color=62fae3&size=64`} 
+                                                    alt={teacher}
+                                                    className="w-7 h-7 rounded-full border border-outline-variant/20 shrink-0"
+                                                />
+                                                <div className="min-w-0">
+                                                    <div className="text-[10px] text-on-surface-variant/35 font-semibold uppercase tracking-wider leading-none mb-0.5">Teacher</div>
+                                                    <div className="text-xs font-semibold text-on-surface truncate">{teacher}</div>
                                                 </div>
-
-                                                <button 
-                                                    onClick={(e) => {
-                                                        e.stopPropagation();
-                                                        setSelectedLiveClassId(rec._id);
-                                                        setShowSummaryModal(true);
-                                                    }}
-                                                    className="w-10 h-10 rounded-xl bg-surface-container-high hover:bg-primary hover:text-on-primary text-on-surface-variant border border-outline-variant/10 flex items-center justify-center transition-all group/btn"
-                                                    title="View AI Summary"
-                                                >
-                                                    <Sparkles size={18} className="group-hover/btn:scale-110 group-hover/btn:rotate-12 transition-all" />
-                                                </button>
                                             </div>
+
+                                            <button 
+                                                onClick={(e) => {
+                                                    e.stopPropagation();
+                                                    setSelectedLiveClassId(rec._id);
+                                                    setShowSummaryModal(true);
+                                                }}
+                                                className="shrink-0 flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-surface-container-high hover:bg-primary hover:text-on-primary text-on-surface-variant border border-outline-variant/10 hover:border-transparent text-[11px] font-semibold transition-all duration-200"
+                                                title="View AI Summary"
+                                            >
+                                                <Sparkles size={12} />
+                                                AI Notes
+                                            </button>
                                         </div>
                                     </div>
                                 </div>
@@ -352,87 +397,104 @@ export default function VODLibrary() {
                 )}
             </div>
 
-            {/* Video Player Modal */}
+            {/* ── Video Player Modal ───────────────────────────────────── */}
             {selectedVideoId && (
-                <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 md:p-12 bg-black/95 backdrop-blur-3xl animate-fade-in">
-                    {/* Floating Background Orbs */}
-                    <div className="absolute top-1/4 left-1/4 w-[500px] h-[500px] bg-primary/20 rounded-full blur-[150px] animate-pulse"></div>
-                    <div className="absolute bottom-1/4 right-1/4 w-[400px] h-[400px] bg-secondary/10 rounded-full blur-[120px] animate-pulse" style={{ animationDelay: '2s' }}></div>
+                <div className="fixed inset-0 left-[var(--sidebar-offset,0px)] z-[100] flex flex-col bg-black/97 backdrop-blur-2xl animate-fade-in">
+                    {/* Top bar */}
+                    <div className="flex items-center justify-between px-6 md:px-10 py-4 border-b border-white/8 bg-white/3 shrink-0">
+                        <div className="flex items-center gap-4 min-w-0">
+                            <button
+                                onClick={closeVideo}
+                                className="flex items-center gap-2 text-white/60 hover:text-white text-sm font-semibold transition-colors"
+                            >
+                                <ArrowLeft size={16} />
+                                <span className="hidden sm:inline">Back to Library</span>
+                            </button>
+                            <div className="w-px h-5 bg-white/10 hidden sm:block" />
+                            <div className="flex items-center gap-2 min-w-0">
+                                <span className="px-2 py-0.5 rounded bg-primary/20 text-primary text-[10px] font-bold uppercase tracking-wide border border-primary/20 shrink-0">
+                                    {selectedRec?.timetableId?.subject || selectedRec?.subject || 'Recording'}
+                                </span>
+                                <h2 className="text-white font-bold text-sm truncate hidden md:block">
+                                    {selectedRec?.title || 'Video Recording'}
+                                </h2>
+                            </div>
+                        </div>
 
-                    {/* Navigation Buttons */}
-                    <button 
-                        onClick={() => setSelectedVideoId(null)}
-                        className="absolute top-10 right-10 p-4 rounded-2xl bg-white/5 hover:bg-error hover:text-on-error text-white transition-all duration-500 group z-[110] border border-white/10"
-                    >
-                        <X size={28} className="group-hover:rotate-90 transition-transform" />
-                    </button>
+                        <div className="flex items-center gap-2 shrink-0">
+                            <button 
+                                onClick={() => { setShowSummaryModal(true); }}
+                                className="flex items-center gap-2 px-4 py-2 rounded-xl bg-white/8 hover:bg-primary/20 hover:text-primary text-white/70 border border-white/10 hover:border-primary/30 text-xs font-semibold transition-all duration-200"
+                            >
+                                <Sparkles size={14} />
+                                <span className="hidden sm:inline">AI Summary</span>
+                            </button>
+                            <button 
+                                onClick={closeVideo}
+                                className="p-2 rounded-xl bg-white/8 hover:bg-white/15 text-white/70 hover:text-white border border-white/10 transition-all"
+                                aria-label="Close"
+                            >
+                                <X size={18} />
+                            </button>
+                        </div>
+                    </div>
 
-                    <div className="w-full max-w-[1400px] flex flex-col gap-10 relative z-[105]">
-                        <div className="w-full aspect-video bg-black rounded-[3rem] overflow-hidden shadow-[0_40px_100px_rgba(0,0,0,0.8)] border border-white/10 ring-1 ring-white/5">
+                    {/* Player */}
+                    <div className="flex-1 flex items-center justify-center p-4 md:p-8 min-h-0">
+                        <div className="w-full max-w-[1200px] aspect-video rounded-2xl overflow-hidden shadow-2xl border border-white/8">
                             <CustomYouTubePlayer 
                                 videoId={selectedVideoId} 
                                 liveClassId={selectedLiveClassId} 
                                 autoplay={true} 
                             />
                         </div>
-                        
-                        <div className="flex flex-col md:flex-row items-start md:items-end justify-between gap-8 px-6 animate-fade-in-up">
-                            <div className="max-w-3xl">
-                                <div className="flex items-center gap-3 mb-4">
-                                    <div className="px-3 py-1 rounded-full bg-primary/20 text-primary border border-primary/20 text-[10px] font-black uppercase tracking-[0.2em]">
-                                        Observing Playback Node
-                                    </div>
-                                    <span className="text-white/40 text-xs font-bold uppercase tracking-widest">
-                                        ID: {selectedLiveClassId?.slice(-8)}
-                                    </span>
-                                </div>
-                                <h2 className="text-4xl md:text-5xl font-black text-white font-headline tracking-tighter uppercase leading-tight">
-                                    {recordings.find(r => r._id === selectedLiveClassId)?.title || 'Video Recording'}
-                                </h2>
-                            </div>
-                            
-                            <div className="flex items-center gap-4 p-4 rounded-3xl bg-white/5 border border-white/10 backdrop-blur-xl">
-                                <div className="w-12 h-12 rounded-2xl bg-primary/20 flex items-center justify-center text-primary border border-primary/20">
-                                    <Sparkles size={24} />
-                                </div>
-                                <div>
-                                    <div className="text-[10px] text-white/40 font-black uppercase tracking-widest mb-1">Context Summary</div>
-                                    <button 
-                                        onClick={() => setShowSummaryModal(true)}
-                                        className="text-white hover:text-primary font-bold transition-colors uppercase tracking-widest text-xs flex items-center gap-2"
-                                    >
-                                        OPEN AI ANALYSIS
-                                        <ChevronRight size={14} />
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
+                    </div>
+
+                    {/* Bottom info bar */}
+                    <div className="shrink-0 px-6 md:px-10 py-4 border-t border-white/8 bg-white/3">
+                        <h2 className="text-white font-bold text-base md:text-xl leading-tight line-clamp-1">
+                            {selectedRec?.title || 'Video Recording'}
+                        </h2>
+                        {selectedRec?.timetableId?.teacher?.name && (
+                            <p className="text-white/40 text-xs mt-1">
+                                {selectedRec.timetableId.teacher.name} · {formatDate(selectedRec.actualEndTime || selectedRec.createdAt)}
+                            </p>
+                        )}
                     </div>
                 </div>
             )}
 
-            {/* AI Summary Modal */}
+            {/* ── AI Summary Modal ─────────────────────────────────────── */}
             {showSummaryModal && (
-                <div className="fixed inset-0 z-[120] flex items-center justify-center p-4 md:p-12 bg-black/80 backdrop-blur-2xl animate-fade-in">
-                    <div className="w-full max-w-5xl bg-surface rounded-[3rem] border border-outline-variant/10 shadow-3xl overflow-hidden relative max-h-[90vh] flex flex-col">
-                        <div className="p-8 border-b border-outline-variant/10 flex items-center justify-between bg-surface-container-high">
-                            <div className="flex items-center gap-4">
-                                <div className="w-12 h-12 rounded-2xl bg-primary/10 flex items-center justify-center text-primary border border-primary/10">
-                                    <Sparkles size={24} />
+                <div
+                    className="fixed inset-0 left-[var(--sidebar-offset,0px)] z-[120] flex items-end sm:items-center justify-center p-0 sm:p-6 bg-black/70 backdrop-blur-xl animate-fade-in"
+                    onClick={(e) => { if (e.target === e.currentTarget) setShowSummaryModal(false); }}
+                >
+                    <div className="w-full sm:max-w-3xl max-h-[90vh] bg-surface rounded-t-3xl sm:rounded-3xl border border-outline-variant/10 shadow-2xl overflow-hidden flex flex-col">
+                        {/* Modal header */}
+                        <div className="flex items-center justify-between px-6 py-4 border-b border-outline-variant/10 bg-surface-container shrink-0">
+                            <div className="flex items-center gap-3">
+                                <div className="w-9 h-9 rounded-xl bg-primary/10 border border-primary/15 flex items-center justify-center text-primary shrink-0">
+                                    <Sparkles size={18} />
                                 </div>
                                 <div>
-                                    <h3 className="text-xl font-black text-on-surface font-headline uppercase tracking-tight">AI Insights Summary</h3>
-                                    <p className="text-[10px] text-primary font-black uppercase tracking-[0.3em]">Session Node Analysis</p>
+                                    <h3 className="text-base font-bold text-on-surface leading-tight">AI Session Summary</h3>
+                                    <p className="text-[11px] text-on-surface-variant/50 font-medium">
+                                        {selectedRec?.title || 'Recording analysis'}
+                                    </p>
                                 </div>
                             </div>
                             <button 
                                 onClick={() => setShowSummaryModal(false)}
-                                className="p-3 rounded-2xl hover:bg-error hover:text-on-error text-on-surface-variant transition-all transition-duration-500"
+                                className="p-2 rounded-xl hover:bg-surface-container-highest text-on-surface-variant hover:text-on-surface transition-all"
+                                aria-label="Close summary"
                             >
-                                <X size={24} />
+                                <X size={18} />
                             </button>
                         </div>
-                        <div className="flex-1 overflow-y-auto p-12 custom-scrollbar">
+
+                        {/* Scrollable body */}
+                        <div className="flex-1 overflow-y-auto p-6 custom-scrollbar">
                             <ClassSummary liveClassId={selectedLiveClassId} />
                         </div>
                     </div>
@@ -441,10 +503,3 @@ export default function VODLibrary() {
         </div>
     );
 }
-
-// Utility animation classes in App.css should be:
-/*
-.animate-pulse-slow { animation: pulse 8s cubic-bezier(0.4, 0, 0.6, 1) infinite; }
-.animate-pulse-slow-reverse { animation: pulse 12s cubic-bezier(0.4, 0, 0.6, 1) infinite; }
-.text-gradient-primary { background: linear-gradient(135deg, #62fae3 0%, #3b82f6 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-*/

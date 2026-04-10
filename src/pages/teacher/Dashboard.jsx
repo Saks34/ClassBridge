@@ -68,7 +68,7 @@ export default function TeacherDashboard() {
       {/* Page Header */}
       <header className="mb-8 flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
         <div>
-          <h1 className="text-4xl md:text-6xl font-extrabold font-headline text-on-surface tracking-tight leading-none mb-4">
+          <h1 className="text-3xl md:text-5xl lg:text-6xl font-extrabold font-headline text-on-surface tracking-tight leading-none mb-4">
              Teacher <span className="text-gradient-primary">Dashboard</span>
           </h1>
           <p className="text-on-surface-variant text-base md:text-lg font-body max-w-2xl leading-relaxed">
@@ -76,15 +76,6 @@ export default function TeacherDashboard() {
           </p>
         </div>
         <div className="flex flex-wrap gap-3 items-center justify-start md:justify-end">
-          <span className="px-3 py-1 rounded-full border border-outline-variant/30 text-xs font-label uppercase tracking-widest bg-surface-container-low text-on-surface-variant">
-            Role: <span className="font-bold text-on-surface ml-1">Teacher</span>
-          </span>
-          <Link
-            to="/home"
-            className="text-xs font-label uppercase tracking-widest px-4 py-2 rounded-full border border-outline-variant/30 text-on-surface-variant hover:text-primary hover:border-primary transition-colors bg-transparent"
-          >
-            Home
-          </Link>
         </div>
       </header>
 
