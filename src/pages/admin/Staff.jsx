@@ -4,7 +4,6 @@ import api from '../../services/api';
 import Table from '../../components/shared/Table';
 import Modal from '../../components/shared/Modal';
 import LoadingSpinner from '../../components/shared/LoadingSpinner';
-import { useTheme } from '../../context/ThemeContext';
 import { Eye, Trash2, UserPlus, Users, GraduationCap, Mail, Shield, BookOpen, Hash, Zap, Activity, Globe } from 'lucide-react';
 import { confirmToast } from '../../utils/confirmToast';
 import usePageTitle from '../../hooks/usePageTitle';
@@ -13,7 +12,6 @@ import { Upload } from 'lucide-react';
 
 export default function Staff() {
     usePageTitle('User Directory', 'Admin');
-    const { toggleTheme } = useTheme();
     const [activeTab, setActiveTab] = useState('teachers');
     const [teachers, setTeachers] = useState([]);
     const [students, setStudents] = useState([]);

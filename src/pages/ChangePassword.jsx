@@ -4,7 +4,8 @@ import toast from 'react-hot-toast';
 import api from '../services/api';
 import { useAuth } from '../context/AuthContext';
 import { useTheme } from '../context/ThemeContext';
-import { Sun, Moon, Lock, ArrowRight, ShieldCheck, Eye, EyeOff } from 'lucide-react';
+import { Lock, ArrowRight, ShieldCheck, Eye, EyeOff } from 'lucide-react';
+import ThemeToggle from '../components/shared/ThemeToggle';
 
 export default function ChangePassword() {
     const [newPassword, setNewPassword] = useState('');
@@ -71,17 +72,7 @@ export default function ChangePassword() {
             {/* Theme Toggle Overlay */}
             <div className="fixed top-0 left-0 w-full h-full bg-[radial-gradient(circle_at_50%_50%,rgba(var(--primary-rgb),0.05),transparent_70%)] pointer-events-none"></div>
 
-            <button
-                onClick={toggleTheme}
-                className="fixed top-6 right-6 p-3 rounded-full shadow-lg hover:shadow-primary/20 transition-all duration-300 group bg-surface-container-high border border-outline-variant/10"
-                aria-label="Toggle theme"
-            >
-                {isDark ? (
-                    <Sun className="w-5 h-5 text-primary group-hover:rotate-12 transition-transform" />
-                ) : (
-                    <Moon className="w-5 h-5 text-secondary group-hover:rotate-12 transition-transform" />
-                )}
-            </button>
+            <ThemeToggle className="fixed top-6 right-6 z-50" />
 
             <div className="w-full max-w-md">
                 {/* Logo & Header */}

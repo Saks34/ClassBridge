@@ -8,8 +8,6 @@ import {
     Key, 
     Palette, 
     Bell, 
-    Moon,
-    Sun,
     ArrowRight,
     CheckCircle2,
     Lock
@@ -17,6 +15,7 @@ import {
 import { useNavigate } from 'react-router-dom';
 import toast from 'react-hot-toast';
 import usePageTitle from '../../hooks/usePageTitle';
+import ThemeToggle from '../../components/shared/ThemeToggle';
 
 export default function Settings() {
     usePageTitle('Terminal Configuration', 'Settings');
@@ -166,26 +165,15 @@ export default function Settings() {
                             <div className="space-y-12 animate-fade-in">
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                                     <div className="space-y-6">
-                                        <h4 className="font-headline font-bold text-on-surface mb-4">Luminance Balance</h4>
-                                        <div className="flex gap-4">
-                                            <button 
-                                                onClick={() => !isDark && toggleTheme()}
-                                                className={`flex-1 p-6 rounded-3xl border transition-all flex flex-col items-center gap-4 ${isDark ? 'bg-primary text-on-primary border-primary shadow-lg shadow-primary/20' : 'bg-surface-container-high border-outline-variant/10 text-on-surface-variant'}`}
-                                            >
-                                                <div className={`w-12 h-12 rounded-2xl flex items-center justify-center ${isDark ? 'bg-white/10 border-white/20' : 'bg-black/5 border-black/10'}`}>
-                                                     <Moon className={isDark ? 'text-on-primary' : 'text-on-surface-variant/40'} fill={isDark ? 'currentColor' : 'none'} size={24} />
+                                        <h4 className="font-headline font-bold text-on-surface mb-6">Luminance Balance</h4>
+                                        <div className="flex flex-col items-start gap-4 p-6 rounded-3xl bg-surface-container-high/50 border border-outline-variant/10">
+                                            <div className="flex items-center justify-between w-full">
+                                                <div>
+                                                    <p className="font-label text-[10px] font-black uppercase tracking-widest text-on-surface">Toggle Interface Spectrum</p>
+                                                    <p className="text-xs text-on-surface-variant/60 font-body mt-1">Switch between Daylight and Deep Space modes</p>
                                                 </div>
-                                                <span className="font-label text-[10px] font-black uppercase tracking-widest">Dark Mode</span>
-                                            </button>
-                                            <button 
-                                                onClick={() => isDark && toggleTheme()}
-                                                className={`flex-1 p-6 rounded-3xl border transition-all flex flex-col items-center gap-4 ${!isDark ? 'bg-primary text-on-primary border-primary shadow-lg shadow-primary/20' : 'bg-surface-container-high border-outline-variant/10 text-on-surface-variant'}`}
-                                            >
-                                                <div className={`w-12 h-12 rounded-2xl flex items-center justify-center ${!isDark ? 'bg-white/10 border-white/20' : 'bg-black/5 border-black/10'}`}>
-                                                     <Sun className={!isDark ? 'text-on-primary' : 'text-on-surface-variant/40'} size={24} />
-                                                </div>
-                                                <span className="font-label text-[10px] font-black uppercase tracking-widest">Daylight (Light)</span>
-                                            </button>
+                                                <ThemeToggle />
+                                            </div>
                                         </div>
                                     </div>
 

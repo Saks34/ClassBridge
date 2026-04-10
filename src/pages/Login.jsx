@@ -7,6 +7,7 @@ import { useTheme } from '../context/ThemeContext';
 import { Info, ArrowRight } from 'lucide-react';
 import logo from '../assets/logo.png';
 import icon from '../assets/icon.png';
+import ThemeToggle from '../components/shared/ThemeToggle';
 
 export default function Login() {
   const navigate = useNavigate();
@@ -82,20 +83,23 @@ export default function Login() {
           <Link to="/" className="flex items-center gap-2">
             <img src={logo} alt="ClassBridge" className=" object-contain dark:brightness-0 dark:invert transition-all" style={{width: '150px', height: '100px'}}/>
           </Link>
-          <div className="hidden md:flex items-center gap-8">
-            <Link className="text-on-surface-variant hover:text-primary transition-colors" to="/">Home</Link>
-            <button 
-              onClick={handleSupportClick}
-              className="text-on-surface-variant hover:text-primary transition-colors"
-            >
-              Support
-            </button>
-            <Link 
-              to="/institution/signup"
-              className="border border-outline-variant/40 text-on-surface px-6 py-2 rounded-full font-bold scale-95 active:scale-90 duration-200 transition-all hover:border-primary hover:text-primary bg-transparent"
-            >
-              Register
-            </Link>
+          <div className="flex items-center gap-4">
+            <div className="hidden md:flex items-center gap-8">
+              <Link className="text-on-surface-variant hover:text-primary transition-colors" to="/">Home</Link>
+              <button 
+                onClick={handleSupportClick}
+                className="text-on-surface-variant hover:text-primary transition-colors"
+              >
+                Support
+              </button>
+              <Link 
+                to="/institution/signup"
+                className="border border-outline-variant/40 text-on-surface px-6 py-2 rounded-full font-bold scale-95 active:scale-90 duration-200 transition-all hover:border-primary hover:text-primary bg-transparent"
+              >
+                Register
+              </Link>
+            </div>
+            <ThemeToggle />
           </div>
         </div>
       </nav>
@@ -111,13 +115,13 @@ export default function Login() {
             />
             <div className="absolute inset-0 bg-gradient-to-r from-transparent to-surface text-left"></div>
           </div>
-          <div className="relative z-10 p-12 max-w-xl text-left">
+          <div className="relative z-10 p-12 max-w-xl text-left bg-black/40 backdrop-blur-sm rounded-3xl m-6">
             <div className="mb-2 text-primary font-black tracking-[0.3em] uppercase text-xs">Login Portal</div>
             <h1 className="text-5xl font-black font-headline text-white mb-6 leading-none tracking-tighter">
               Welcome <br />
               <span className="text-primary">Back</span>
             </h1>
-            <p className="text-white/60 font-body text-lg leading-relaxed">
+            <p className="text-white/80 font-body text-lg leading-relaxed">
               Log in to access your classes, study materials, and connect with your teachers.
             </p>
           </div>
@@ -152,6 +156,7 @@ export default function Login() {
                     placeholder="name@email.com"
                     required
                     type="email"
+                    style={"border-radius:10px; padding-inline:10px"}
                   />
                   <span className="material-symbols-outlined absolute right-0 top-1/2 -translate-y-1/2 text-outline-variant/30 group-focus-within:text-primary transition-all text-lg">alternate_email</span>
                 </div>
@@ -170,6 +175,7 @@ export default function Login() {
                     placeholder="••••••••••••"
                     required
                     type={showPassword ? 'text' : 'password'}
+                     style={"border-radius:10px; padding-inline:10px"}
                   />
                   <button
                     type="button"

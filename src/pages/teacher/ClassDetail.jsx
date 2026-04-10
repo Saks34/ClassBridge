@@ -37,10 +37,9 @@ import {
     Edit3,
     Link,
     Save,
-    Sparkles,
-    Sun,
-    Moon
+    Sparkles
 } from 'lucide-react';
+import ThemeToggle from '../../components/shared/ThemeToggle';
 import toast from 'react-hot-toast';
 import { confirmToast } from '../../utils/confirmToast';
 import api, { API_BASE } from '../../services/api';
@@ -367,47 +366,6 @@ export default function TeacherClassControl() {
             )}
 
             {/* Top Bar */}
-            <div className="border-b border-outline-variant/10 sticky top-0 z-50 bg-surface-container">
-                <div className="max-w-[1920px] mx-auto px-6 py-3">
-                    <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-4">
-                            <button onClick={() => navigate('/teacher/dashboard')} className="p-1.5 rounded-full hover:bg-surface-container-high text-on-surface transition">
-                                <ArrowLeft className="w-5 h-5" />
-                            </button>
-                            <h1 className="text-xl font-medium text-on-surface">
-                                {classData.title || classData.subject}
-                            </h1>
-
-                            {classData.status !== 'Completed' && (
-                                <ClassTimer 
-                                    startTime={classData.startTime} 
-                                    endTime={classData.endTime} 
-                                    status={classData.status} 
-                                />
-                            )}
-                            <div className={`flex items-center gap-2 px-3 py-1 rounded-sm text-white text-sm font-medium ${statusConfig.badge}`}>
-                                {statusConfig.pulse && <span className="w-2 h-2 bg-white rounded-full animate-pulse"></span>}
-                                {statusConfig.text}
-                            </div>
-                        </div>
-
-                        <div className="flex items-center gap-3">
-                            <div className="hidden md:flex items-center gap-2 mr-2">
-                                <span className="text-sm text-on-surface-variant/70">
-                                    {classData.batch?.name || classData.batchName}
-                                </span>
-                            </div>
-                             <button
-                                onClick={toggleTheme}
-                                className="w-10 h-10 flex items-center justify-center rounded-xl bg-surface-container-high text-on-surface-variant hover:text-primary transition-all active:scale-95 group relative"
-                            >
-                                {isDark ? <Sun className="w-4 h-4 group-hover:rotate-45 transition-transform" /> : <Moon className="w-4 h-4 group-hover:-rotate-12 transition-transform" />}
-                            </button>
-                            <button
-                                onClick={() => setSettingsOpen(true)}
-                                className="px-4 py-2 rounded-lg text-sm font-medium transition text-primary hover:bg-primary/10">
-                                <Settings className="w-4 h-4 inline mr-2" />
-                                Settings
                             </button>
 
                             {/* Button Flow Logic */}

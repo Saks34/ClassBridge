@@ -1,10 +1,10 @@
 import { Link } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
-import { Sun, Moon } from 'lucide-react';
 import { useTheme } from '../context/ThemeContext';
 import logo from '../assets/logo.png';
 import icon from '../assets/icon.png';
+import ThemeToggle from '../components/shared/ThemeToggle';
 
 
 export default function LandingPage() {
@@ -66,14 +66,7 @@ export default function LandingPage() {
                         ))}
                     </div>
                     <div className="flex items-center gap-4">
-                        <button
-                            type="button"
-                            onClick={toggleTheme}
-                            className="hidden md:inline-flex w-9 h-9 items-center justify-center rounded-full bg-surface-container-high text-on-surface-variant hover:text-primary hover:bg-surface-container transition-all active:scale-95"
-                            aria-label={isDark ? 'Switch to light mode' : 'Switch to dark mode'}
-                        >
-                            {isDark ? <Sun size={16} /> : <Moon size={16} />}
-                        </button>
+                        <ThemeToggle />
                         <Link 
                             to="/login"
                             className="border border-outline-variant/40 text-on-surface px-6 py-2 rounded-full font-headline font-bold text-sm hover:border-primary hover:text-primary transition-all active:scale-95 bg-transparent"

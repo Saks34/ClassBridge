@@ -6,6 +6,7 @@ import { useTheme } from '../context/ThemeContext';
 import { Info, ArrowRight, Building2, User, School, BookOpen, Briefcase, Eye, EyeOff, CheckCircle2 } from 'lucide-react';
 import logo from '../assets/logo.png';
 import icon from '../assets/icon.png';
+import ThemeToggle from '../components/shared/ThemeToggle';
 
 export default function InstitutionSignup() {
   const navigate = useNavigate();
@@ -65,9 +66,12 @@ export default function InstitutionSignup() {
           <Link to="/" className="flex items-center gap-2">
             <img src={logo} alt="ClassBridge" className=" object-contain dark:brightness-0 dark:invert transition-all" style={{width: '150px', height: '100px'}}/>
           </Link>
-          <div className="hidden md:flex items-center gap-8">
-            <Link className="text-on-surface-variant hover:text-primary transition-colors" to="/">Return to Base</Link>
-            <Link to="/login" className="text-on-surface-variant hover:text-primary transition-colors">Existing Node?</Link>
+          <div className="flex items-center gap-4">
+            <div className="hidden md:flex items-center gap-8">
+              <Link className="text-on-surface-variant hover:text-primary transition-colors" to="/">Return to Base</Link>
+              <Link to="/login" className="text-on-surface-variant hover:text-primary transition-colors">Existing Node?</Link>
+            </div>
+            <ThemeToggle />
           </div>
         </div>
       </nav>

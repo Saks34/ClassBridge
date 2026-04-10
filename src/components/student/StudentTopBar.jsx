@@ -1,7 +1,8 @@
 import { useAuth } from '../../context/AuthContext';
 import { useTheme } from '../../context/ThemeContext';
-import { Sun, Moon, LogOut, Bell, Search, Rocket } from 'lucide-react';
+import { LogOut, Bell, Search, Rocket } from 'lucide-react';
 import NotificationDropdown from '../shared/NotificationDropdown';
+import ThemeToggle from '../shared/ThemeToggle';
 
 export default function StudentTopBar() {
     const { user } = useAuth();
@@ -33,13 +34,7 @@ export default function StudentTopBar() {
 
             <div className="flex items-center gap-4 md:gap-6">
                 <div className="flex items-center gap-2 md:gap-4 border-r border-outline-variant/10 pr-4 md:pr-6">
-                    <button
-                        onClick={toggleTheme}
-                        className="w-10 h-10 flex items-center justify-center rounded-xl bg-surface-container-high text-on-surface-variant hover:text-secondary transition-all active:scale-95 group relative"
-                    >
-                        {isDark ? <Sun size={18} className="group-hover:rotate-45 transition-transform" /> : <Moon size={18} className="group-hover:-rotate-12 transition-transform" />}
-                        <span className="absolute -bottom-10 right-0 p-2 bg-inverse-surface text-inverse-on-surface border border-outline-variant/20 rounded text-[8px] font-label uppercase tracking-widest opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none">Spectral Mode</span>
-                    </button>
+                    <ThemeToggle />
                     <NotificationDropdown />
                     
                 </div>

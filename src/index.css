@@ -395,4 +395,21 @@
   transform-origin: center center;
   border: 0;
   filter: saturate(1.04) contrast(1.03);
+/* Theme Toggle Animations */
+@keyframes cb-float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-2px); }
 }
+
+@keyframes cb-spin-slow {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+.animate-cb-float {
+  animation: cb-float 3s ease-in-out infinite;
+}
+
+.animate-cb-spin-slow {
+  animation: cb-spin-slow 8s linear infinite;
+}

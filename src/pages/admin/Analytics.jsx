@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react';
 import api from '../../services/api';
 import AnalyticsCard from '../../components/teacher/AnalyticsCard';
-import { useTheme } from '../../context/ThemeContext';
 import LoadingSpinner from '../../components/shared/LoadingSpinner';
 import EmptyState from '../../components/shared/EmptyState';
 import { BarChart3, Users, Video, BookCheck, MessageSquare, Eye, AlertCircle, Zap, Shield, Globe, Activity, TrendingUp } from 'lucide-react';
@@ -9,7 +8,6 @@ import usePageTitle from '../../hooks/usePageTitle';
 
 export default function AdminAnalytics() {
     usePageTitle('Analytics', 'Admin');
-    const { toggleTheme } = useTheme();
     const [stats, setStats] = useState(null);
     const [loading, setLoading] = useState(true);
 

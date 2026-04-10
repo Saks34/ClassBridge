@@ -1,6 +1,7 @@
 import { useNavigate } from 'react-router-dom';
 import { Home, ArrowLeft } from 'lucide-react';
 import usePageTitle from '../../hooks/usePageTitle';
+import ThemeToggle from '../../components/shared/ThemeToggle';
 
 export default function NotFound() {
     usePageTitle('Page Not Found');
@@ -8,6 +9,7 @@ export default function NotFound() {
 
     return (
         <div className="min-h-screen bg-background flex flex-col items-center justify-center p-6 relative overflow-hidden">
+            <ThemeToggle className="fixed top-6 right-6 z-50" />
             {/* Background Effects */}
             <div className="absolute inset-0 pointer-events-none">
                 <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-primary/5 rounded-full blur-[100px] animate-pulse"></div>

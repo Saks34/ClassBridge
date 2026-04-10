@@ -24,10 +24,9 @@ import {
     HelpCircle,
     Users,
     Hand,
-    Edit3,
-    Sun,
-    Moon
+    Edit3
 } from 'lucide-react';
+import ThemeToggle from '../../components/shared/ThemeToggle';
 import toast from 'react-hot-toast';
 
 export default function StudentClassDetail() {
@@ -314,12 +313,7 @@ export default function StudentClassDetail() {
                                     />
                                     
                                     <div className="flex items-center gap-2 md:ml-auto">
-                                        <button 
-                                            onClick={toggleTheme}
-                                            className="w-10 h-10 flex items-center justify-center rounded-xl bg-surface-container-high text-on-surface-variant hover:text-primary transition-all active:scale-95 border border-outline-variant/10 shadow-sm"
-                                        >
-                                            {isDark ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
-                                        </button>
+                                        <ThemeToggle />
                                     </div>
                                 </div>
                             </div>
