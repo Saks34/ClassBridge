@@ -141,7 +141,7 @@ export default function TeacherClassControl() {
 
         socket.on('handraise:new', (entry) => {
             setHandRaises(prev => [...prev, entry]);
-            toast(`${entry.name} raised their hand!`, { icon: '✋' });
+            toast(`${entry.name} raised their hand!`, { icon: 'âœ‹' });
         });
 
         socket.on('handraise:cleared', () => {
@@ -366,6 +366,38 @@ export default function TeacherClassControl() {
             )}
 
             {/* Top Bar */}
+            <div className="sticky top-0 z-30 bg-surface/80 backdrop-blur-xl border-b border-outline-variant/10">
+                <div className="max-w-[1920px] mx-auto px-4 lg:px-6 py-4">
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                        <div className="flex items-center gap-4">
+                            <button
+                                onClick={() => navigate('/teacher/dashboard')}
+                                className="p-2.5 rounded-xl border border-outline-variant/10 hover:bg-surface-container transition text-on-surface-variant hover:text-primary active:scale-95"
+                            >
+                                <ArrowLeft className="w-5 h-5" />
+                            </button>
+                            <div>
+                                <h1 className="text-xl font-bold text-on-surface font-headline leading-none mb-1.5 flex items-center gap-3">
+                                    {classData.subject}
+                                    <span className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-bold ${statusConfig.badge}`}>
+                                        <StatusIcon className={`w-3 h-3 ${statusConfig.pulse ? 'animate-pulse' : ''}`} />
+                                        {statusConfig.text}
+                                    </span>
+                                </h1>
+                                <p className="text-xs text-on-surface-variant font-label tracking-widest uppercase opacity-60">
+                                    {classData.title || 'Live Controller'}
+                                </p>
+                            </div>
+                        </div>
+
+                        <div className="flex items-center gap-3 flex-wrap">
+                            <ThemeToggle />
+                            <button
+                                onClick={() => setSettingsOpen(true)}
+                                className="p-2.5 rounded-xl border border-outline-variant/10 hover:bg-surface-container transition text-on-surface-variant hover:text-primary active:scale-95"
+                                title="Stream Settings"
+                            >
+                                <Settings className="w-5 h-5" />
                             </button>
 
                             {/* Button Flow Logic */}
@@ -375,8 +407,8 @@ export default function TeacherClassControl() {
                                         <button
                                             onClick={handleCreateStream}
                                             disabled={scheduling}
-                                            className="px-4 py-2 rounded-sm text-sm font-medium bg-primary hover:shadow-primary/20 hover:shadow-md text-on-primary transition flex items-center gap-2 disabled:opacity-50">
-                                            <Plus className="w-3.5 h-3.5" />
+                                            className="px-5 py-2.5 rounded-xl text-sm font-bold bg-primary hover:shadow-primary/20 hover:shadow-lg text-on-primary transition flex items-center gap-2 disabled:opacity-50 active:scale-95">
+                                            <Plus className="w-4 h-4" />
                                             Create Stream
                                         </button>
                                     )}
@@ -385,8 +417,8 @@ export default function TeacherClassControl() {
                                         <button
                                             onClick={handleGoLive}
                                             disabled={isCheckingConfig}
-                                            className="px-4 py-2 rounded-sm text-sm font-medium bg-secondary hover:shadow-secondary/20 hover:shadow-md text-on-secondary transition flex items-center gap-2 disabled:opacity-50">
-                                            <Radio className="w-3.5 h-3.5" />
+                                            className="px-5 py-2.5 rounded-xl text-sm font-bold bg-secondary hover:shadow-secondary/20 hover:shadow-lg text-on-secondary transition flex items-center gap-2 disabled:opacity-50 active:scale-95">
+                                            <Radio className="w-4 h-4" />
                                             {isCheckingConfig ? 'Connecting...' : 'Go Live'}
                                         </button>
                                     )}
@@ -395,8 +427,8 @@ export default function TeacherClassControl() {
                                         <button
                                             onClick={handleEndStream}
                                             disabled={scheduling}
-                                            className="px-4 py-2 rounded-sm text-sm font-medium bg-error hover:shadow-error/20 hover:shadow-md text-on-error transition flex items-center gap-2 disabled:opacity-50">
-                                            <Square className="w-3.5 h-3.5" />
+                                            className="px-5 py-2.5 rounded-xl text-sm font-bold bg-error hover:shadow-error/20 hover:shadow-lg text-on-error transition flex items-center gap-2 disabled:opacity-50 active:scale-95">
+                                            <Square className="w-4 h-4" />
                                             End Stream
                                         </button>
                                     )}
@@ -405,14 +437,14 @@ export default function TeacherClassControl() {
 
                             {isCompleted && (
                                 <div className="flex items-center gap-2">
-                                    <button 
+                                    <button
                                         onClick={scrollToSummary}
-                                        className="px-4 py-2 rounded-sm text-sm font-medium bg-surface-container-highest hover:bg-white/5 text-primary transition flex items-center gap-2 border border-primary/20"
+                                        className="px-5 py-2.5 rounded-xl text-sm font-bold bg-surface-container-highest hover:bg-white/5 text-primary transition flex items-center gap-2 border border-primary/20 active:scale-95"
                                     >
-                                        <Sparkles className="w-3.5 h-3.5" />
+                                        <Sparkles className="w-4 h-4" />
                                         AI Summary
                                     </button>
-                                    <button disabled className="px-4 py-2 rounded-sm text-sm font-medium bg-surface-container-highest text-on-surface-variant cursor-not-allowed">
+                                    <button disabled className="px-5 py-2.5 rounded-xl text-sm font-bold bg-surface-container-highest text-on-surface-variant cursor-not-allowed border border-outline-variant/10">
                                         Stream Ended
                                     </button>
                                 </div>
@@ -469,18 +501,18 @@ export default function TeacherClassControl() {
                                         <span className="text-on-surface-variant/70">
                                             {classData.batch?.name || classData.batchName}
                                         </span>
-                                        <span className="text-on-surface-variant/40">•</span>
+                                        <span className="text-on-surface-variant/40">â€¢</span>
                                         <span className="text-on-surface-variant/70">
                                             {classData.startTime} - {classData.endTime}
                                         </span>
-                                        <span className="text-on-surface-variant/40">•</span>
+                                        <span className="text-on-surface-variant/40">â€¢</span>
                                         <span className="flex items-center gap-1.5 text-on-surface-variant/70">
                                             <Users className="w-4 h-4" />
                                             {viewerCount} students
                                         </span>
                                         {handRaises.length > 0 && (
                                             <>
-                                                <span className="text-on-surface-variant/40">•</span>
+                                                <span className="text-on-surface-variant/40">â€¢</span>
                                                 <div className="flex items-center gap-2">
                                                     <span className="flex items-center gap-1.5 text-orange-500 font-bold animate-pulse">
                                                         <Hand className="w-4 h-4" />
@@ -683,7 +715,7 @@ function StreamSetupTab({ streamKey, ingestionUrl }) {
                 </h4>
                 <ol className="space-y-1 text-sm text-on-surface-variant/80">
                     <li>1. Open OBS Studio</li>
-                    <li>2. Go to Settings → Stream</li>
+                    <li>2. Go to Settings â†’ Stream</li>
                     <li>3. Select "Custom" service</li>
                     <li>4. Paste the URL and Key above</li>
                     <li>5. Click "Start Streaming"</li>

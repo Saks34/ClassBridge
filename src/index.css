@@ -13,6 +13,7 @@
     --surface-bright: #ffffff;
     --surface-dim: #f3f4f9;
     --surface-variant: #e1e2ec;
+    --surface-variant-rgb: 225, 226, 236;
     --surface-container-lowest: #ffffff;
     --surface-container-low: #f8f9ff;
     --surface-container: #eff1f8;
@@ -64,6 +65,7 @@
     --surface-bright: #1f2b49;
     --surface-dim: #060e20;
     --surface-variant: #192540;
+    --surface-variant-rgb: 25, 37, 64;
     --surface-container-lowest: #000000;
     --surface-container-low: #091328;
     --surface-container: #0f1930;
@@ -178,7 +180,7 @@
   .btn-glass {
     @apply px-10 py-4 rounded-[1.5rem] font-headline font-bold transition-all duration-300;
     @apply glass-panel border-outline-variant/20 shadow-xl;
-    @apply hover:bg-surface-variant/40 hover:-translate-y-0.5 hover:scale-[1.02];
+    @apply hover:-translate-y-0.5 hover:scale-[1.02];
     @apply active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed;
   }
 
@@ -189,7 +191,11 @@
   .card-premium {
     @apply glass-panel rounded-[2rem] p-8 transition-all duration-500;
     @apply border-outline-variant/10 shadow-2xl;
-    @apply hover:bg-surface-variant/30 hover:shadow-[0_20px_50px_rgba(0,0,0,0.1)] hover:scale-[1.01];
+    @apply hover:shadow-[0_20px_50px_rgba(0,0,0,0.1)] hover:scale-[1.01];
+  }
+
+  .card-premium:hover {
+    background-color: color-mix(in srgb, var(--surface-variant), transparent 70%);
   }
 
   .input-premium {

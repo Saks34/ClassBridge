@@ -11,7 +11,7 @@ export default {
         "primary": "rgb(var(--primary-rgb) / <alpha-value>)",
         "secondary": "rgb(var(--secondary-rgb) / <alpha-value>)",
         "secondary-fixed": "var(--secondary-dim)",
-        "surface-variant": "var(--surface-variant)",
+        "surface-variant": "rgb(var(--surface-variant-rgb) / <alpha-value>)",
         "surface-dim": "var(--surface-dim)",
         "primary-dim": "var(--primary-dim)",
         "tertiary-dim": "var(--tertiary-dim)",
