@@ -164,12 +164,18 @@
   }
 
   .btn-premium {
-    @apply relative overflow-hidden px-8 py-3 rounded-full font-headline font-bold transition-all bg-gradient-to-br from-primary to-primary-container text-on-primary-container hover:shadow-[0_0_20px_rgba(83,221,252,0.3)] hover:scale-[1.02] active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100;
+    @apply relative overflow-hidden px-10 py-4 rounded-[1.5rem] font-headline font-extrabold transition-all duration-300;
+    @apply bg-gradient-to-br from-primary via-primary-container to-secondary-container;
+    @apply text-on-primary shadow-lg shadow-primary/20;
+    @apply hover:shadow-[0_12px_30px_rgba(var(--primary-rgb),0.3)] hover:-translate-y-0.5 hover:scale-[1.02];
+    @apply active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed;
   }
 
   .btn-glass {
-    @apply px-8 py-3 rounded-full font-headline font-bold transition-all glass-panel;
-    @apply hover:scale-[1.02] active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed;
+    @apply px-10 py-4 rounded-[1.5rem] font-headline font-bold transition-all duration-300;
+    @apply glass-panel border-outline-variant/20 shadow-xl;
+    @apply hover:bg-surface-variant/40 hover:-translate-y-0.5 hover:scale-[1.02];
+    @apply active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed;
   }
 
   .btn-glass:hover {
@@ -177,11 +183,9 @@
   }
 
   .card-premium {
-    @apply glass-panel rounded-xl p-6 transition-all hover:scale-[1.01];
-  }
-
-  .card-premium:hover {
-    background-color: color-mix(in srgb, var(--surface-variant), transparent 50%);
+    @apply glass-panel rounded-[2rem] p-8 transition-all duration-500;
+    @apply border-outline-variant/10 shadow-2xl;
+    @apply hover:bg-surface-variant/30 hover:shadow-[0_20px_50px_rgba(0,0,0,0.1)] hover:scale-[1.01];
   }
 
   .input-premium {
@@ -395,6 +399,8 @@
   transform-origin: center center;
   border: 0;
   filter: saturate(1.04) contrast(1.03);
+}
+
 /* Theme Toggle Animations */
 @keyframes cb-float {
   0%, 100% { transform: translateY(0); }
@@ -412,4 +418,18 @@
 
 .animate-cb-spin-slow {
   animation: cb-spin-slow 8s linear infinite;
+}
+
+/* Premium Utilities */
+.text-glow-primary {
+  text-shadow: 0 0 20px rgba(var(--primary-rgb), 0.4);
+}
+
+.card-blur {
+  backdrop-filter: blur(12px) saturate(180%);
+  -webkit-backdrop-filter: blur(12px) saturate(180%);
+}
+
+.hover-lift {
+  @apply transition-transform duration-300 hover:-translate-y-1 hover:shadow-xl;
 }
