@@ -48,7 +48,9 @@
     --on-surface: #191c1d;
     --on-surface-variant: #41484a;
     --outline: #71787b;
+    --outline-rgb: 113, 120, 123;
     --outline-variant: #c1c8cb;
+    --outline-variant-rgb: 193, 200, 203;
 
     --inverse-surface: #2d3132;
     --inverse-on-surface: #eff1f1;
@@ -97,7 +99,9 @@
     --on-surface: #dee5ff;
     --on-surface-variant: #a3aac4;
     --outline: #6d758c;
+    --outline-rgb: 109, 117, 140;
     --outline-variant: #40485d;
+    --outline-variant-rgb: 64, 72, 93;
 
     --inverse-surface: #faf8ff;
     --inverse-on-surface: #4d556b;
