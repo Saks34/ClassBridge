@@ -41,6 +41,7 @@ const CustomYouTubePlayer = forwardRef(({
         height: '100%',
         width: '100%',
         playerVars: {
+            origin: window.location.origin,
             autoplay: autoplay ? 1 : 0,
             mute: autoplay ? 1 : 0,
             controls: 0,

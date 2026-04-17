@@ -57,6 +57,7 @@ export default function ChatPanel({ liveClassId }) {
 
         const socket = io((import.meta.env.VITE_SOCKET_URL || API_BASE) + '/live-classes', {
             auth: { token },
+            transports: ['websocket']
         });
         socketRef.current = socket;
 
